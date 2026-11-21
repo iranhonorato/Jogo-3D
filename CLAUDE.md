@@ -24,6 +24,7 @@ As rubricas premiam acabamento, não quantidade de mecânicas: uma fase polida v
 ## Estado atual
 
 - **Pronto:** Unity 6000.3.28f1 com URP; pacotes (Input System, Cinemachine 3, AI Navigation, uGUI/TMP, Test Framework); pastas de `Assets/_Project/`; assemblies `Guaxinim.Runtime`, `Guaxinim.EditorTools` e `Guaxinim.Tests.EditMode`; layers 6 a 11 (`Player`, `Guard`, `Obstacle`, `ShelfTop`, `NarrowGap`, `Interactable`); `.gitignore` e `.gitattributes`.
+- **Adiantado a pedido do usuário (parte do passo 3.10):** modelos estáticos do guaxinim, do segurança e do Seu Zé em `Art/Models/Characters/`, gerados pelos scripts de `Tools/Blender/` e validados na Unity (escala, frente em +Z, textura ligada). Faltam rig, animações e o kit modular.
 - **Ainda não existe:** nenhum script de gameplay. A única cena é `Scenes/Sandbox/SampleScene`. As Input Actions são o template padrão da Unity.
 - **Próximo passo: 0.1.**
 
@@ -102,6 +103,7 @@ Se uma skill e o GDD divergirem, o GDD manda no design e as skills mandam na for
 - O Unity gera os `.meta` ao importar. Faça commit do `.meta` junto com o arquivo e nunca apague nem recrie o `.meta` de um asset existente: as referências são por GUID.
 - O `.inputactions` é JSON e pode ser editado direto.
 - O Editor sobrescreve `ProjectSettings/*.asset` se estiver aberto. Peça ao usuário para mudar no Editor, ou edite com o Editor fechado.
+- **Modelos do Blender:** frente em −Y no Blender, que vira +Z na Unity (verificado). O FBX traz o material `M_<Nome>`, e o `BlenderModelPostprocessor` o liga à textura `Art/Textures/<pasta>/<Nome>_BaseColor.png`. Pontos de encaixe são empties `Socket_<Uso>`. Detalhes em [Tools/Blender/README.md](Tools/Blender/README.md).
 
 ### Configurações que ainda precisam de ajuste
 
@@ -173,7 +175,7 @@ Os marcos seguem o GDD §16, quebrados em passos pequenos. Cada passo termina em
 - [ ] **3.7 SaveSystem.** Um JSON numa chave do `PlayerPrefs`: fases desbloqueadas, estrelas e melhor tempo. Serialização testada. *§12.*
 - [ ] **3.8 Fluxo de cenas.** Boot, MainMenu, CityMap e a tela de início da fase. "Sair" escondido no WebGL. *§13.* *Pronto:* do menu, jogar a fase, vencer, voltar ao mapa e ver a próxima fase desbloqueada, sem fechar o jogo.
 - [ ] **3.9 Fase 3 em greybox.** `Level_03_PaoDeMel`: 2 seguranças, 1 aspirador, 6 cogumelos e itens volumosos. Build. *§11.*
-- [ ] **3.10 Primeiros modelos.** Scripts `bpy` em `Tools/Blender/` para o guaxinim, o segurança e o kit modular, exportando FBX para `Art/Models/`. *§15.4.*
+- [ ] **3.10 Primeiros modelos.** Scripts `bpy` em `Tools/Blender/` para o guaxinim, o segurança e o kit modular, exportando FBX para `Art/Models/`. *§15.4.* Personagens estáticos já feitos (guaxinim, segurança e Seu Zé); faltam rig, animações e o kit modular.
 
 ### Marco 4: arte, áudio e entrega (semana 4)
 

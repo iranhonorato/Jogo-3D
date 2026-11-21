@@ -471,7 +471,7 @@ A história se passa em um supermercado à noite. A iluminação combina sombras
 ### 15.4 Fluxo com o Blender
 
 - Os modelos são criados no Blender por script Python (`bpy`), rodando em background (`blender -b -P script.py`) ou pela integração disponível. Cada script fica salvo em `Tools/Blender/` para poder ser rodado de novo.
-- **Escala real em metros**, pivô na base do objeto e frente para +Y no Blender (vira +Z no Unity ao exportar com "Apply Transform").
+- **Escala real em metros**, pivô na base do objeto e frente para −Y no Blender (vira +Z no Unity; verificado importando um FBX de teste no Unity 6.3).
 - **Exportar FBX** para `Assets/_Project/Art/Models/` com o mesmo nome do prefab (`Item_Watermelon.fbx`, `Shelf_Aisle_2m.fbx`).
 - **Limites de polígonos:** guaxinim até 3 mil triângulos, segurança até 3 mil, itens até 500, peças de cenário até 1.500.
 - **Materiais:** texturas com aparência pintada à mão (cores base com variação de pincel, sombra e luz pintadas de leve), seguindo a seção 15.1. Para manter poucos draw calls no WebGL, agrupe as texturas de cada conjunto (personagens, itens, cenário) em atlas.
