@@ -1,0 +1,84 @@
+# =============================================================================
+# Unity — pastas geradas pelo Editor (são recriadas ao abrir o projeto)
+# Base: https://github.com/github/gitignore/blob/main/Unity.gitignore
+# =============================================================================
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Cenas de recuperação criadas após um crash do Editor
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta
+
+# Plugin gerado automaticamente pelo Rider
+/[Aa]ssets/Plugins/Editor/JetBrains*
+
+# =============================================================================
+# Builds — vão para o itch.io, não para o Git
+# =============================================================================
+/[Bb]uild/
+/[Bb]uilds/
+*.apk
+*.aab
+*.app
+*.unitypackage
+*.unitypackage.meta
+crashlytics-build.properties
+sysinfo.txt
+
+# =============================================================================
+# IDEs e arquivos de solução (o Unity regera .sln/.csproj sozinho)
+# =============================================================================
+.vs/
+.vscode/
+.idea/
+.consulo/
+.gradle/
+ExportedObj/
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# =============================================================================
+# Addressables / StreamingAssets temporários
+# =============================================================================
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# =============================================================================
+# Blender (Tools/Blender) — backups automáticos e cache do Python
+# =============================================================================
+*.blend1
+*.blend2
+*.blend@
+__pycache__/
+*.py[cod]
+
+# =============================================================================
+# Sistema operacional
+# =============================================================================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
