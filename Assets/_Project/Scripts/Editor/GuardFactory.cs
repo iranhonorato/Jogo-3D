@@ -9,26 +9,23 @@ using UnityEngine.Rendering;
 namespace Guaxinim.EditorTools
 {
     /// <summary>
-    /// Gera o prefab do segurança (passos 1.5 e 1.6, GDD §6) em Prefabs/Guards/: NavMeshAgent, collider,
+    /// Gera os prefabs dos seguranças (passos 1.5 a 1.10, GDD §6) em Prefabs/Guards/: NavMeshAgent, collider,
     /// GuardAI, visão (VisionCone e o cone desenhado no chão), a lanterna (luz spot no Socket_Flashlight)
-    /// e o modelo do Blender, na layer Guard. Os waypoints são ligados na cena.
+    /// e o modelo do Blender (segurança comum ou Seu Zé), na layer Guard. Os waypoints são ligados na cena.
     /// </summary>
     public static class GuardFactory
     {
         public const string GuardPrefabPath = "Assets/_Project/Prefabs/Guards/Guard.prefab";
+        public const string SeuZePrefabPath = "Assets/_Project/Prefabs/Guards/SeuZe.prefab";
 
+        private const string GuardModelPath = "Assets/_Project/Art/Models/Characters/Char_Guard.fbx";
+        private const string SeuZeModelPath = "Assets/_Project/Art/Models/Characters/Char_SeuZe.fbx";
         private const string DataPath = "Assets/_Project/Data/Guards/GuardData.asset";
         private const string VisionDataPath = "Assets/_Project/Data/Guards/VisionData_Guard.asset";
-        private const string ConeMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_VisionCone_Guard.mat";
         private const string DetectionDataPath = "Assets/_Project/Data/Guards/DetectionData.asset";
+        private const string ConeMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_VisionCone_Guard.mat";
         private const string IconBackgroundMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Icon_Background.mat";
         private const string IconFillMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Icon_Fill.mat";
-        private const float IconHeight = 2.25f;
-        private const float IconWidth = 0.8f;
-        private const float IconBarHeight = 0.12f;
-        private const float IconBorder = 0.06f;
-        private static readonly Color IconBackgroundColor = new Color(0.08f, 0.07f, 0.1f);
-        private const string ModelPath ="Assets/_Project/Art/Models/Characters/Char_Guard.fbx";
         private const string FlashlightSocket = "Socket_Flashlight";
 
         private const float Height = 1.8f;
@@ -38,14 +35,26 @@ namespace Guaxinim.EditorTools
         private const float ConeFloorOffset = 0.02f;
         private const float FlashlightTiltDegrees = 20f;
         private const float FlashlightIntensity = 6f;
+        private const float IconHeight = 2.25f;
+        private const float IconWidth = 0.8f;
+        private const float IconBarHeight = 0.12f;
+        private const float IconBorder = 0.06f;
 
         private static readonly Color ConeColor = new Color(1f, 0.85f, 0.45f, 0.22f); // GDD §15.2: luz quente
         private static readonly Color FlashlightColor = new Color(1f, 0.86f, 0.6f);
+        private static readonly Color IconBackgroundColor = new Color(0.08f, 0.07f, 0.1f);
 
-        [MenuItem("Tools/Guaxinim/Greybox/Prefab do Segurança")]
-        internal static void CreateGuardPrefab()
+        /// <summary>Gera o segurança comum e o Seu Zé (GDD §11: o segurança da Fase 1 é o dono do mercadinho).</summary>
+        [MenuItem("Tools/Guaxinim/Greybox/Prefabs dos Seguranças")]
+        internal static void CreateGuardPrefabs()
         {
-            var root = new GameObject("Guard");
+            CreateGuardPrefab("Guard", GuardModelPath, GuardPrefabPath);
+            CreateGuardPrefab("SeuZe", SeuZeModelPath, SeuZePrefabPath);
+        }
+
+        private static void CreateGuardPrefab(string name, string modelPath, string prefabPath)
+        {
+            var root = new GameObject(name);
             ConfigureAgent(root.AddComponent<NavMeshAgent>());
             AddBodyCollider(root);
 
@@ -58,11 +67,11 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(guard, "_vision", visionCone);
             EditorAssets.SetReference(guard, "_meter", meter);
             EditorAssets.SetReference(guard, "_hearing", root.AddComponent<NoiseListener>());
-            GameObject model = AddModel(root.transform);
+            GameObject model = AddModel(root.transform, modelPath);
             AddFlashlight(root.transform, model, visionData);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Guard));
 
-            PrefabUtility.SaveAsPrefabAsset(root, GuardPrefabPath);
+            PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
             Object.DestroyImmediate(root);
         }
 
@@ -149,12 +158,12 @@ namespace Guaxinim.EditorTools
             return quad;
         }
 
-        private static GameObject AddModel(Transform root)
+        private static GameObject AddModel(Transform root, string modelPath)
         {
-            var model = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath);
+            var model = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
             if (model == null)
             {
-                Debug.LogError($"Model not found: {ModelPath}");
+                Debug.LogError($"Model not found: {modelPath}");
                 return null;
             }
 

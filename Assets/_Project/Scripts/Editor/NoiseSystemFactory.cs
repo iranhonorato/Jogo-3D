@@ -21,7 +21,7 @@ namespace Guaxinim.EditorTools
         [MenuItem("Tools/Guaxinim/Greybox/Sistema de Som")]
         internal static NoiseRingVFX CreateNoiseAssets()
         {
-            EnsureFolder(SystemsFolder);
+            EditorAssets.EnsureFolder(SystemsFolder);
             EditorAssets.LoadOrCreate<NoiseData>(NoiseDataPath);
             NoiseRingVFX ringPrefab = CreateRingPrefab();
             Selection.activeObject = ringPrefab.gameObject;
@@ -42,15 +42,6 @@ namespace Guaxinim.EditorTools
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(ring, RingPrefabPath);
             Object.DestroyImmediate(ring);
             return prefab.GetComponent<NoiseRingVFX>();
-        }
-
-        private static void EnsureFolder(string path)
-        {
-            if (!AssetDatabase.IsValidFolder(path))
-            {
-                int lastSlash = path.LastIndexOf('/');
-                AssetDatabase.CreateFolder(path.Substring(0, lastSlash), path.Substring(lastSlash + 1));
-            }
         }
     }
 }

@@ -61,6 +61,20 @@ namespace Guaxinim.EditorTools
             return material;
         }
 
+        /// <summary>Cria a pasta (e as de cima) se não existir. Caminho com "/", a partir de "Assets".</summary>
+        public static void EnsureFolder(string path)
+        {
+            if (AssetDatabase.IsValidFolder(path))
+            {
+                return;
+            }
+
+            int lastSlash = path.LastIndexOf('/');
+            string parent = path.Substring(0, lastSlash);
+            EnsureFolder(parent);
+            AssetDatabase.CreateFolder(parent, path.Substring(lastSlash + 1));
+        }
+
         public static void SetLayerRecursively(GameObject target, int layer)
         {
             target.layer = layer;
