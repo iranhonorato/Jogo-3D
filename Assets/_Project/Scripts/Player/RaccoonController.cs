@@ -7,7 +7,7 @@ namespace Guaxinim.Player
     /// Move o guaxinim com o CharacterController (GDD §4): anda e corre relativo à câmera
     /// isométrica, gira para a direção do movimento e cai com gravidade.
     /// </summary>
-    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(CharacterController), typeof(PlayerState))]
     public class RaccoonController : MonoBehaviour
     {
         [SerializeField] private PlayerData _data;
@@ -17,6 +17,7 @@ namespace Guaxinim.Player
         [SerializeField] private Transform _cameraTransform;
 
         private CharacterController _controller;
+        private PlayerState _state;
         private Vector3 _horizontalVelocity;
         private float _verticalVelocity;
 
@@ -26,12 +27,15 @@ namespace Guaxinim.Player
         private void Awake()
         {
             _controller = GetComponent<CharacterController>();
+            _state = GetComponent<PlayerState>();
             if (_data == null || _input == null || _cameraTransform == null)
             {
                 Debug.LogError("RaccoonController needs Data, Input and Camera Transform assigned.", this);
                 enabled = false;
             }
         }
+
+        private void OnEnable() => _state.OnCaught += HandleCaught;
 
         private void Update()
         {
@@ -46,6 +50,14 @@ namespace Guaxinim.Player
             _controller.Move((_horizontalVelocity + Vector3.up * _verticalVelocity) * deltaTime);
             TurnTowards(direction, deltaTime);
         }
+
+        private void OnDisable()
+        {
+            IsRunning = false; // parado não faz barulho
+            _state.OnCaught -= HandleCaught;
+        }
+
+        private void HandleCaught() => enabled = false; // GDD §6.5: pego, para de se mexer até reiniciar
 
         private void UpdateHorizontalVelocity(Vector3 direction, float deltaTime)
         {

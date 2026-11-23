@@ -1,15 +1,17 @@
+using Guaxinim.Shared;
 using UnityEngine;
 
 namespace Guaxinim.Guards.States
 {
     /// <summary>
-    /// Perseguição (GDD §6.2): corre atrás do guaxinim a 5,5 m/s. Sem vê-lo por um instante, vai até a
-    /// última posição conhecida e passa para a Busca.
+    /// Perseguição (GDD §6.2 e §6.5): corre atrás do guaxinim a 5,5 m/s e o pega a menos de 1 m.
+    /// Sem vê-lo por um instante, vai até a última posição conhecida e passa para a Busca.
     /// </summary>
     public class ChaseState : IGuardState
     {
         private readonly GuardAI _guard;
         private readonly LostSightTimer _lostSight;
+        private IDetectable _target;
         private Vector3 _lastKnownPosition;
         private float _secondsUntilRepath;
 
@@ -24,9 +26,8 @@ namespace Guaxinim.Guards.States
             _guard.Agent.speed = _guard.Data.ChaseSpeed;
             _lostSight.Reset();
             _secondsUntilRepath = 0f;
-            _lastKnownPosition = _guard.Vision.HasVisibleTarget
-                ? _guard.Vision.VisibleTarget.DetectionPoint
-                : _guard.transform.position;
+            _target = _guard.Vision.VisibleTarget;
+            _lastKnownPosition = _target != null ? _target.DetectionPoint : _guard.transform.position;
             // TODO(passo 3.3): disparar o alerta geral (GDD §6.4).
         }
 
@@ -35,7 +36,13 @@ namespace Guaxinim.Guards.States
             bool isTargetSeen = _guard.Vision.HasVisibleTarget;
             if (isTargetSeen)
             {
-                _lastKnownPosition = _guard.Vision.VisibleTarget.DetectionPoint;
+                _target = _guard.Vision.VisibleTarget;
+                _lastKnownPosition = _target.DetectionPoint;
+            }
+
+            if (TryCatchTarget())
+            {
+                return;
             }
 
             if (_lostSight.Tick(isTargetSeen, deltaTime))
@@ -45,16 +52,40 @@ namespace Guaxinim.Guards.States
                 return;
             }
 
-            _secondsUntilRepath -= deltaTime;
-            if (_secondsUntilRepath <= 0f)
-            {
-                _secondsUntilRepath = _guard.Data.ChaseRepathSeconds;
-                _guard.MoveTo(_lastKnownPosition);
-            }
+            RepathIfDue(deltaTime);
         }
 
-        public void Exit()
+        public void Exit() => _target = null;
+
+        /// <summary>Pega pela distância, mesmo fora do cone: colado de lado também conta.</summary>
+        private bool TryCatchTarget()
         {
+            if (_target == null)
+            {
+                return false;
+            }
+
+            float distance = VisionMath.FlatDistance(_guard.transform.position, _target.DetectionPoint);
+            if (!CatchRule.CanCatch(distance, _guard.Data.CatchDistance, _target.IsUntouchable))
+            {
+                return false;
+            }
+
+            _target.Catch();
+            _guard.Agent.isStopped = true;
+            return true;
+        }
+
+        private void RepathIfDue(float deltaTime)
+        {
+            _secondsUntilRepath -= deltaTime;
+            if (_secondsUntilRepath > 0f)
+            {
+                return;
+            }
+
+            _secondsUntilRepath = _guard.Data.ChaseRepathSeconds;
+            _guard.MoveTo(_lastKnownPosition);
         }
     }
 }

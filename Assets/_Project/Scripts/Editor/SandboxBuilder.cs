@@ -44,9 +44,11 @@ namespace Guaxinim.EditorTools
             BuildFloorAndWalls(root.transform);
             BuildShelves(root.transform);
             Place(EnvironmentKitFactory.DenPath, root.transform, new Vector3(6f, 0f, -4.5f), 0f);
-            Place(NoiseSystemFactory.SystemsPrefabPath, root.transform, Vector3.zero, 0f);
+            GameObject systems = Place(LevelSystemsFactory.SystemsPrefabPath, root.transform, Vector3.zero, 0f);
 
             GameObject raccoon = Place(GreyboxRaccoonFactory.PrefabPath, root.transform, RaccoonStart, 0f);
+            EditorAssets.SetReference(systems.GetComponent<Core.LevelFlow>(), "_player",
+                raccoon.GetComponent<Player.PlayerState>());
             GameObject cameraRig = Place(CameraRigFactory.PerspectivePath, root.transform, Vector3.zero, 0f);
             DisableOtherMainCameras(cameraRig);
             ConnectCamera(cameraRig, raccoon);
@@ -60,7 +62,7 @@ namespace Guaxinim.EditorTools
         private static void GenerateAllPrefabs()
         {
             EnvironmentKitFactory.CreateKitPrefabs();
-            NoiseSystemFactory.CreateNoiseAssets();
+            LevelSystemsFactory.CreateLevelSystemsPrefab();
             GreyboxRaccoonFactory.CreateRaccoonPrefab();
             CameraRigFactory.CreateCameraRigs();
             GuardFactory.CreateGuardPrefab();

@@ -16,5 +16,8 @@ namespace Guaxinim.Shared
 
         /// <summary>Verdadeiro no modo cogumelo: não pode ser pego.</summary>
         bool IsUntouchable { get; }
+
+        /// <summary>O segurança alcançou o alvo (GDD §6.5). Ignorado se intocável ou já pego.</summary>
+        void Catch();
     }
 }

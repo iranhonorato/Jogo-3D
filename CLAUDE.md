@@ -38,8 +38,9 @@ As rubricas premiam acabamento, não quantidade de mecânicas: uma fase polida v
   - 1.6: `Shared/IDetectable` e `Shared/DetectableRegistry` (os detectores encontram o guaxinim sem buscar na cena), `Player/PlayerState` mínimo, `Guards/VisionData` (SO próprio, para a câmera reaproveitar), `VisionMath` testado, `VisionCone` (raycast na layer `Obstacle`), `VisionConeMesh` (leque no chão recortado pelas paredes) e lanterna spot no `Socket_Flashlight`, sem sombras.
   - 1.7: `Guards/DetectionData`, `DetectionLevel` (lógica pura testada: 1 s a 9 m, até 3× mais rápido de perto, esvazia 0,35/s) e `DetectionMeter` (`OnFilled`), mais `UI/DetectionMeterIcon` (barra sobre a cabeça, amarelo ao vermelho).
   - 1.8: estados `SuspiciousState` e `SearchState` (base `InvestigateState`, Template Method), `ChaseState` (5,5 m/s, `LostSightTimer` testado) e `ReturnState`; `LookAroundPause` compartilhado. O `GuardAI` liga os sentidos: medidor cheio com o guaxinim à vista leva à Perseguição; som (`NoiseListener`) ou relance levam ao Desconfiado. Teste do balanço: guaxinim sem carga (6 m/s) mais rápido que o segurança (5,5 m/s).
+  - 1.9: `PlayerState.Catch()`/`OnCaught` (idempotente), `Guards/CatchRule` testada (1 m na Perseguição), `Core/LevelFlow` + `LevelFlowData` (reinicia a fase em 1,5 s), `Core/SceneLoader` estático e `UI/CaughtMessageUI` ("Você foi pego!", com `Text` do uGUI por enquanto). **Decisão:** o estado da fase fica no `LevelFlow`, que vive na cena; o `GameManager` persistente entra só com pausa e menu (3.6 e 3.8), para não guardar estado da fase num singleton. Menu `Sistemas da Fase` gera o `LevelSystems` (som, `LevelFlow` e aviso).
 - **Ferramentas:** **`Tools/Guaxinim/Montar Sandbox de Teste`** gera todos os prefabs e monta na cena aberta um mercadinho de teste já ligado (guaxinim, câmera em perspectiva, LevelSystems, NavMesh assado). É o jeito de testar tudo no Play Mode. `Tools/Guaxinim/Vitrine de Modelos` mostra os modelos lado a lado.
-- **Próximo passo: 1.9.** O usuário testa tudo no Play Mode ao chegar no 1.10.
+- **Próximo passo: 1.10.** O usuário testa tudo no Play Mode ao chegar no 1.10.
 
 Atualize esta seção ao fim de cada passo.
 

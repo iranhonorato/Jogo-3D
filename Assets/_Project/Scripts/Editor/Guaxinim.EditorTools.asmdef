@@ -5,7 +5,8 @@
         "Guaxinim.Runtime",
         "Unity.Cinemachine",
         "Unity.AI.Navigation",
-        "Unity.AI.Navigation.Editor"
+        "Unity.AI.Navigation.Editor",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [
         "Editor"

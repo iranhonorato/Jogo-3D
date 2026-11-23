@@ -39,6 +39,9 @@ namespace Guaxinim.Guards
         [Tooltip("Segundos entre dois recálculos do caminho até o guaxinim")]
         [SerializeField, Min(0.02f)] private float _chaseRepathSeconds = 0.2f;
 
+        [Tooltip("Metros: mais perto que isto, em Perseguição, o guaxinim é pego (GDD §6.5)")]
+        [SerializeField, Min(0.1f)] private float _catchDistance = 1f;
+
         [Header("Busca")]
         [Tooltip("Metros por segundo, indo até a última posição conhecida")]
         [SerializeField, Min(0f)] private float _searchSpeed = 3f;
@@ -56,6 +59,7 @@ namespace Guaxinim.Guards
         public float ChaseSpeed => _chaseSpeed;
         public float LostSightGraceSeconds => _lostSightGraceSeconds;
         public float ChaseRepathSeconds => _chaseRepathSeconds;
+        public float CatchDistance => _catchDistance;
         public float SearchSpeed => _searchSpeed;
         public float SearchLookSeconds => _searchLookSeconds;
     }

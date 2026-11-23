@@ -94,6 +94,10 @@ namespace Guaxinim.Tests
             public Vector3 DetectionPoint => Vector3.zero;
             public bool IsVisible => true;
             public bool IsUntouchable => false;
+
+            public void Catch()
+            {
+            }
         }
     }
 }
