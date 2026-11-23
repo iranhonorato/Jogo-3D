@@ -6,5 +6,6 @@ namespace Guaxinim.Shared
         public const string Player = "Player";
         public const string Guard = "Guard";
         public const string Obstacle = "Obstacle";
+        public const string Interactable = "Interactable";
     }
 }

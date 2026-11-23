@@ -29,6 +29,10 @@ namespace Guaxinim.Player
         [Tooltip("Metros por segundo para baixo no chão, para manter o contato em rampas e degraus")]
         [SerializeField, Min(0f)] private float _groundedFallSpeed = 2f;
 
+        [Header("Interação")]
+        [Tooltip("Metros: alcance do E para pegar itens e usar objetos")]
+        [SerializeField, Min(0.1f)] private float _interactionRadius = 1.1f;
+
         public float WalkSpeed => _walkSpeed;
         public float SprintSpeed => _sprintSpeed;
         public float Acceleration => _acceleration;
@@ -36,6 +40,7 @@ namespace Guaxinim.Player
         public float TurnSpeedDegrees => _turnSpeedDegrees;
         public float Gravity => _gravity;
         public float GroundedFallSpeed => _groundedFallSpeed;
+        public float InteractionRadius => _interactionRadius;
 
         private void OnValidate()
         {

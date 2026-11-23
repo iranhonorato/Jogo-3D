@@ -29,6 +29,7 @@ namespace Guaxinim.EditorTools
             GreyboxRaccoonFactory.CreateRaccoonPrefab();
             CameraRigFactory.CreateCameraRigs();
             GuardFactory.CreateGuardPrefabs();
+            ItemFactory.CreateItems();
         }
 
         public static GameObject Place(string prefabPath, Transform parent, Vector3 position, float yawDegrees)

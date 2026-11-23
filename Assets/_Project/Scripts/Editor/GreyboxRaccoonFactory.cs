@@ -39,10 +39,13 @@ namespace Guaxinim.EditorTools
             ConfigureCharacterController(root.AddComponent<CharacterController>());
             var input = root.AddComponent<InputReader>();
             root.AddComponent<PlayerState>(); // antes do controller: o RequireComponent dele não cria um segundo
+            var data = EditorAssets.LoadOrCreate<PlayerData>(DataPath);
             var controller = root.AddComponent<RaccoonController>();
-            EditorAssets.SetReference(controller, "_data", EditorAssets.LoadOrCreate<PlayerData>(DataPath));
+            EditorAssets.SetReference(controller, "_data", data);
             EditorAssets.SetReference(controller, "_input", input);
             AddNoiseMaker(root, input, controller);
+            root.AddComponent<Inventory>();
+            AddInteractor(root, data, input);
             AddBody(root.transform);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Player));
 
@@ -69,6 +72,16 @@ namespace Guaxinim.EditorTools
                 EditorAssets.LoadOrCreate<NoiseData>(NoiseSystemFactory.NoiseDataPath));
             EditorAssets.SetReference(noiseMaker, "_input", input);
             EditorAssets.SetReference(noiseMaker, "_controller", controller);
+        }
+
+        private static void AddInteractor(GameObject root, PlayerData data, InputReader input)
+        {
+            var interactor = root.AddComponent<RaccoonInteractor>();
+            EditorAssets.SetReference(interactor, "_data", data);
+            EditorAssets.SetReference(interactor, "_input", input);
+            var serialized = new SerializedObject(interactor);
+            serialized.FindProperty("_interactableMask").intValue = LayerMask.GetMask(Layers.Interactable);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void AddBody(Transform root)
