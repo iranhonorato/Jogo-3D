@@ -101,10 +101,26 @@ class Part:
     usa o padrão xadrez (mask = 1). low_tris é o orçamento da parte na versão low poly.
     """
 
-    def __init__(self, obj, paint, low_tris):
+    def __init__(self, obj, paint, low_tris, low=None):
         self.obj = obj
         self.paint = paint
         self.low_tris = low_tris
+        self.low = low  # versão low poly pronta; se None, é uma cópia simplificada de obj
+
+
+class Piece:
+    """Um objeto exportado pelo run_model: várias partes unidas numa malha só.
+
+    pivot é a origem do objeto, nas coordenadas em que as partes foram montadas.
+    parent é o nome da peça mãe (None para a raiz de um FBX). sockets: [(nome, posição)].
+    """
+
+    def __init__(self, name, parts, pivot=(0.0, 0.0, 0.0), parent=None, sockets=()):
+        self.name = name
+        self.parts = parts
+        self.pivot = Vector(pivot)
+        self.parent = parent
+        self.sockets = list(sockets)
 
 
 def flat(color):
@@ -169,6 +185,44 @@ def box(name, center, size, rotation=None):
         matrix = matrix @ rotation.to_matrix().to_4x4()
     bmesh.ops.transform(bm, matrix=matrix, verts=bm.verts)
     return _object_from_bmesh(name, bm, smooth=False)
+
+
+_BOX_FACES = {  # nome: (canto de origem, vetor u, vetor v), em unidades da caixa (-0,5 a 0,5)
+    "+x": ((0.5, -0.5, -0.5), (0, 1, 0), (0, 0, 1)),
+    "-x": ((-0.5, 0.5, -0.5), (0, -1, 0), (0, 0, 1)),
+    "+y": ((0.5, 0.5, -0.5), (-1, 0, 0), (0, 0, 1)),
+    "-y": ((-0.5, -0.5, -0.5), (1, 0, 0), (0, 0, 1)),
+    "+z": ((-0.5, -0.5, 0.5), (1, 0, 0), (0, 1, 0)),
+    "-z": ((-0.5, 0.5, -0.5), (1, 0, 0), (0, -1, 0)),
+}
+
+
+def grid_box(name, center, size, spacing=None, skip=()):
+    """Caixa cujas faces são grades com quadrados de cerca de spacing metros.
+
+    A grade dá vértices para a pintura por vértice (azulejos, etiquetas). spacing=None faz
+    uma face por lado (versão low poly). skip lista as faces omitidas ('-z', '+y'...).
+    """
+    c, s = Vector(center), Vector(size)
+    bm = bmesh.new()
+    for face_name, (corner, u, v) in _BOX_FACES.items():
+        if face_name in skip:
+            continue
+        origin = Vector((c.x + corner[0] * s.x, c.y + corner[1] * s.y, c.z + corner[2] * s.z))
+        u_vec = Vector((u[0] * s.x, u[1] * s.y, u[2] * s.z))
+        v_vec = Vector((v[0] * s.x, v[1] * s.y, v[2] * s.z))
+        nu = max(1, math.ceil(u_vec.length / spacing)) if spacing else 1
+        nv = max(1, math.ceil(v_vec.length / spacing)) if spacing else 1
+        grid = [[bm.verts.new(origin + u_vec * (i / nu) + v_vec * (j / nv)) for j in range(nv + 1)]
+                for i in range(nu + 1)]
+        for i in range(nu):
+            for j in range(nv):
+                bm.faces.new((grid[i][j], grid[i + 1][j], grid[i + 1][j + 1], grid[i][j + 1]))
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+    mesh = bpy.data.meshes.new(name)
+    bm.to_mesh(mesh)  # sem recalcular normais: a ordem dos vértices já aponta para fora
+    bm.free()
+    return _link(bpy.data.objects.new(name, mesh))
 
 
 def torus(name, center, axis, major, minor, segments=16, sides=6):
@@ -521,10 +575,25 @@ def export_fbx(objects, path):
         add_leaf_bones=False, path_mode='RELATIVE', embed_textures=False)
 
 
-def render_preview(obj, out_png):
-    """Três vistas lado a lado: isométrica (como no jogo), 3/4 de frente e perfil."""
-    height = obj.dimensions.z
-    extent = max(obj.dimensions)
+def _world_bounds(objects):
+    corners = [obj.matrix_world @ Vector(c) for obj in objects if obj.type == 'MESH' for c in obj.bound_box]
+    low = Vector([min(c[i] for c in corners) for i in range(3)])
+    high = Vector([max(c[i] for c in corners) for i in range(3)])
+    return low, high
+
+
+def render_preview(obj, out_png, objects=None):
+    """Três vistas lado a lado: isométrica (como no jogo), 3/4 de frente e perfil.
+
+    objects (opcional) são as malhas enquadradas; as outras malhas da cena ficam escondidas.
+    """
+    objects = objects or [obj]
+    low_corner, high_corner = _world_bounds(objects)
+    size = high_corner - low_corner
+    extent = max(size)
+    hidden = [o for o in bpy.context.scene.objects if o.type == 'MESH' and o not in objects]
+    for other in hidden:
+        other.hide_render = True
     scene = bpy.context.scene
     scene.render.engine = 'BLENDER_WORKBENCH'
     shading = scene.display.shading
@@ -539,7 +608,7 @@ def render_preview(obj, out_png):
     camera_data = bpy.data.cameras.new("PreviewCamera")
     camera = _link(bpy.data.objects.new("PreviewCamera", camera_data))
     scene.camera = camera
-    target = Vector((0.0, 0.0, height * 0.5))
+    target = (low_corner + high_corner) * 0.5
     views = (("iso", 45.0, 35.0, 'ORTHO'), ("front", 8.0, -30.0, 'PERSP'), ("side", 4.0, 90.0, 'PERSP'))
 
     tiles = []
@@ -568,6 +637,8 @@ def render_preview(obj, out_png):
     out.file_format = 'PNG'
     out.save()
     bpy.data.objects.remove(camera)
+    for other in hidden:
+        other.hide_render = False
 
 
 # ---------------------------------------------------------------------------
@@ -645,3 +716,129 @@ def run_character(name, build, budget_tris, texture_size, bake_cage, bake_ray, a
         preview_path = os.path.join(args["preview"], name + "_preview.png")
         render_preview(low, preview_path)
         print(f"REPORT {name}: preview={preview_path}")
+
+
+# ---------------------------------------------------------------------------
+# Objetos de cenário e perigos (várias peças, uma textura)
+# ---------------------------------------------------------------------------
+
+BAKE_SPACING = 8.0  # distância entre as peças durante o bake, para um raio não acertar a vizinha
+
+
+def _model_dirs(folder):
+    art = os.path.join(PROJECT_ROOT, "Assets", "_Project", "Art")
+    return os.path.join(art, "Models", folder), os.path.join(art, "Textures", folder)
+
+
+def _make_low(part):
+    if part.low is not None:
+        return part.low
+    low = part.obj.copy()
+    low.data = part.obj.data.copy()
+    low.name = part.obj.name + "_low"
+    _link(low)
+    for attribute in list(low.data.color_attributes):
+        low.data.color_attributes.remove(attribute)
+    decimate_to(low, part.low_tris)
+    return low
+
+
+def _separate_pieces(low, pieces):
+    """Separa a malha unida em um objeto por peça, pelo grupo de vértices com o nome da peça."""
+    objects = {}
+    for piece in pieces[:-1]:
+        _select_only([low], low)
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_mode(type='VERT')
+        bpy.ops.mesh.select_all(action='DESELECT')
+        low.vertex_groups.active_index = low.vertex_groups[piece.name].index
+        bpy.ops.object.vertex_group_select()
+        bpy.ops.mesh.separate(type='SELECTED')
+        bpy.ops.object.mode_set(mode='OBJECT')
+        objects[piece.name] = next(o for o in bpy.context.selected_objects if o != low)
+    objects[pieces[-1].name] = low
+    for piece in pieces:
+        obj = objects[piece.name]
+        obj.name = piece.name
+        obj.data.name = piece.name
+        obj.vertex_groups.clear()
+    return objects
+
+
+def _root_of(piece, by_name):
+    while piece.parent is not None:
+        piece = by_name[piece.parent]
+    return piece
+
+
+def run_model(texture_name, folder, build, texture_size, bake_cage, bake_ray, ao_distance,
+              blotch_scale, stroke_scale, ao_strength=0.35, smooth_angle=30.0):
+    """Gera um ou mais FBX que dividem a textura <texture_name>_BaseColor.png (atlas).
+
+    build() devolve a lista de Piece. Cada peça raiz vira um FBX com o nome dela, levando as
+    peças filhas (com pivô próprio, para girar na Unity) e os sockets.
+    """
+    args = _cli_args()
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    models_dir, textures_dir = _model_dirs(folder)
+
+    pieces = build()
+    by_name = {p.name: p for p in pieces}
+    roots = [p for p in pieces if p.parent is None]
+    offsets = {}
+    for piece in pieces:
+        offsets[piece.name] = Vector((BAKE_SPACING * roots.index(_root_of(piece, by_name)), 0.0, 0.0))
+
+    highs, lows = [], []
+    for piece in pieces:
+        shift = Matrix.Translation(offsets[piece.name])
+        for part in piece.parts:
+            paint(part)
+            low = _make_low(part)
+            part.obj.data.transform(shift)
+            low.data.transform(shift)
+            low.vertex_groups.new(name=piece.name).add(range(len(low.data.vertices)), 1.0, 'REPLACE')
+            highs.append(part.obj)
+            lows.append(low)
+
+    high = join(highs, texture_name + "_High")
+    high.data.materials.append(make_paint_material("M_" + texture_name + "_Paint", blotch_scale, stroke_scale))
+    low = join(lows, texture_name)
+    smooth_by_angle(low, smooth_angle)
+    unwrap(low)
+    low.data.materials.append(make_final_material("M_" + texture_name))
+
+    texture_path = os.path.join(textures_dir, texture_name + "_BaseColor.png")
+    bake_texture(high, low, texture_size, bake_cage, bake_ray, ao_distance, ao_strength, texture_path)
+    bpy.data.objects.remove(high)
+
+    objects = _separate_pieces(low, pieces)
+    for piece in pieces:
+        objects[piece.name].data.transform(Matrix.Translation(-(offsets[piece.name] + piece.pivot)))
+    for piece in pieces:
+        obj = objects[piece.name]
+        if piece.parent is not None:
+            obj.parent = objects[piece.parent]
+            obj.location = piece.pivot - by_name[piece.parent].pivot
+        for socket_name, co in piece.sockets:
+            empty = _link(bpy.data.objects.new(socket_name, None))
+            empty.empty_display_type = 'ARROWS'
+            empty.empty_display_size = 0.05
+            empty.parent = obj
+            empty.location = Vector(co) - piece.pivot
+
+    print(f"REPORT {texture_name}: texture={texture_path}")
+    for root in roots:
+        root_obj = objects[root.name]
+        family = [root_obj] + list(root_obj.children_recursive)
+        fbx_path = os.path.join(models_dir, root.name + ".fbx")
+        export_fbx(family, fbx_path)
+        meshes = [o for o in family if o.type == 'MESH']
+        low_corner, high_corner = _world_bounds(meshes)
+        size = high_corner - low_corner
+        tris = sum(tri_count(o) for o in meshes)
+        print(f"REPORT {root.name}: tris={tris} size=({size.x:.3f}, {size.y:.3f}, {size.z:.3f}) m fbx={fbx_path}")
+        if args["preview"]:
+            preview_path = os.path.join(args["preview"], root.name + "_preview.png")
+            render_preview(root_obj, preview_path, meshes)
+            print(f"REPORT {root.name}: preview={preview_path}")

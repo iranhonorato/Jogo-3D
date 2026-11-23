@@ -23,8 +23,9 @@ As rubricas premiam acabamento, não quantidade de mecânicas: uma fase polida v
 
 ## Estado atual
 
-- **Pronto:** Unity 6000.3.28f1 com URP; pacotes (Input System, Cinemachine 3, AI Navigation, uGUI/TMP, Test Framework); pastas de `Assets/_Project/`; assemblies `Guaxinim.Runtime`, `Guaxinim.EditorTools` e `Guaxinim.Tests.EditMode`; layers 6 a 11 (`Player`, `Guard`, `Obstacle`, `ShelfTop`, `NarrowGap`, `Interactable`); `.gitignore` e `.gitattributes`.
-- **Adiantado a pedido do usuário (parte do passo 3.10):** modelos estáticos do guaxinim, do segurança e do Seu Zé em `Art/Models/Characters/`, gerados pelos scripts de `Tools/Blender/` e validados na Unity (escala, frente em +Z, textura ligada). Faltam rig, animações e o kit modular.
+- **Pronto:** Unity 6000.3.24f1 com URP; pacotes (Input System, Cinemachine 3, AI Navigation, uGUI/TMP, Test Framework); pastas de `Assets/_Project/`; assemblies `Guaxinim.Runtime`, `Guaxinim.EditorTools` e `Guaxinim.Tests.EditMode`; layers 6 a 11 (`Player`, `Guard`, `Obstacle`, `ShelfTop`, `NarrowGap`, `Interactable`); `.gitignore` e `.gitattributes`.
+- **Adiantado a pedido do usuário (parte do passo 3.10):** modelos estáticos do guaxinim, do segurança e do Seu Zé em `Art/Models/Characters/`, gerados pelos scripts de `Tools/Blender/` e validados na Unity (escala, frente em +Z, textura ligada). Em 23/11 também foram gerados a câmera de segurança (`Art/Models/Hazards/`) e o kit modular (gôndolas de 2 m e 4 m, parede, piso e toca, em `Art/Models/Environment/`, com um atlas só), ainda sem conferência na Unity. Faltam rig e animações.
+- **Prazo confirmado:** entrega em 25/11/2026, com cerca de 15 h de trabalho por dia em 23 e 24/11. O plano dos 2 dias: marcos 0 e 1 no dia 23; no dia 24, passos 2.1 a 2.6, 3.3 e 3.4 (alerta e câmeras), 3.5, 3.6 e 3.8, e a troca do greybox pela arte; no dia 25, build final e página do itch.io. Lixeiras, aspirador, consumíveis, cogumelo, save e as fases 2 e 3 ficam como extras.
 - **Ainda não existe:** nenhum script de gameplay. A única cena é `Scenes/Sandbox/SampleScene`. As Input Actions são o template padrão da Unity.
 - **Próximo passo: 0.1.**
 
@@ -118,7 +119,7 @@ Se uma skill e o GDD divergirem, o GDD manda no design e as skills mandam na for
 Testes EditMode por linha de comando (PowerShell, **com o Editor fechado**: o projeto fica travado enquanto ele está aberto; leva cerca de 1,5 min):
 
 ```powershell
-& "C:\Program Files\Unity\Hub\Editor\6000.3.28f1\Editor\Unity.exe" -batchmode -projectPath . -runTests -testPlatform EditMode -testResults Logs/editmode-results.xml -logFile Logs/editmode.log | Out-Null; "exit=$LASTEXITCODE"
+& "C:\Program Files\Unity\Hub\Editor\6000.3.24f1\Editor\Unity.exe" -batchmode -projectPath . -runTests -testPlatform EditMode -testResults Logs/editmode-results.xml -logFile Logs/editmode.log | Out-Null; "exit=$LASTEXITCODE"
 ```
 
 Exit 0 significa que tudo passou; o resultado detalhado fica em `Logs/editmode-results.xml`. Com o Editor aberto, use Window > General > Test Runner.
@@ -175,7 +176,7 @@ Os marcos seguem o GDD §16, quebrados em passos pequenos. Cada passo termina em
 - [ ] **3.7 SaveSystem.** Um JSON numa chave do `PlayerPrefs`: fases desbloqueadas, estrelas e melhor tempo. Serialização testada. *§12.*
 - [ ] **3.8 Fluxo de cenas.** Boot, MainMenu, CityMap e a tela de início da fase. "Sair" escondido no WebGL. *§13.* *Pronto:* do menu, jogar a fase, vencer, voltar ao mapa e ver a próxima fase desbloqueada, sem fechar o jogo.
 - [ ] **3.9 Fase 3 em greybox.** `Level_03_PaoDeMel`: 2 seguranças, 1 aspirador, 6 cogumelos e itens volumosos. Build. *§11.*
-- [ ] **3.10 Primeiros modelos.** Scripts `bpy` em `Tools/Blender/` para o guaxinim, o segurança e o kit modular, exportando FBX para `Art/Models/`. *§15.4.* Personagens estáticos já feitos (guaxinim, segurança e Seu Zé); faltam rig, animações e o kit modular.
+- [ ] **3.10 Primeiros modelos.** Scripts `bpy` em `Tools/Blender/` para o guaxinim, o segurança e o kit modular, exportando FBX para `Art/Models/`. *§15.4.* Personagens estáticos (guaxinim, segurança e Seu Zé), câmera de segurança e kit modular já feitos; faltam rig e animações.
 
 ### Marco 4: arte, áudio e entrega (semana 4)
 
@@ -203,4 +204,4 @@ Pergunte antes de assumir qualquer uma destas:
 - Nome do jogo (GDD §17).
 - Paleta exata de cada mercado (GDD §17).
 - Câmera em perspectiva ou ortográfica (GDD §3.1, decidida no passo 1.2).
-- **Prazo:** o GDD planeja cerca de 4 semanas, mas o enunciado fixa a entrega em 25/11/2026 e o primeiro commit é de 21/11/2026. Confirmar com o usuário e, se for o caso, reduzir o escopo do plano.
+- ~~Prazo~~: decidido em 23/11 (entrega em 25/11; ver "Estado atual").
