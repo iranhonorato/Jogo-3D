@@ -23,7 +23,15 @@ namespace Guaxinim.EditorTools
         private const float TileSize = 2f;
         private const float WallThicknessOffset = 0.1f;
 
-        private static readonly Vector3 RaccoonStart = new Vector3(-6f, 0f, -4.5f);
+        private static readonly Vector3 RaccoonStart = new Vector3(-6.5f, 0f, 4.5f);
+
+        private static readonly Vector3[] GuardWaypoints =
+        {
+            new Vector3(-3.5f, 0f, 0.5f),
+            new Vector3(3.5f, 0f, 0.5f),
+            new Vector3(3.5f, 0f, -4f),
+            new Vector3(-3.5f, 0f, -4f),
+        };
 
         [MenuItem("Tools/Guaxinim/Montar Sandbox de Teste")]
         private static void BuildSandbox()
@@ -42,6 +50,7 @@ namespace Guaxinim.EditorTools
             GameObject cameraRig = Place(CameraRigFactory.PerspectivePath, root.transform, Vector3.zero, 0f);
             DisableOtherMainCameras(cameraRig);
             ConnectCamera(cameraRig, raccoon);
+            PlaceGuard(root.transform);
             BakeNavMesh(root);
 
             EditorSceneManager.MarkSceneDirty(root.scene);
@@ -54,6 +63,24 @@ namespace Guaxinim.EditorTools
             NoiseSystemFactory.CreateNoiseAssets();
             GreyboxRaccoonFactory.CreateRaccoonPrefab();
             CameraRigFactory.CreateCameraRigs();
+            GuardFactory.CreateGuardPrefab();
+        }
+
+        private static void PlaceGuard(Transform root)
+        {
+            var waypointsRoot = new GameObject("GuardWaypoints").transform;
+            waypointsRoot.SetParent(root, false);
+            var waypoints = new Object[GuardWaypoints.Length];
+            for (int i = 0; i < GuardWaypoints.Length; i++)
+            {
+                var waypoint = new GameObject($"Waypoint_{i}").transform;
+                waypoint.SetParent(waypointsRoot, false);
+                waypoint.position = GuardWaypoints[i];
+                waypoints[i] = waypoint;
+            }
+
+            GameObject guard = Place(GuardFactory.GuardPrefabPath, root, GuardWaypoints[GuardWaypoints.Length - 1], 90f);
+            EditorAssets.SetReferenceArray(guard.GetComponent<Guards.GuardAI>(), "_waypoints", waypoints);
         }
 
         private static void RemovePreviousSandbox()
@@ -134,7 +161,7 @@ namespace Guaxinim.EditorTools
             var surface = root.AddComponent<NavMeshSurface>();
             surface.collectObjects = CollectObjects.Children;
             surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
-            surface.layerMask = ~LayerMask.GetMask(Layers.Player);
+            surface.layerMask = ~LayerMask.GetMask(Layers.Player, Layers.Guard); // personagens não viram obstáculo
             NavMeshAssetManager.instance.StartBakingSurfaces(new Object[] { surface });
         }
     }

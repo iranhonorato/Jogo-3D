@@ -67,6 +67,19 @@ namespace Guaxinim.EditorTools
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        public static void SetReferenceArray(Object component, string propertyName, Object[] values)
+        {
+            var serialized = new SerializedObject(component);
+            SerializedProperty array = serialized.FindProperty(propertyName);
+            array.arraySize = values.Length;
+            for (int i = 0; i < values.Length; i++)
+            {
+                array.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
+            }
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         private static Material LoadOrCreateMaterial(string path, string shaderName)
         {
             var material = AssetDatabase.LoadAssetAtPath<Material>(path);
