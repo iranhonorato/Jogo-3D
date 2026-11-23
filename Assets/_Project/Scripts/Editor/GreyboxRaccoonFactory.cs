@@ -38,11 +38,11 @@ namespace Guaxinim.EditorTools
             var root = new GameObject("Raccoon");
             ConfigureCharacterController(root.AddComponent<CharacterController>());
             var input = root.AddComponent<InputReader>();
+            root.AddComponent<PlayerState>(); // antes do controller: o RequireComponent dele não cria um segundo
             var controller = root.AddComponent<RaccoonController>();
             EditorAssets.SetReference(controller, "_data", EditorAssets.LoadOrCreate<PlayerData>(DataPath));
             EditorAssets.SetReference(controller, "_input", input);
             AddNoiseMaker(root, input, controller);
-            root.AddComponent<PlayerState>();
             AddBody(root.transform);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Player));
 
