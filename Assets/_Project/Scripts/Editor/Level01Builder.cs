@@ -79,6 +79,7 @@ namespace Guaxinim.EditorTools
             GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, systems, RaccoonStart, 180f);
             LevelBuildKit.PlaceGuard(root.transform, GuardFactory.SeuZePrefabPath, SeuZeWaypoints, 0, -90f);
             PlaceItems(root.transform);
+            PlaceBins(root.transform);
             SetUpNightLighting(root.transform, raccoon.scene);
             BakeNavMesh(root);
 
@@ -107,6 +108,13 @@ namespace Guaxinim.EditorTools
             {
                 LevelBuildKit.Place(ItemFactory.PrefabPath(spot.ItemName), items, spot.Position, spot.YawDegrees);
             }
+        }
+
+        /// <summary>GDD §11: a Fase 1 ensina a lixeira. Duas no fundo, longe da patrulha, com a saída para o corredor.</summary>
+        private static void PlaceBins(Transform root)
+        {
+            LevelBuildKit.Place(HidingSpotFactory.BinPrefabPath, root, new Vector3(-1f, 0f, 3.6f), 180f);
+            LevelBuildKit.Place(HidingSpotFactory.BinPrefabPath, root, new Vector3(3.5f, 0f, 3.8f), 180f);
         }
 
         private static void SetUpNightLighting(Transform root, Scene scene)

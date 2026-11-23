@@ -31,6 +31,7 @@ namespace Guaxinim.EditorTools
             CameraRigFactory.CreateCameraRigs();
             GuardFactory.CreateGuardPrefabs();
             ItemFactory.CreateItems();
+            HidingSpotFactory.CreateBinPrefab();
         }
 
         public static GameObject Place(string prefabPath, Transform parent, Vector3 position, float yawDegrees)

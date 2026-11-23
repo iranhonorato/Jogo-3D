@@ -45,6 +45,12 @@ namespace Guaxinim.Player
 
         private void Update()
         {
+            if (!_state.CanMove)
+            {
+                StandStill(); // na lixeira ou entrando nela
+                return;
+            }
+
             float deltaTime = Time.deltaTime;
             Vector3 direction = RaccoonLocomotion.GetMoveDirection(_input.Move, _cameraTransform.eulerAngles.y);
             IsRunning = _input.IsSprinting && direction.sqrMagnitude > 0f;
@@ -63,7 +69,14 @@ namespace Guaxinim.Player
             _state.OnCaught -= HandleCaught;
         }
 
-        private void HandleCaught() => enabled = false; // GDD §6.5: pego, para de se mexer até reiniciar
+        private void HandleCaught() => enabled = false;
+
+        private void StandStill()
+        {
+            IsRunning = false;
+            _horizontalVelocity = Vector3.zero;
+            _verticalVelocity = 0f;
+        } // GDD §6.5: pego, para de se mexer até reiniciar
 
         private void UpdateHorizontalVelocity(Vector3 direction, float deltaTime)
         {

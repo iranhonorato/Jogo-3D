@@ -51,9 +51,9 @@ namespace Guaxinim.Player
 
         private void HandleDropPressed()
         {
-            if (_state.IsCaught)
+            if (!_state.CanMove)
             {
-                return;
+                return; // pego ou na lixeira
             }
 
             Vector3 dropPosition = GetDropPosition();

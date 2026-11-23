@@ -54,7 +54,8 @@ namespace Guaxinim.EditorTools
             AddDropper(root, input);
             AddBulkyLoad(root, data);
             AddFragileShake(root, data);
-            AddModel(root.transform);
+            GameObject model = AddModel(root.transform);
+            AddHiding(root, data, model);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Player));
 
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
@@ -160,17 +161,26 @@ namespace Guaxinim.EditorTools
         }
 
         /// <summary>Visual: o modelo do Blender (0,6 m, frente em +Z), sem collider; a colisão é do CharacterController.</summary>
-        private static void AddModel(Transform root)
+        private static GameObject AddModel(Transform root)
         {
             var model = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath);
             if (model == null)
             {
                 Debug.LogError($"Model not found: {ModelPath}");
-                return;
+                return null;
             }
 
             var visual = (GameObject)PrefabUtility.InstantiatePrefab(model, root);
             visual.name = "Model";
+            return visual;
+        }
+
+        /// <summary>Entrar e sair da lixeira (GDD §9); o modelo some lá dentro.</summary>
+        private static void AddHiding(GameObject root, PlayerData data, GameObject model)
+        {
+            var hiding = root.AddComponent<RaccoonHiding>();
+            EditorAssets.SetReference(hiding, "_data", data);
+            EditorAssets.SetReference(hiding, "_model", model);
         }
     }
 }

@@ -59,6 +59,9 @@ namespace Guaxinim.Player
         [Tooltip("Metros: alcance do E para pegar itens e usar objetos")]
         [SerializeField, Min(0.1f)] private float _interactionRadius = 1.1f;
 
+        [Tooltip("Segundos para entrar ou sair da lixeira (GDD §9)")]
+        [SerializeField, Min(0.01f)] private float _hideTransitionSeconds = 0.5f;
+
         public float WalkSpeed => _walkSpeed;
         public float SprintSpeed => _sprintSpeed;
         public float Acceleration => _acceleration;
@@ -75,6 +78,7 @@ namespace Guaxinim.Player
         public float ShakeFillSeconds => _shakeFillSeconds;
         public float ShakeDrainPerSecond => _shakeDrainPerSecond;
         public float InteractionRadius => _interactionRadius;
+        public float HideTransitionSeconds => _hideTransitionSeconds;
 
         private void OnValidate()
         {
