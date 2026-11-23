@@ -45,7 +45,7 @@ namespace Guaxinim.Noise
             OnNoiseEmitted?.Invoke(noise);
         }
 
-        // TODO(passo 1.8): paredes externas bloqueiam o som; prateleiras não (GDD §5).
+        // TODO(passo 1.10): paredes externas bloqueiam o som; prateleiras não (GDD §5). Hoje todo barulho é dentro do mercado.
         public static bool CanHear(Vector3 listenerPosition, NoiseEvent noise) =>
             (listenerPosition - noise.Position).sqrMagnitude <= noise.Radius * noise.Radius;
 

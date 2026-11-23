@@ -1,4 +1,5 @@
 using Guaxinim.Guards;
+using Guaxinim.Noise;
 using Guaxinim.Shared;
 using UnityEditor;
 using UnityEngine;
@@ -53,7 +54,10 @@ namespace Guaxinim.EditorTools
             VisionData visionData = EditorAssets.LoadOrCreate<VisionData>(VisionDataPath);
             VisionCone visionCone = AddVision(root, visionData);
             AddConeMesh(root.transform, visionCone);
-            AddDetection(root, visionCone);
+            DetectionMeter meter = AddDetection(root, visionCone);
+            EditorAssets.SetReference(guard, "_vision", visionCone);
+            EditorAssets.SetReference(guard, "_meter", meter);
+            EditorAssets.SetReference(guard, "_hearing", root.AddComponent<NoiseListener>());
             GameObject model = AddModel(root.transform);
             AddFlashlight(root.transform, model, visionData);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Guard));
@@ -105,7 +109,7 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(coneMesh, "_visionCone", visionCone);
         }
 
-        private static void AddDetection(GameObject root, VisionCone visionCone)
+        private static DetectionMeter AddDetection(GameObject root, VisionCone visionCone)
         {
             var meter = root.AddComponent<DetectionMeter>();
             EditorAssets.SetReference(meter, "_visionCone", visionCone);
@@ -129,6 +133,7 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(icon, "_fill", fill.transform);
             EditorAssets.SetReference(icon, "_fillRenderer", fill.GetComponent<MeshRenderer>());
             visual.SetActive(false);
+            return meter;
         }
 
         private static GameObject CreateQuad(string name, Transform parent, Material material)
