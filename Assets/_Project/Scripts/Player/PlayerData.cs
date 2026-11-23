@@ -29,6 +29,16 @@ namespace Guaxinim.Player
         [Tooltip("Metros por segundo para baixo no chão, para manter o contato em rampas e degraus")]
         [SerializeField, Min(0f)] private float _groundedFallSpeed = 2f;
 
+        [Header("Carga")]
+        [Tooltip("Unidades de peso que o guaxinim consegue carregar (GDD §4)")]
+        [SerializeField, Min(0.1f)] private float _maxWeight = 10f;
+
+        [Tooltip("Unidades de volume que o guaxinim consegue carregar (GDD §4)")]
+        [SerializeField, Min(0.1f)] private float _maxVolume = 6f;
+
+        [Tooltip("Fração da velocidade perdida com o peso máximo (GDD §7.3: 0,5 = metade da velocidade)")]
+        [SerializeField, Range(0f, 1f)] private float _weightSpeedPenalty = 0.5f;
+
         [Header("Interação")]
         [Tooltip("Metros: alcance do E para pegar itens e usar objetos")]
         [SerializeField, Min(0.1f)] private float _interactionRadius = 1.1f;
@@ -40,6 +50,9 @@ namespace Guaxinim.Player
         public float TurnSpeedDegrees => _turnSpeedDegrees;
         public float Gravity => _gravity;
         public float GroundedFallSpeed => _groundedFallSpeed;
+        public float MaxWeight => _maxWeight;
+        public float MaxVolume => _maxVolume;
+        public float WeightSpeedPenalty => _weightSpeedPenalty;
         public float InteractionRadius => _interactionRadius;
 
         private void OnValidate()

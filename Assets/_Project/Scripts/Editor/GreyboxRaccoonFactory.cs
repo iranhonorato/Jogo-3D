@@ -38,13 +38,15 @@ namespace Guaxinim.EditorTools
             var root = new GameObject("Raccoon");
             ConfigureCharacterController(root.AddComponent<CharacterController>());
             var input = root.AddComponent<InputReader>();
-            root.AddComponent<PlayerState>(); // antes do controller: o RequireComponent dele não cria um segundo
             var data = EditorAssets.LoadOrCreate<PlayerData>(DataPath);
+            // PlayerState e Inventory antes do controller: o RequireComponent dele não cria uma segunda cópia.
+            root.AddComponent<PlayerState>();
+            var inventory = root.AddComponent<Inventory>();
+            EditorAssets.SetReference(inventory, "_data", data);
             var controller = root.AddComponent<RaccoonController>();
             EditorAssets.SetReference(controller, "_data", data);
             EditorAssets.SetReference(controller, "_input", input);
-            AddNoiseMaker(root, input, controller);
-            root.AddComponent<Inventory>();
+            AddNoiseMaker(root, input, controller, inventory);
             AddInteractor(root, data, input);
             AddBody(root.transform);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Player));
@@ -65,13 +67,15 @@ namespace Guaxinim.EditorTools
             characterController.minMoveDistance = 0f;
         }
 
-        private static void AddNoiseMaker(GameObject root, InputReader input, RaccoonController controller)
+        private static void AddNoiseMaker(GameObject root, InputReader input, RaccoonController controller,
+            Inventory inventory)
         {
             var noiseMaker = root.AddComponent<RaccoonNoiseMaker>();
             EditorAssets.SetReference(noiseMaker, "_noiseData",
                 EditorAssets.LoadOrCreate<NoiseData>(NoiseSystemFactory.NoiseDataPath));
             EditorAssets.SetReference(noiseMaker, "_input", input);
             EditorAssets.SetReference(noiseMaker, "_controller", controller);
+            EditorAssets.SetReference(noiseMaker, "_inventory", inventory);
         }
 
         private static void AddInteractor(GameObject root, PlayerData data, InputReader input)

@@ -5,9 +5,10 @@ namespace Guaxinim.Player
 {
     /// <summary>
     /// Move o guaxinim com o CharacterController (GDD §4): anda e corre relativo à câmera
-    /// isométrica, gira para a direção do movimento e cai com gravidade.
+    /// isométrica, fica mais lento com o peso carregado (GDD §7.3), gira para a direção do movimento
+    /// e cai com gravidade.
     /// </summary>
-    [RequireComponent(typeof(CharacterController), typeof(PlayerState))]
+    [RequireComponent(typeof(CharacterController), typeof(PlayerState), typeof(Inventory))]
     public class RaccoonController : MonoBehaviour
     {
         [SerializeField] private PlayerData _data;
@@ -18,6 +19,7 @@ namespace Guaxinim.Player
 
         private CharacterController _controller;
         private PlayerState _state;
+        private Inventory _inventory;
         private Vector3 _horizontalVelocity;
         private float _verticalVelocity;
 
@@ -28,6 +30,7 @@ namespace Guaxinim.Player
         {
             _controller = GetComponent<CharacterController>();
             _state = GetComponent<PlayerState>();
+            _inventory = GetComponent<Inventory>();
             if (_data == null || _input == null || _cameraTransform == null)
             {
                 Debug.LogError("RaccoonController needs Data, Input and Camera Transform assigned.", this);
@@ -61,8 +64,10 @@ namespace Guaxinim.Player
 
         private void UpdateHorizontalVelocity(Vector3 direction, float deltaTime)
         {
-            float speed = RaccoonLocomotion.GetTargetSpeed(direction.magnitude, _input.IsSprinting,
+            float baseSpeed = RaccoonLocomotion.GetTargetSpeed(direction.magnitude, _input.IsSprinting,
                 _data.WalkSpeed, _data.SprintSpeed);
+            float speed = CarrySpeed.Calculate(baseSpeed, _inventory.CurrentWeight, _inventory.MaxWeight,
+                _data.WeightSpeedPenalty);
             Vector3 target = direction.sqrMagnitude > 0f ? direction.normalized * speed : Vector3.zero;
             _horizontalVelocity = RaccoonLocomotion.StepHorizontalVelocity(_horizontalVelocity, target,
                 _data.Acceleration, _data.Deceleration, deltaTime);
