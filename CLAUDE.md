@@ -23,10 +23,25 @@ As rubricas premiam acabamento, não quantidade de mecânicas: uma fase polida v
 
 ## Estado atual
 
-- **Pronto:** Unity 6000.3.28f1 com URP; pacotes (Input System, Cinemachine 3, AI Navigation, uGUI/TMP, Test Framework); pastas de `Assets/_Project/`; assemblies `Guaxinim.Runtime`, `Guaxinim.EditorTools` e `Guaxinim.Tests.EditMode`; layers 6 a 11 (`Player`, `Guard`, `Obstacle`, `ShelfTop`, `NarrowGap`, `Interactable`); `.gitignore` e `.gitattributes`.
-- **Adiantado a pedido do usuário (parte do passo 3.10):** modelos estáticos do guaxinim, do segurança e do Seu Zé em `Art/Models/Characters/`, gerados pelos scripts de `Tools/Blender/` e validados na Unity (escala, frente em +Z, textura ligada). Faltam rig, animações e o kit modular.
-- **Ainda não existe:** nenhum script de gameplay. A única cena é `Scenes/Sandbox/SampleScene`. As Input Actions são o template padrão da Unity.
-- **Próximo passo: 0.1.**
+- **Pronto:** Unity 6000.3.24f1 com URP; pacotes (Input System, Cinemachine 3, AI Navigation, uGUI/TMP, Test Framework); pastas de `Assets/_Project/`; assemblies `Guaxinim.Runtime`, `Guaxinim.EditorTools` e `Guaxinim.Tests.EditMode`; layers 6 a 11 (`Player`, `Guard`, `Obstacle`, `ShelfTop`, `NarrowGap`, `Interactable`); `.gitignore` e `.gitattributes`.
+- **Adiantado a pedido do usuário (parte do passo 3.10):** modelos estáticos do guaxinim, do segurança e do Seu Zé em `Art/Models/Characters/`, gerados pelos scripts de `Tools/Blender/` e validados na Unity (escala, frente em +Z, textura ligada). Em 23/11 também foram gerados a câmera de segurança (`Art/Models/Hazards/`) e o kit modular (gôndolas de 2 m e 4 m, parede, piso e toca, em `Art/Models/Environment/`, com um atlas só), ainda sem conferência na Unity. Faltam rig e animações.
+- **Prazo confirmado:** entrega em 25/11/2026, com cerca de 15 h de trabalho por dia em 23 e 24/11. O plano dos 2 dias: marcos 0 e 1 no dia 23; no dia 24, passos 2.1 a 2.6, 3.3 e 3.4 (alerta e câmeras), 3.5, 3.6 e 3.8, e a troca do greybox pela arte; no dia 25, build final e página do itch.io. Lixeiras, aspirador, consumíveis, cogumelo, save e as fases 2 e 3 ficam como extras.
+- **Feito, falta testar no Play Mode (o usuário vai testar tudo junto mais adiante):**
+  - 0.1: mapa `Player` com as ações da §3.2, classe gerada `Core/GameInput.cs` e `Core/InputReader` (eventos e troca para o mapa `UI` na pausa); `UI/Cancel` também aceita o Start do controle.
+  - 0.2: WebGL em Gzip com Decompression Fallback. **Nome do produto e da empresa ficaram para depois**, a pedido do usuário.
+  - 0.3: `BuildScript` (menu `Tools/Guaxinim/Build`). O build Windows abriu; falta abrir o WebGL.
+  - 1.1: `PlayerData`, `RaccoonLocomotion` (testado), `RaccoonController` e o menu `Tools/Guaxinim/Greybox/Prefab do Guaxinim`.
+  - 1.2: menu `Tools/Guaxinim/Greybox/Rigs de Câmera Isométrica` gera `Prefabs/Camera/CameraRig_Perspective` (FOV 25°) e `CameraRig_Orthographic` (tamanho 6), com Position Composer e lookahead. **O usuário ainda escolhe qual usar**; registrar a escolha no GDD §3.1.
+  - 1.3: `Noise/` (`NoiseSystem` mediador estático, `NoiseListener`, `NoiseRadius` testado, `NoiseRingVFX` com pool no `NoiseRingSpawner`) e `Player/RaccoonNoiseMaker` (correr em intervalos, assobio de 8 m). Menu `Tools/Guaxinim/Greybox/Sistema de Som` gera `NoiseData`, o anel e o prefab `Prefabs/Systems/LevelSystems` (vai em toda fase). Rodar de novo o menu do guaxinim para ele ganhar o `RaccoonNoiseMaker`.
+  - 1.4: `EnvironmentKitFactory` (menu `Kit de Cenário`): prefabs de piso, parede, gôndolas de 2 m e 4 m e toca em `Prefabs/Environment/`, **já com os modelos do Blender** (decisão para não ter que trocar o greybox depois) e BoxColliders; paredes e gôndolas na layer `Obstacle`, todos estáticos.
+  - 1.5: `Guards/` (`GuardData`, `IGuardState`, `GuardAI`, `PatrolRoute` e `LookAround` testados, `States/PatrolState`) e `GuardFactory` (prefab com NavMeshAgent e o modelo `Char_Guard`). A Sandbox ganha um segurança com 4 waypoints.
+  - 1.6: `Shared/IDetectable` e `Shared/DetectableRegistry` (os detectores encontram o guaxinim sem buscar na cena), `Player/PlayerState` mínimo, `Guards/VisionData` (SO próprio, para a câmera reaproveitar), `VisionMath` testado, `VisionCone` (raycast na layer `Obstacle`), `VisionConeMesh` (leque no chão recortado pelas paredes) e lanterna spot no `Socket_Flashlight`, sem sombras.
+  - 1.7: `Guards/DetectionData`, `DetectionLevel` (lógica pura testada: 1 s a 9 m, até 3× mais rápido de perto, esvazia 0,35/s) e `DetectionMeter` (`OnFilled`), mais `UI/DetectionMeterIcon` (barra sobre a cabeça, amarelo ao vermelho).
+  - 1.8: estados `SuspiciousState` e `SearchState` (base `InvestigateState`, Template Method), `ChaseState` (5,5 m/s, `LostSightTimer` testado) e `ReturnState`; `LookAroundPause` compartilhado. O `GuardAI` liga os sentidos: medidor cheio com o guaxinim à vista leva à Perseguição; som (`NoiseListener`) ou relance levam ao Desconfiado. Teste do balanço: guaxinim sem carga (6 m/s) mais rápido que o segurança (5,5 m/s).
+  - 1.9: `PlayerState.Catch()`/`OnCaught` (idempotente), `Guards/CatchRule` testada (1 m na Perseguição), `Core/LevelFlow` + `LevelFlowData` (reinicia a fase em 1,5 s), `Core/SceneLoader` estático e `UI/CaughtMessageUI` ("Você foi pego!", com `Text` do uGUI por enquanto). **Decisão:** o estado da fase fica no `LevelFlow`, que vive na cena; o `GameManager` persistente entra só com pausa e menu (3.6 e 3.8), para não guardar estado da fase num singleton. Menu `Sistemas da Fase` gera o `LevelSystems` (som, `LevelFlow` e aviso).
+  - 1.10: menu **`Tools/Guaxinim/Montar Fase 1`** cria `Scenes/Levels/Level_01_Mercadinho` (12 × 10 m, 2 corredores com um vão de 1,2 m entre as gôndolas, toca no fundo onde o guaxinim começa, Seu Zé patrulhando 4 waypoints), luz noturna com 4 luzes em tempo real (lua, 2 luzes da loja e a lanterna), NavMesh assado em asset e a cena como primeira do Build Profile. Prefab `SeuZe` (variante do segurança com o modelo dele). `LevelBuildKit` concentra o que a Sandbox e as fases têm em comum.
+- **Ferramentas:** **`Tools/Guaxinim/Montar Sandbox de Teste`** gera todos os prefabs e monta na cena aberta um mercadinho de teste já ligado (guaxinim, câmera em perspectiva, LevelSystems, NavMesh assado). É o jeito de testar tudo no Play Mode. `Tools/Guaxinim/Vitrine de Modelos` mostra os modelos lado a lado.
+- **Próximo passo: fechar o Marco 1.** O usuário já viu a Fase 1 rodando (23/11). Faltam: (1) rodar de novo `Montar Fase 1` para aplicar a correção do `PlayerState` duplicado e confirmar que ser pego reinicia a fase; (2) Test Runner EditMode (59 testes); (3) escolher a câmera (perspectiva ou ortográfica) e registrar no GDD §3.1; (4) builds Windows e WebGL. Depois, marcar os passos 0.1 a 1.10 e o GDD §16, e seguir para o 2.1.
 
 Atualize esta seção ao fim de cada passo.
 
@@ -102,6 +117,7 @@ Se uma skill e o GDD divergirem, o GDD manda no design e as skills mandam na for
 - **Não escreva YAML de cena, prefab ou asset à mão.** Para gerar assets em lote (os itens da tabela §7.8, os `LevelData`, os prefabs de greybox), crie em `Scripts/Editor/` um `MenuItem` no menu `Tools/Guaxinim/...`, usando `AssetDatabase` e `PrefabUtility`.
 - O Unity gera os `.meta` ao importar. Faça commit do `.meta` junto com o arquivo e nunca apague nem recrie o `.meta` de um asset existente: as referências são por GUID.
 - O `.inputactions` é JSON e pode ser editado direto.
+- O `.inputactions` gera a classe `Core/GameInput.cs` (opção "Generate C# Class" no `.meta`). Ela só é regenerada quando o asset é reimportado, e a Unity não reimporta nada se houver erro de compilação: ao renomear ou adicionar uma ação usada no código, gere a classe antes de usar a ação nova. O `Dispose()` dela usa `Destroy`; em testes EditMode, use `Object.DestroyImmediate(input.asset)`.
 - O Editor sobrescreve `ProjectSettings/*.asset` se estiver aberto. Peça ao usuário para mudar no Editor, ou edite com o Editor fechado.
 - **Modelos do Blender:** frente em −Y no Blender, que vira +Z na Unity (verificado). O FBX traz o material `M_<Nome>`, e o `BlenderModelPostprocessor` o liga à textura `Art/Textures/<pasta>/<Nome>_BaseColor.png`. Pontos de encaixe são empties `Socket_<Uso>`. Detalhes em [Tools/Blender/README.md](Tools/Blender/README.md).
 
@@ -111,14 +127,13 @@ Se uma skill e o GDD divergirem, o GDD manda no design e as skills mandam na for
 - `productName` está "Jogo-3D" e `companyName` está "DefaultCompany". Passo 0.2.
 - A matriz de colisão das layers está toda ligada. Configurar nos passos que usam `NarrowGap` (2.4) e `ShelfTop` (3.2).
 - **Qualidade por plataforma:** o WebGL usa o nível Mobile (renderer Forward, render scale 0,8) e o Windows usa o nível PC (Forward+). Confira o visual nos dois.
-- As Input Actions são o template: sobram `Look`, `Attack`, `Crouch`, `Previous` e `Next`, e faltam `Drop`, `Whistle`, `MushroomPower`, `ShowList` e `Pause`. Passo 0.1.
 
 ## Comandos
 
 Testes EditMode por linha de comando (PowerShell, **com o Editor fechado**: o projeto fica travado enquanto ele está aberto; leva cerca de 1,5 min):
 
 ```powershell
-& "C:\Program Files\Unity\Hub\Editor\6000.3.28f1\Editor\Unity.exe" -batchmode -projectPath . -runTests -testPlatform EditMode -testResults Logs/editmode-results.xml -logFile Logs/editmode.log | Out-Null; "exit=$LASTEXITCODE"
+& "C:\Program Files\Unity\Hub\Editor\6000.3.24f1\Editor\Unity.exe" -batchmode -projectPath . -runTests -testPlatform EditMode -testResults Logs/editmode-results.xml -logFile Logs/editmode.log | Out-Null; "exit=$LASTEXITCODE"
 ```
 
 Exit 0 significa que tudo passou; o resultado detalhado fica em `Logs/editmode-results.xml`. Com o Editor aberto, use Window > General > Test Runner.
@@ -133,8 +148,8 @@ Os marcos seguem o GDD §16, quebrados em passos pequenos. Cada passo termina em
 
 ### Marco 0: fundação
 
-- [ ] **0.1 Input Actions do jogo.** Reescrever o mapa `Player` com as ações da §3.2: `Move`, `Sprint`, `Interact`, `Drop`, `Whistle`, `MushroomPower`, `Jump`, `ShowList` e `Pause`, com teclado e gamepad da tabela. Remover as ações que sobram e manter o mapa `UI`. Criar um único ponto de leitura de input (`Core/InputReader`) que o resto do jogo usa e que troca para o mapa `UI` na pausa. *Pronto:* cada ação dispara no Input Debugger.
-- [ ] **0.2 Player Settings.** Nome do produto e da empresa, compressão WebGL (ver Armadilhas). O usuário muda no Editor e Claude lista os campos.
+- [x] **0.1 Input Actions do jogo.** Reescrever o mapa `Player` com as ações da §3.2: `Move`, `Sprint`, `Interact`, `Drop`, `Whistle`, `MushroomPower`, `Jump`, `ShowList` e `Pause`, com teclado e gamepad da tabela. Remover as ações que sobram e manter o mapa `UI`. Criar um único ponto de leitura de input (`Core/InputReader`) que o resto do jogo usa e que troca para o mapa `UI` na pausa. *Pronto:* cada ação dispara no Input Debugger.
+- [x] **0.2 Player Settings.** Nome do produto e da empresa, compressão WebGL (ver Armadilhas). O usuário muda no Editor e Claude lista os campos.
 - [ ] **0.3 Script de build.** `Scripts/Editor/BuildScript.cs` com `MenuItem` e métodos para `-executeMethod`, gerando Windows e WebGL em `Builds/<plataforma>/`. *Pronto:* os dois builds da Sandbox abrem.
 
 ### Marco 1: núcleo furtivo em greybox (GDD §16, semana 1)
@@ -175,7 +190,7 @@ Os marcos seguem o GDD §16, quebrados em passos pequenos. Cada passo termina em
 - [ ] **3.7 SaveSystem.** Um JSON numa chave do `PlayerPrefs`: fases desbloqueadas, estrelas e melhor tempo. Serialização testada. *§12.*
 - [ ] **3.8 Fluxo de cenas.** Boot, MainMenu, CityMap e a tela de início da fase. "Sair" escondido no WebGL. *§13.* *Pronto:* do menu, jogar a fase, vencer, voltar ao mapa e ver a próxima fase desbloqueada, sem fechar o jogo.
 - [ ] **3.9 Fase 3 em greybox.** `Level_03_PaoDeMel`: 2 seguranças, 1 aspirador, 6 cogumelos e itens volumosos. Build. *§11.*
-- [ ] **3.10 Primeiros modelos.** Scripts `bpy` em `Tools/Blender/` para o guaxinim, o segurança e o kit modular, exportando FBX para `Art/Models/`. *§15.4.* Personagens estáticos já feitos (guaxinim, segurança e Seu Zé); faltam rig, animações e o kit modular.
+- [ ] **3.10 Primeiros modelos.** Scripts `bpy` em `Tools/Blender/` para o guaxinim, o segurança e o kit modular, exportando FBX para `Art/Models/`. *§15.4.* Personagens estáticos (guaxinim, segurança e Seu Zé), câmera de segurança e kit modular já feitos; faltam rig e animações.
 
 ### Marco 4: arte, áudio e entrega (semana 4)
 
@@ -203,4 +218,4 @@ Pergunte antes de assumir qualquer uma destas:
 - Nome do jogo (GDD §17).
 - Paleta exata de cada mercado (GDD §17).
 - Câmera em perspectiva ou ortográfica (GDD §3.1, decidida no passo 1.2).
-- **Prazo:** o GDD planeja cerca de 4 semanas, mas o enunciado fixa a entrega em 25/11/2026 e o primeiro commit é de 21/11/2026. Confirmar com o usuário e, se for o caso, reduzir o escopo do plano.
+- ~~Prazo~~: decidido em 23/11 (entrega em 25/11; ver "Estado atual").

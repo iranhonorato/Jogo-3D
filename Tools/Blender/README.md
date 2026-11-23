@@ -9,7 +9,9 @@ Scripts Python (`bpy`) que geram os modelos 3D do jogo. Cada modelo é criado po
 | `char_raccoon.py` | `Char_Raccoon.fbx` | Guaxinim em pé, 0,6 m, máscara, cauda anelada e bolsa transversal |
 | `char_guard.py` | `Char_Guard.fbx` | Segurança, 1,77 m, uniforme azul-marinho, quepe, lanterna (`Socket_Flashlight`) |
 | `char_seu_ze.py` | `Char_SeuZe.fbx` | Seu Zé (dono e faxineiro do Mercadinho), 1,56 m, avental, vassoura, lanterna (`Socket_Flashlight`) |
-| `guaxinim_common.py` | — | Funções compartilhadas: geometria, pintura, bake, exportação e prévia |
+| `hazard_security_camera.py` | `Hazards/Hazard_SecurityCamera.fbx` | Câmera de teto, pivô no ponto de fixação (z = 0, pende para baixo). A cabeça é o filho `Head`, com pivô no eixo da varredura (girar em Y na Unity). `Socket_Lens` na ponta da lente |
+| `env_kit.py` | `Environment/Shelf_Aisle_2m.fbx`, `Shelf_Aisle_4m.fbx`, `Wall_2m.fbx`, `Floor_2m.fbx`, `Den_Manhole.fbx` | Kit modular com um atlas só (`M_Env_Kit`, `Env_Kit_BaseColor.png`). Gôndola dupla de 1,8 × 0,9 m, parede de 2 × 2,5 × 0,2 m, piso de 2 × 2 m com o topo em z = 0 e toca (bueiro aberto) |
+| `guaxinim_common.py` | — | Funções compartilhadas: geometria, pintura, bake, exportação e prévia. `run_character` para personagens e `run_model` para objetos com várias peças e textura compartilhada |
 
 ## Como rodar
 

@@ -23,7 +23,7 @@ Projeto 3D Hiper-Casual — Jogos Digitais, Insper 2026.2.
 
 ## Requisitos
 
-- **Unity 6000.3.28f1** (Unity 6.3 LTS), Universal Render Pipeline
+- **Unity 6000.3.24f1** (Unity 6.3 LTS), Universal Render Pipeline
 - **Blender 5.3** para os modelos (ver [Tools/Blender](Tools/Blender/README.md))
 - Pacotes: Input System, Cinemachine 3, AI Navigation, uGUI/TextMeshPro, Test Framework
 
@@ -31,7 +31,7 @@ Projeto 3D Hiper-Casual — Jogos Digitais, Insper 2026.2.
 
 1. Clone o repositório.
 2. No Unity Hub: **Add → Add project from disk** e selecione a pasta do repositório.
-3. Abra com a versão **6000.3.28f1**. A primeira abertura importa tudo e leva alguns minutos.
+3. Abra com a versão **6000.3.24f1**. A primeira abertura importa tudo e leva alguns minutos.
 4. Cena de testes: `Assets/_Project/Scenes/Sandbox/SampleScene`.
 
 ## Estrutura do projeto
@@ -114,7 +114,7 @@ Todo asset de terceiros ou gerado por IA entra aqui, com fonte e licença (GDD, 
 
 | Asset | Autor | Fonte | Licença |
 | --- | --- | --- | --- |
-| _a preencher_ | | | |
+| Modelos e texturas em `Art/Models/` e `Art/Textures/` (personagens, câmera de segurança, kit modular) | Gerados por scripts Python do Blender escritos com o Claude (Anthropic) | `Tools/Blender/` | Feitos para este projeto |
 
 ### Código de terceiros
 
