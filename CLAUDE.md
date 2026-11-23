@@ -31,8 +31,9 @@ As rubricas premiam acabamento, não quantidade de mecânicas: uma fase polida v
   - 0.2: WebGL em Gzip com Decompression Fallback. **Nome do produto e da empresa ficaram para depois**, a pedido do usuário.
   - 0.3: `BuildScript` (menu `Tools/Guaxinim/Build`). O build Windows abriu; falta abrir o WebGL.
   - 1.1: `PlayerData`, `RaccoonLocomotion` (testado), `RaccoonController` e o menu `Tools/Guaxinim/Greybox/Prefab do Guaxinim`. A Sandbox ainda não tem chão com colisão: para testar, pôr um Plane e cubos, e a Main Camera em (45, 45, 0).
+  - 1.2: menu `Tools/Guaxinim/Greybox/Rigs de Câmera Isométrica` gera `Prefabs/Camera/CameraRig_Perspective` (FOV 25°) e `CameraRig_Orthographic` (tamanho 6), com Position Composer e lookahead. **O usuário ainda escolhe qual usar**; registrar a escolha no GDD §3.1.
 - **Ferramentas:** `Tools/Guaxinim/Vitrine de Modelos` monta os modelos de `Art/Models` na cena aberta.
-- **Próximo passo: 1.2.**
+- **Próximo passo: 1.3.**
 
 Atualize esta seção ao fim de cada passo.
 
