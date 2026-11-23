@@ -9,6 +9,10 @@ namespace Guaxinim.Core
         [Tooltip("Segundos com o aviso \"Você foi pego!\" antes de reiniciar a fase")]
         [SerializeField, Min(0f)] private float _caughtRestartDelaySeconds = 1.5f;
 
+        [Tooltip("Pontos por item bônus entregue (GDD §12)")]
+        [SerializeField, Min(0)] private int _pointsPerBonusItem = 100;
+
         public float CaughtRestartDelaySeconds => _caughtRestartDelaySeconds;
+        public int PointsPerBonusItem => _pointsPerBonusItem;
     }
 }

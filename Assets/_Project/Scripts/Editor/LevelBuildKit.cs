@@ -71,11 +71,13 @@ namespace Guaxinim.EditorTools
         }
 
         /// <summary>Cria (ou carrega) o LevelData de uma fase com a lista de compras pelos nomes dos itens.</summary>
-        public static LevelData LoadOrCreateLevelData(string path, string displayName, string[] shoppingListItems)
+        public static LevelData LoadOrCreateLevelData(string path, string displayName, string[] shoppingListItems,
+            float targetTimeSeconds)
         {
             var level = EditorAssets.LoadOrCreate<LevelData>(path);
             var serialized = new SerializedObject(level);
             serialized.FindProperty("_displayName").stringValue = displayName;
+            serialized.FindProperty("_targetTimeSeconds").floatValue = targetTimeSeconds;
             SerializedProperty list = serialized.FindProperty("_shoppingList");
             list.arraySize = shoppingListItems.Length;
             for (int i = 0; i < shoppingListItems.Length; i++)
@@ -98,6 +100,7 @@ namespace Guaxinim.EditorTools
             }
 
             EditorAssets.SetReferenceArray(systems.GetComponent<ShoppingList>(), "_required", listItems);
+            EditorAssets.SetReference(systems.GetComponent<LevelFlow>(), "_level", level);
             return systems;
         }
 
@@ -155,8 +158,9 @@ namespace Guaxinim.EditorTools
         /// <summary>A HUD vive no LevelSystems; o que é do guaxinim é ligado aqui, na cena.</summary>
         private static void ConnectHud(GameObject systems, GameObject raccoon)
         {
-            EditorAssets.SetReference(systems.GetComponentInChildren<ShoppingListUI>(), "_input",
-                raccoon.GetComponent<Core.InputReader>());
+            var input = raccoon.GetComponent<InputReader>();
+            EditorAssets.SetReference(systems.GetComponentInChildren<ShoppingListUI>(), "_input", input);
+            EditorAssets.SetReference(systems.GetComponent<PauseController>(), "_input", input);
             var loadUI = systems.GetComponentInChildren<CarryLoadUI>();
             EditorAssets.SetReference(loadUI, "_inventory", raccoon.GetComponent<Inventory>());
             EditorAssets.SetReference(loadUI, "_effects", raccoon.GetComponent<RaccoonEffects>());

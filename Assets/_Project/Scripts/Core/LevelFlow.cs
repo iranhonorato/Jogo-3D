@@ -14,6 +14,7 @@ namespace Guaxinim.Core
     public class LevelFlow : MonoBehaviour
     {
         [SerializeField] private LevelFlowData _data;
+        [SerializeField] private LevelData _level;
         [SerializeField] private PlayerState _player;
         [SerializeField] private ShoppingList _shoppingList;
 
@@ -25,11 +26,19 @@ namespace Guaxinim.Core
         /// <summary>Segundos de jogo desde o início da fase; para no fim (cronômetro e tempo-alvo).</summary>
         public float ElapsedSeconds { get; private set; }
 
+        /// <summary>Preenchido ao vencer (estrelas, tempo e bônus).</summary>
+        public LevelResult Result { get; private set; }
+
+        public LevelData Level => _level;
+
+        // TODO(passo 3.3): o AlertManager marca quando um alerta geral dispara (estrela "sem alerta").
+        public bool HadAlert { get; private set; }
+
         private void Awake()
         {
-            if (_data == null || _player == null || _shoppingList == null)
+            if (_data == null || _level == null || _player == null || _shoppingList == null)
             {
-                Debug.LogError("LevelFlow needs Data, Player and Shopping List assigned.", this);
+                Debug.LogError("LevelFlow needs Data, Level, Player and Shopping List assigned.", this);
                 enabled = false;
             }
         }
@@ -88,6 +97,8 @@ namespace Guaxinim.Core
             }
 
             IsLevelOver = true;
+            Result = LevelResult.Create(ElapsedSeconds, _level.TargetTimeSeconds, _shoppingList.Progress.IsComplete,
+                HadAlert, _shoppingList.Progress.BonusCount, _data.PointsPerBonusItem);
             Time.timeScale = 0f; // o mundo para atrás da tela de resultado; o SceneLoader volta a 1
             OnLevelWon?.Invoke();
         }

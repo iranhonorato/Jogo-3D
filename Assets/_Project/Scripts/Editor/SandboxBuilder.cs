@@ -18,6 +18,7 @@ namespace Guaxinim.EditorTools
         private const int FloorColumns = 8;
         private const int FloorRows = 6;
         private const string LevelDataPath = "Assets/_Project/Data/Levels/Level_Sandbox.asset";
+        private const float SandboxTargetTimeSeconds = 120f;
 
         private static readonly string[] ShoppingListItems = { "Jam", "Watermelon" };
 
@@ -41,7 +42,8 @@ namespace Guaxinim.EditorTools
             Undo.RegisterCreatedObjectUndo(root, "Build sandbox");
             LevelBuildKit.BuildRoom(root.transform, FloorColumns, FloorRows);
             BuildShelves(root.transform);
-            LevelData level = LevelBuildKit.LoadOrCreateLevelData(LevelDataPath, "Sandbox", ShoppingListItems);
+            LevelData level = LevelBuildKit.LoadOrCreateLevelData(LevelDataPath, "Sandbox", ShoppingListItems,
+                SandboxTargetTimeSeconds);
             GameObject systems = LevelBuildKit.PlaceLevelSystems(root.transform, level);
             LevelBuildKit.PlaceDen(root.transform, systems, new Vector3(6f, 0f, -4.5f), 0f);
             GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, systems, RaccoonStart, 0f);

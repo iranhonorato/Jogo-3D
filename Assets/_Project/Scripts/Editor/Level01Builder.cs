@@ -22,6 +22,7 @@ namespace Guaxinim.EditorTools
         private const string NavMeshDataPath = LevelsFolder + "/Level_01_Mercadinho_NavMesh.asset";
         private const string LevelDataPath = "Assets/_Project/Data/Levels/Level_01_Mercadinho.asset";
         private const string LevelName = "Mercadinho do Seu Zé";
+        private const float TargetTimeSeconds = 90f; // fase tutorial e pequena; ajustável no LevelData
         private const int FloorColumns = 6;
         private const int FloorRows = 5;
         private const float StoreLightHeight = 2.4f;
@@ -73,7 +74,8 @@ namespace Guaxinim.EditorTools
             var root = new GameObject("Level_01");
             LevelBuildKit.BuildRoom(root.transform, FloorColumns, FloorRows);
             BuildShelves(root.transform);
-            LevelData level = LevelBuildKit.LoadOrCreateLevelData(LevelDataPath, LevelName, ShoppingListItems);
+            LevelData level = LevelBuildKit.LoadOrCreateLevelData(LevelDataPath, LevelName, ShoppingListItems,
+                TargetTimeSeconds);
             GameObject systems = LevelBuildKit.PlaceLevelSystems(root.transform, level);
             LevelBuildKit.PlaceDen(root.transform, systems, DenPosition, 0f);
             GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, systems, RaccoonStart, 180f);

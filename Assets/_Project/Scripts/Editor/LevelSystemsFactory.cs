@@ -24,6 +24,12 @@ namespace Guaxinim.EditorTools
         private const string CaughtText = "Você foi pego!";
         private const string WinTitle = "Fase completa!";
         private const string PlayAgainText = "Jogar de novo";
+        private const string PauseTitle = "Pausado";
+        private const string ResumeText = "Continuar";
+        private const string RestartText = "Reiniciar fase";
+        private const int StarCount = 3;
+        private const float StarSize = 90f;
+        private const float StarSpacing = 0.08f;
         private const string BuiltinFontName = "LegacyRuntime.ttf";
         private const int CaughtFontSize = 110;
         private const int TitleFontSize = 90;
@@ -37,6 +43,7 @@ namespace Guaxinim.EditorTools
         private const float BarLabelHeight = 40f;
         private const int CaughtSortingOrder = 10;
         private const int ResultSortingOrder = 20;
+        private const int PauseSortingOrder = 30;
 
         private static readonly Vector2 ReferenceResolution = new Vector2(1920f, 1080f);
         private static readonly Vector2 ButtonSize = new Vector2(460f, 110f);
@@ -67,6 +74,7 @@ namespace Guaxinim.EditorTools
             AddHud(systems.transform, flow, shoppingList);
             AddCaughtMessage(systems.transform, flow);
             AddResultScreen(systems.transform, flow, shoppingList);
+            AddPauseScreen(systems.transform, flow);
             AddEventSystem(systems.transform);
 
             PrefabUtility.SaveAsPrefabAsset(systems, SystemsPrefabPath);
@@ -89,29 +97,78 @@ namespace Guaxinim.EditorTools
 
         private static void AddResultScreen(Transform parent, LevelFlow flow, ShoppingList shoppingList)
         {
-            GameObject canvas = CreateCanvas("ResultCanvas", parent, ResultSortingOrder);
-            canvas.AddComponent<GraphicRaycaster>();
-
-            var panel = new GameObject("Panel", typeof(RectTransform)) { layer = UILayer };
-            panel.transform.SetParent(canvas.transform, false);
-            Stretch((RectTransform)panel.transform);
-            panel.AddComponent<Image>().color = PanelColor;
+            GameObject panel = CreateScreenPanel("ResultCanvas", parent, ResultSortingOrder);
 
             Text title = CreateText("Title", panel.transform, WinTitle, TitleFontSize, CaughtTextColor);
-            Place((RectTransform)title.transform, new Vector2(0.5f, 0.82f), new Vector2(1400f, 140f));
+            Place((RectTransform)title.transform, new Vector2(0.5f, 0.88f), new Vector2(1400f, 140f));
             AddOutline(title.gameObject);
-            Text details = CreateText("Details", panel.transform, string.Empty, DetailsFontSize, Color.white);
-            Place((RectTransform)details.transform, new Vector2(0.5f, 0.5f), new Vector2(1000f, 420f));
-            Button playAgain = CreateButton(panel.transform, PlayAgainText);
+            var stars = new Object[StarCount];
+            for (int i = 0; i < StarCount; i++)
+            {
+                stars[i] = CreateStar(panel.transform, new Vector2(0.5f + (i - 1) * StarSpacing, 0.74f));
+            }
 
-            var resultUI = canvas.AddComponent<LevelResultUI>();
+            Text details = CreateText("Details", panel.transform, string.Empty, DetailsFontSize, Color.white);
+            details.fontStyle = FontStyle.Normal;
+            Place((RectTransform)details.transform, new Vector2(0.5f, 0.43f), new Vector2(1100f, 480f));
+            Button playAgain = CreateButton("PlayAgainButton", panel.transform, PlayAgainText, new Vector2(0.5f, 0.1f));
+
+            var resultUI = panel.transform.parent.gameObject.AddComponent<LevelResultUI>();
             EditorAssets.SetReference(resultUI, "_levelFlow", flow);
             EditorAssets.SetReference(resultUI, "_shoppingList", shoppingList);
             EditorAssets.SetReference(resultUI, "_panel", panel);
+            EditorAssets.SetReferenceArray(resultUI, "_stars", stars);
             EditorAssets.SetReference(resultUI, "_details", details);
             EditorAssets.SetReference(resultUI, "_playAgainButton", playAgain);
             UnityEventTools.AddPersistentListener(playAgain.onClick, resultUI.PlayAgain);
             panel.SetActive(false);
+        }
+
+        /// <summary>Pausa (GDD §13): Continuar e Reiniciar fase. O botão do mapa entra com o fluxo de cenas (3.8).</summary>
+        private static void AddPauseScreen(Transform parent, LevelFlow flow)
+        {
+            var pause = parent.gameObject.AddComponent<PauseController>();
+            EditorAssets.SetReference(pause, "_levelFlow", flow);
+
+            GameObject panel = CreateScreenPanel("PauseCanvas", parent, PauseSortingOrder);
+            Text title = CreateText("Title", panel.transform, PauseTitle, TitleFontSize, CaughtTextColor);
+            Place((RectTransform)title.transform, new Vector2(0.5f, 0.72f), new Vector2(1000f, 140f));
+            AddOutline(title.gameObject);
+            Button resume = CreateButton("ResumeButton", panel.transform, ResumeText, new Vector2(0.5f, 0.5f));
+            Button restart = CreateButton("RestartButton", panel.transform, RestartText, new Vector2(0.5f, 0.36f));
+            UnityEventTools.AddPersistentListener(resume.onClick, pause.Resume);
+            UnityEventTools.AddPersistentListener(restart.onClick, pause.RestartLevel);
+
+            var pauseUI = panel.transform.parent.gameObject.AddComponent<PauseMenuUI>();
+            EditorAssets.SetReference(pauseUI, "_pause", pause);
+            EditorAssets.SetReference(pauseUI, "_panel", panel);
+            EditorAssets.SetReference(pauseUI, "_resumeButton", resume);
+            panel.SetActive(false);
+        }
+
+        /// <summary>Canvas com um painel escuro de tela cheia, que recebe cliques (telas de pausa e resultado).</summary>
+        private static GameObject CreateScreenPanel(string canvasName, Transform parent, int sortingOrder)
+        {
+            GameObject canvas = CreateCanvas(canvasName, parent, sortingOrder);
+            canvas.AddComponent<GraphicRaycaster>();
+            var panel = new GameObject("Panel", typeof(RectTransform)) { layer = UILayer };
+            panel.transform.SetParent(canvas.transform, false);
+            Stretch((RectTransform)panel.transform);
+            panel.AddComponent<Image>().color = PanelColor;
+            return panel;
+        }
+
+        /// <summary>Estrela greybox: um losango (quadrado girado), colorido pela tela de resultado.</summary>
+        private static Image CreateStar(Transform parent, Vector2 anchor)
+        {
+            var star = new GameObject("Star", typeof(RectTransform)) { layer = UILayer };
+            star.transform.SetParent(parent, false);
+            var rect = (RectTransform)star.transform;
+            Place(rect, anchor, Vector2.one * StarSize);
+            rect.localRotation = Quaternion.Euler(0f, 0f, 45f);
+            var image = star.AddComponent<Image>();
+            image.raycastTarget = false;
+            return image;
         }
 
         /// <summary>
@@ -198,11 +255,11 @@ namespace Guaxinim.EditorTools
             rect.anchoredPosition = offset;
         }
 
-        private static Button CreateButton(Transform parent, string label)
+        private static Button CreateButton(string name, Transform parent, string label, Vector2 anchor)
         {
-            var buttonObject = new GameObject("PlayAgainButton", typeof(RectTransform)) { layer = UILayer };
+            var buttonObject = new GameObject(name, typeof(RectTransform)) { layer = UILayer };
             buttonObject.transform.SetParent(parent, false);
-            Place((RectTransform)buttonObject.transform, new Vector2(0.5f, 0.18f), ButtonSize);
+            Place((RectTransform)buttonObject.transform, anchor, ButtonSize);
             var image = buttonObject.AddComponent<Image>();
             image.color = ButtonColor;
             var button = buttonObject.AddComponent<Button>();
