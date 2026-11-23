@@ -10,25 +10,21 @@ using UnityEngine.UI;
 namespace Guaxinim.EditorTools
 {
     /// <summary>
-    /// Gera o prefab greybox do guaxinim (GDD §4): cápsula de 0,6 m na layer Player, com
-    /// CharacterController, InputReader, RaccoonController e RaccoonNoiseMaker, mais os dados e o material.
+    /// Gera o prefab do guaxinim (GDD §4): o modelo do Blender com um CharacterController de 0,6 m na layer
+    /// Player, os componentes do jogador (input, movimento, som, inventário, interação, carga e frágeis) e os dados.
     /// Rodar de novo atualiza o prefab e mantém os ScriptableObjects existentes (e os números ajustados neles).
     /// </summary>
     public static class GreyboxRaccoonFactory
     {
         public const string PrefabPath = "Assets/_Project/Prefabs/Player/Raccoon.prefab";
         private const string DataPath = "Assets/_Project/Data/Player/PlayerData.asset";
-        private const string BodyMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Greybox_Raccoon.mat";
-        private const string NoseMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Greybox_RaccoonNose.mat";
+        private const string ModelPath = "Assets/_Project/Art/Models/Characters/Char_Raccoon.fbx";
 
         private const float Height = 0.6f;
         private const float Radius = 0.2f;
         private const float StepOffset = 0.15f;
         private const float SkinWidth = 0.02f;
         private const float SlopeLimitDegrees = 45f;
-        private const float UnityCapsuleHeight = 2f;
-        private const float UnityCapsuleDiameter = 1f;
-        private const float NoseHeightFraction = 0.65f;
         private const string PuddlePrefabPath = "Assets/_Project/Prefabs/Items/Puddle.prefab";
         private const string PuddleMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Puddle.mat";
         private const float ShakeIconHeight = 0.95f;
@@ -38,9 +34,6 @@ namespace Guaxinim.EditorTools
         private static readonly Color PuddleColor = new Color(0.95f, 0.6f, 0.2f, 0.6f);
         private static readonly Color ShakeLowColor = new Color(1f, 1f, 1f);
         private static readonly Color ShakeFullColor = new Color(0.95f, 0.15f, 0.1f);
-        private static readonly Vector3 NoseSize = new Vector3(0.1f, 0.08f, 0.12f);
-        private static readonly Color RaccoonColor = new Color(0.62f, 0.52f, 0.42f); // GDD §15.2: tons quentes
-        private static readonly Color NoseColor = new Color(0.15f, 0.13f, 0.12f);
 
         [MenuItem("Tools/Guaxinim/Greybox/Prefab do Guaxinim")]
         internal static void CreateRaccoonPrefab()
@@ -61,7 +54,7 @@ namespace Guaxinim.EditorTools
             AddDropper(root, input);
             AddBulkyLoad(root, data);
             AddFragileShake(root, data);
-            AddBody(root.transform);
+            AddModel(root.transform);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Player));
 
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
@@ -166,29 +159,18 @@ namespace Guaxinim.EditorTools
             return prefab;
         }
 
-        private static void AddBody(Transform root)
+        /// <summary>Visual: o modelo do Blender (0,6 m, frente em +Z), sem collider; a colisão é do CharacterController.</summary>
+        private static void AddModel(Transform root)
         {
-            Material bodyMaterial = EditorAssets.LoadOrCreateLitMaterial(BodyMaterialPath, RaccoonColor);
-            GameObject body = CreateVisual(PrimitiveType.Capsule, "Body", root, bodyMaterial);
-            float diameterScale = Radius * 2f / UnityCapsuleDiameter;
-            body.transform.localScale = new Vector3(diameterScale, Height / UnityCapsuleHeight, diameterScale);
-            body.transform.localPosition = new Vector3(0f, Height / 2f, 0f);
+            var model = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath);
+            if (model == null)
+            {
+                Debug.LogError($"Model not found: {ModelPath}");
+                return;
+            }
 
-            // O "nariz" mostra para onde o guaxinim está virado (+Z).
-            Material noseMaterial = EditorAssets.LoadOrCreateLitMaterial(NoseMaterialPath, NoseColor);
-            GameObject nose = CreateVisual(PrimitiveType.Cube, "Nose", root, noseMaterial);
-            nose.transform.localScale = NoseSize;
-            nose.transform.localPosition = new Vector3(0f, Height * NoseHeightFraction, Radius);
-        }
-
-        private static GameObject CreateVisual(PrimitiveType type, string name, Transform parent, Material material)
-        {
-            GameObject visual = GameObject.CreatePrimitive(type);
-            visual.name = name;
-            visual.transform.SetParent(parent, false);
-            Object.DestroyImmediate(visual.GetComponent<Collider>()); // a colisão é do CharacterController
-            visual.GetComponent<MeshRenderer>().sharedMaterial = material;
-            return visual;
+            var visual = (GameObject)PrefabUtility.InstantiatePrefab(model, root);
+            visual.name = "Model";
         }
     }
 }

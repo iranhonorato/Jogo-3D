@@ -44,8 +44,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 74d36d16877a76a4fa5db3a980d0fce3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.UI.DetectionMeterIcon
-  _meter: {fileID: 2460089505054489601}
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.UI.WorldMeterIcon
+  _source: {fileID: 2460089505054489601}
   _visualRoot: {fileID: 2051484422380942698}
   _fill: {fileID: 8470087985499503613}
   _fillRenderer: {fileID: 5075463681224736752}

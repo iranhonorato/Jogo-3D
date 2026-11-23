@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95c50d7ae223c934e908d499405fe280, type: 3}
+  m_Name: Level_01_Mercadinho
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Core.LevelData
+  _displayName: "Mercadinho do Seu Z\xE9"
+  _shoppingList:
+  - {fileID: 11400000, guid: a08b631010433024c82380d0f3e1c107, type: 2}
+  - {fileID: 11400000, guid: be2733857069a904da29d3231056214b, type: 2}
+  - {fileID: 11400000, guid: ec73f6aedd73c5b4db86f3017c5a95b7, type: 2}
