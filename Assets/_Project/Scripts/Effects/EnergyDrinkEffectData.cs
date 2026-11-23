@@ -9,6 +9,6 @@ namespace Guaxinim.Effects
         [Tooltip("Multiplicador da velocidade (1,5 = +50%)")]
         [SerializeField, Min(1f)] private float _speedMultiplier = 1.5f;
 
-        public override ConsumableEffect CreateEffect() => new EnergyDrinkEffect(DurationSeconds, _speedMultiplier);
+        public override ConsumableEffect CreateEffect() => new EnergyDrinkEffect(DisplayName, DurationSeconds, _speedMultiplier);
     }
 }

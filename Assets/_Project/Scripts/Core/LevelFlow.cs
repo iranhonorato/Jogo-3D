@@ -22,6 +22,9 @@ namespace Guaxinim.Core
 
         public bool IsLevelOver { get; private set; }
 
+        /// <summary>Segundos de jogo desde o início da fase; para no fim (cronômetro e tempo-alvo).</summary>
+        public float ElapsedSeconds { get; private set; }
+
         private void Awake()
         {
             if (_data == null || _player == null || _shoppingList == null)
@@ -41,6 +44,14 @@ namespace Guaxinim.Core
             if (_shoppingList != null)
             {
                 _shoppingList.OnCompleted += HandleListCompleted;
+            }
+        }
+
+        private void Update()
+        {
+            if (!IsLevelOver)
+            {
+                ElapsedSeconds += Time.deltaTime;
             }
         }
 

@@ -4,6 +4,7 @@ using Guaxinim.Guards;
 using Guaxinim.Items;
 using Guaxinim.Player;
 using Guaxinim.Shared;
+using Guaxinim.UI;
 using Unity.AI.Navigation;
 using Unity.Cinemachine;
 using UnityEditor;
@@ -114,6 +115,7 @@ namespace Guaxinim.EditorTools
             GameObject raccoon = Place(GreyboxRaccoonFactory.PrefabPath, root, start, yawDegrees);
             EditorAssets.SetReference(systems.GetComponent<LevelFlow>(), "_player", raccoon.GetComponent<PlayerState>());
             EditorAssets.SetReference(systems.GetComponent<ShoppingListHighlighter>(), "_player", raccoon.transform);
+            ConnectHud(systems, raccoon);
 
             GameObject cameraRig = Place(CameraRigFactory.PerspectivePath, root, Vector3.zero, 0f);
             DisableOtherMainCameras(cameraRig);
@@ -148,6 +150,19 @@ namespace Guaxinim.EditorTools
             surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
             surface.layerMask = ~LayerMask.GetMask(Layers.Player, Layers.Guard);
             return surface;
+        }
+
+        /// <summary>A HUD vive no LevelSystems; o que é do guaxinim é ligado aqui, na cena.</summary>
+        private static void ConnectHud(GameObject systems, GameObject raccoon)
+        {
+            EditorAssets.SetReference(systems.GetComponentInChildren<ShoppingListUI>(), "_input",
+                raccoon.GetComponent<Core.InputReader>());
+            var loadUI = systems.GetComponentInChildren<CarryLoadUI>();
+            EditorAssets.SetReference(loadUI, "_inventory", raccoon.GetComponent<Inventory>());
+            EditorAssets.SetReference(loadUI, "_effects", raccoon.GetComponent<RaccoonEffects>());
+            EditorAssets.SetReference(loadUI, "_bulkyLoad", raccoon.GetComponent<RaccoonBulkyLoad>());
+            EditorAssets.SetReference(systems.GetComponentInChildren<EffectsUI>(), "_effects",
+                raccoon.GetComponent<RaccoonEffects>());
         }
 
         private static void DisableOtherMainCameras(GameObject cameraRig)

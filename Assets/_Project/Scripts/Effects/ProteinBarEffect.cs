@@ -6,8 +6,8 @@ namespace Guaxinim.Effects
         private readonly float _maxWeightBonus;
         private readonly float _weightPenaltyScale;
 
-        public ProteinBarEffect(float durationSeconds, float maxWeightBonus, float weightPenaltyScale)
-            : base(durationSeconds)
+        public ProteinBarEffect(string displayName, float durationSeconds, float maxWeightBonus,
+            float weightPenaltyScale) : base(displayName, durationSeconds)
         {
             _maxWeightBonus = maxWeightBonus;
             _weightPenaltyScale = weightPenaltyScale;

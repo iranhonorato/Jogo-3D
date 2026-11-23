@@ -30,6 +30,11 @@ namespace Guaxinim.EditorTools
         private const int DetailsFontSize = 40;
         private const int ButtonFontSize = 44;
         private const int UILayer = 5;
+        private const int HudSortingOrder = 1;
+        private const int HudFontSize = 32;
+        private const int TimerFontSize = 48;
+        private const float BarBlockHeight = 80f;
+        private const float BarLabelHeight = 40f;
         private const int CaughtSortingOrder = 10;
         private const int ResultSortingOrder = 20;
 
@@ -38,6 +43,8 @@ namespace Guaxinim.EditorTools
         private static readonly Color CaughtTextColor = new Color(1f, 0.88f, 0.7f);
         private static readonly Color OutlineColor = new Color(0.1f, 0.05f, 0.1f);
         private static readonly Vector2 OutlineDistance = new Vector2(4f, -4f);
+        private static readonly Vector2 BarSize = new Vector2(380f, 22f);
+        private static readonly Color HudPanelColor = new Color(0.05f, 0.03f, 0.1f, 0.6f);
         private static readonly Color PanelColor = new Color(0.05f, 0.03f, 0.1f, 0.85f);
         private static readonly Color ButtonColor = new Color(1f, 0.78f, 0.3f);
         private static readonly Color ButtonTextColor = new Color(0.12f, 0.07f, 0.15f);
@@ -57,6 +64,7 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(flow, "_data", EditorAssets.LoadOrCreate<LevelFlowData>(FlowDataPath));
             EditorAssets.SetReference(flow, "_shoppingList", shoppingList);
 
+            AddHud(systems.transform, flow, shoppingList);
             AddCaughtMessage(systems.transform, flow);
             AddResultScreen(systems.transform, flow, shoppingList);
             AddEventSystem(systems.transform);
@@ -104,6 +112,90 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(resultUI, "_playAgainButton", playAgain);
             UnityEventTools.AddPersistentListener(playAgain.onClick, resultUI.PlayAgain);
             panel.SetActive(false);
+        }
+
+        /// <summary>
+        /// HUD (GDD §13): lista no canto superior esquerdo, cronômetro no superior direito, peso e volume no
+        /// inferior esquerdo e efeitos no inferior direito. O guaxinim é ligado na montagem da fase.
+        /// </summary>
+        private static void AddHud(Transform parent, LevelFlow flow, ShoppingList shoppingList)
+        {
+            GameObject canvas = CreateCanvas("HudCanvas", parent, HudSortingOrder);
+
+            Text list = CreateHudText("ShoppingList", canvas.transform, new Vector2(0f, 1f), new Vector2(30f, -30f),
+                new Vector2(560f, 320f), TextAnchor.UpperLeft);
+            var listUI = canvas.AddComponent<ShoppingListUI>();
+            EditorAssets.SetReference(listUI, "_shoppingList", shoppingList);
+            EditorAssets.SetReference(listUI, "_text", list);
+
+            Text timer = CreateHudText("Timer", canvas.transform, new Vector2(1f, 1f), new Vector2(-30f, -30f),
+                new Vector2(240f, 80f), TextAnchor.MiddleRight);
+            timer.fontSize = TimerFontSize;
+            var timerUI = canvas.AddComponent<LevelTimerUI>();
+            EditorAssets.SetReference(timerUI, "_levelFlow", flow);
+            EditorAssets.SetReference(timerUI, "_text", timer);
+
+            Text effects = CreateHudText("Effects", canvas.transform, new Vector2(1f, 0f), new Vector2(-30f, 30f),
+                new Vector2(380f, 140f), TextAnchor.LowerRight);
+            EditorAssets.SetReference(canvas.AddComponent<EffectsUI>(), "_text", effects);
+
+            AddLoadBars(canvas);
+        }
+
+        private static void AddLoadBars(GameObject canvas)
+        {
+            var loadUI = canvas.AddComponent<CarryLoadUI>();
+            var serialized = new SerializedObject(loadUI);
+            CreateBar("Volume", canvas.transform, new Vector2(30f, 30f), serialized, "_volumeFill", "_volumeFillImage",
+                "_volumeLabel");
+            CreateBar("Weight", canvas.transform, new Vector2(30f, 30f + BarBlockHeight), serialized, "_weightFill",
+                "_weightFillImage", "_weightLabel");
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        /// <summary>Rótulo e barra (fundo escuro com preenchimento pela âncora), presos no canto inferior esquerdo.</summary>
+        private static void CreateBar(string name, Transform canvas, Vector2 offset, SerializedObject loadUI,
+            string fillProperty, string fillImageProperty, string labelProperty)
+        {
+            Text label = CreateHudText(name + "Label", canvas, Vector2.zero, offset + Vector2.up * BarSize.y,
+                new Vector2(BarSize.x, BarLabelHeight), TextAnchor.LowerLeft);
+
+            var background = new GameObject(name + "Bar", typeof(RectTransform)) { layer = UILayer };
+            background.transform.SetParent(canvas, false);
+            var backgroundRect = (RectTransform)background.transform;
+            PinToCorner(backgroundRect, Vector2.zero, offset, BarSize);
+            background.AddComponent<Image>().color = HudPanelColor;
+
+            var fill = new GameObject("Fill", typeof(RectTransform)) { layer = UILayer };
+            fill.transform.SetParent(background.transform, false);
+            var fillRect = (RectTransform)fill.transform;
+            Stretch(fillRect);
+            fillRect.anchorMax = new Vector2(0f, 1f);
+            var fillImage = fill.AddComponent<Image>();
+
+            loadUI.FindProperty(fillProperty).objectReferenceValue = fillRect;
+            loadUI.FindProperty(fillImageProperty).objectReferenceValue = fillImage;
+            loadUI.FindProperty(labelProperty).objectReferenceValue = label;
+        }
+
+        private static Text CreateHudText(string name, Transform canvas, Vector2 corner, Vector2 offset, Vector2 size,
+            TextAnchor alignment)
+        {
+            Text text = CreateText(name, canvas, string.Empty, HudFontSize, Color.white);
+            text.alignment = alignment;
+            text.fontStyle = FontStyle.Normal;
+            PinToCorner((RectTransform)text.transform, corner, offset, size);
+            AddOutline(text.gameObject);
+            return text;
+        }
+
+        private static void PinToCorner(RectTransform rect, Vector2 corner, Vector2 offset, Vector2 size)
+        {
+            rect.anchorMin = corner;
+            rect.anchorMax = corner;
+            rect.pivot = corner;
+            rect.sizeDelta = size;
+            rect.anchoredPosition = offset;
         }
 
         private static Button CreateButton(Transform parent, string label)

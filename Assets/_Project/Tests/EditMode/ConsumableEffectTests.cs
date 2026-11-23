@@ -9,9 +9,9 @@ namespace Guaxinim.Tests
     {
         private const float Tolerance = 0.001f;
 
-        private static EnergyDrinkEffect EnergyDrink() => new EnergyDrinkEffect(8f, 1.5f);
+        private static EnergyDrinkEffect EnergyDrink() => new EnergyDrinkEffect("Energético", 8f, 1.5f);
 
-        private static ProteinBarEffect ProteinBar() => new ProteinBarEffect(15f, 5f, 0.5f);
+        private static ProteinBarEffect ProteinBar() => new ProteinBarEffect("Proteína", 15f, 5f, 0.5f);
 
         [Test]
         public void NoEffects_ModifiersAreNeutral()

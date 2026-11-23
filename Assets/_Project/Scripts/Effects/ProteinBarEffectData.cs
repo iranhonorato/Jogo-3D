@@ -13,6 +13,6 @@ namespace Guaxinim.Effects
         [SerializeField, Range(0f, 1f)] private float _weightPenaltyScale = 0.5f;
 
         public override ConsumableEffect CreateEffect() =>
-            new ProteinBarEffect(DurationSeconds, _maxWeightBonus, _weightPenaltyScale);
+            new ProteinBarEffect(DisplayName, DurationSeconds, _maxWeightBonus, _weightPenaltyScale);
     }
 }

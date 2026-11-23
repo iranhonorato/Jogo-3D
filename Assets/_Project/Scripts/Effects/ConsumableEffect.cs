@@ -7,12 +7,15 @@ namespace Guaxinim.Effects
     /// </summary>
     public abstract class ConsumableEffect
     {
-        protected ConsumableEffect(float durationSeconds)
+        protected ConsumableEffect(string displayName, float durationSeconds)
         {
+            DisplayName = displayName;
             DurationSeconds = durationSeconds;
             RemainingSeconds = durationSeconds;
         }
 
+        /// <summary>Nome que o jogador vê na HUD.</summary>
+        public string DisplayName { get; }
         public float DurationSeconds { get; }
         public float RemainingSeconds { get; private set; }
         public bool IsFinished => RemainingSeconds <= 0f;

@@ -5,8 +5,8 @@ namespace Guaxinim.Effects
     {
         private readonly float _speedMultiplier;
 
-        public EnergyDrinkEffect(float durationSeconds, float speedMultiplier) : base(durationSeconds) =>
-            _speedMultiplier = speedMultiplier;
+        public EnergyDrinkEffect(string displayName, float durationSeconds, float speedMultiplier)
+            : base(displayName, durationSeconds) => _speedMultiplier = speedMultiplier;
 
         public override float SpeedMultiplier => _speedMultiplier;
     }

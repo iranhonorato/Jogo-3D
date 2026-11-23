@@ -102,14 +102,15 @@ namespace Guaxinim.EditorTools
             }
 
             ConsumableEffectData effect = row.Name == ProteinBarName
-                ? LoadOrCreateEffect<ProteinBarEffectData>("Effect_ProteinBar", ProteinBarSeconds)
-                : LoadOrCreateEffect<EnergyDrinkEffectData>("Effect_EnergyDrink", EnergyDrinkSeconds);
+                ? LoadOrCreateEffect<ProteinBarEffectData>("Effect_ProteinBar", "Proteína", ProteinBarSeconds)
+                : LoadOrCreateEffect<EnergyDrinkEffectData>("Effect_EnergyDrink", "Energético", EnergyDrinkSeconds);
             var serialized = new SerializedObject(data);
             serialized.FindProperty("_effect").objectReferenceValue = effect;
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static T LoadOrCreateEffect<T>(string assetName, float durationSeconds) where T : ConsumableEffectData
+        private static T LoadOrCreateEffect<T>(string assetName, string displayName, float durationSeconds)
+            where T : ConsumableEffectData
         {
             string path = $"{EffectsFolder}/{assetName}.asset";
             var effect = AssetDatabase.LoadAssetAtPath<T>(path);
@@ -120,6 +121,7 @@ namespace Guaxinim.EditorTools
 
             effect = ScriptableObject.CreateInstance<T>();
             var serialized = new SerializedObject(effect);
+            serialized.FindProperty("_displayName").stringValue = displayName;
             serialized.FindProperty("_durationSeconds").floatValue = durationSeconds;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             AssetDatabase.CreateAsset(effect, path);
