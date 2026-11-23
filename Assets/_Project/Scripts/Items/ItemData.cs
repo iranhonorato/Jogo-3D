@@ -1,3 +1,4 @@
+using Guaxinim.Effects;
 using UnityEngine;
 
 namespace Guaxinim.Items
@@ -26,11 +27,15 @@ namespace Guaxinim.Items
         [Tooltip("Usado na hora, ao pegar (GDD §8.1)")]
         [SerializeField] private bool _isConsumable;
 
+        [Tooltip("Efeito aplicado ao pegar, se for consumível")]
+        [SerializeField] private ConsumableEffectData _effect;
+
         public string DisplayName => _displayName;
         public Sprite Icon => _icon;
         public float Weight => _weight;
         public float Volume => _volume;
         public bool IsFragile => _isFragile;
         public bool IsConsumable => _isConsumable;
+        public ConsumableEffectData Effect => _effect;
     }
 }

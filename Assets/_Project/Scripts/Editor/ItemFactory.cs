@@ -1,3 +1,4 @@
+using Guaxinim.Effects;
 using Guaxinim.Items;
 using Guaxinim.Shared;
 using UnityEditor;
@@ -16,6 +17,10 @@ namespace Guaxinim.EditorTools
         public const string PrefabsFolder = "Assets/_Project/Prefabs/Items";
 
         private const string DataFolder = "Assets/_Project/Data/Items";
+        private const string EffectsFolder = "Assets/_Project/Data/Effects";
+        private const string ProteinBarName = "ProteinBar";
+        private const float EnergyDrinkSeconds = 8f;
+        private const float ProteinBarSeconds = 15f;
         private const string MaterialsFolder = "Assets/_Project/Art/Materials/Greybox";
         private const float BaseSize = 0.18f;
         private const float SizePerVolume = 0.07f;
@@ -58,9 +63,11 @@ namespace Guaxinim.EditorTools
         {
             EditorAssets.EnsureFolder(DataFolder);
             EditorAssets.EnsureFolder(PrefabsFolder);
+            EditorAssets.EnsureFolder(EffectsFolder);
             foreach (ItemRow row in Rows)
             {
                 ItemData data = LoadOrCreateData(row);
+                AssignEffectIfMissing(row, data);
                 CreatePrefab(row, data);
             }
         }
@@ -84,6 +91,39 @@ namespace Guaxinim.EditorTools
             serialized.ApplyModifiedPropertiesWithoutUndo();
             AssetDatabase.CreateAsset(data, path);
             return data;
+        }
+
+        /// <summary>GDD §8.1: o consumível aponta para o asset do efeito (energético 8 s, proteína 15 s).</summary>
+        private static void AssignEffectIfMissing(ItemRow row, ItemData data)
+        {
+            if (!row.IsConsumable || data.Effect != null)
+            {
+                return;
+            }
+
+            ConsumableEffectData effect = row.Name == ProteinBarName
+                ? LoadOrCreateEffect<ProteinBarEffectData>("Effect_ProteinBar", ProteinBarSeconds)
+                : LoadOrCreateEffect<EnergyDrinkEffectData>("Effect_EnergyDrink", EnergyDrinkSeconds);
+            var serialized = new SerializedObject(data);
+            serialized.FindProperty("_effect").objectReferenceValue = effect;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static T LoadOrCreateEffect<T>(string assetName, float durationSeconds) where T : ConsumableEffectData
+        {
+            string path = $"{EffectsFolder}/{assetName}.asset";
+            var effect = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (effect != null)
+            {
+                return effect;
+            }
+
+            effect = ScriptableObject.CreateInstance<T>();
+            var serialized = new SerializedObject(effect);
+            serialized.FindProperty("_durationSeconds").floatValue = durationSeconds;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            AssetDatabase.CreateAsset(effect, path);
+            return effect;
         }
 
         private static void CreatePrefab(ItemRow row, ItemData data)

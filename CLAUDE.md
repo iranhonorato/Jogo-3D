@@ -48,7 +48,9 @@ As rubricas premiam acabamento, não quantidade de mecânicas: uma fase polida v
   - 2.4: `RaccoonBulkyLoad` (volume 4 ou mais: `Shared/ViewObstruction` esconde cones a mais de 6 m, `UI/BulkyVignetteUI`, `Physics.IgnoreLayerCollision` com `NarrowGap`) e prefab `NarrowGap_1.2m`, posto no vão entre as gôndolas da Fase 1.
   - 2.5: `ShakeMeter` testado e `FragileShake` (quebra o último frágil, som de 10 m e poça). `DetectionMeterIcon` virou `UI/WorldMeterIcon` (lê `Shared/IMeterValue`).
   - 2.6: `Core/LevelData`, `Items/ShoppingListProgress` testado, `ShoppingList`, `Den` (trigger na toca, entrega automática), `ShoppingListHighlighter` (contorno), vitória no `LevelFlow` (congela o tempo; o `SceneLoader` volta a 1) e `UI/LevelResultUI` provisória com "Jogar de novo". `LevelSystems` ganhou EventSystem com `InputSystemUIInputModule`.
-  - A Sandbox tem geleia, papel higiênico e melancia para testar frágil, volume e peso; a lista dela é geleia e melancia.
+  - 2.7: `Effects/` (`ConsumableEffect` base, `EnergyDrinkEffect`, `ProteinBarEffect`, `ActiveEffects` testado e os assets `ConsumableEffectData` com `CreateEffect()`), `Player/RaccoonEffects`; o `Inventory` usa o consumível na hora, soma o bônus de peso da proteína e tem `IsOverweight` (velocidade mínima de 40% e não pega nada).
+  - A Sandbox tem geleia, papel higiênico, melancia, energético e barra de proteína para testar os efeitos; a lista dela é geleia e melancia.
+- **Pendências de visual (combinadas em 23/11, para depois):** o guaxinim já usa o modelo `Char_Raccoon` (rodar `Montar Fase 1` de novo para ver); fazer animação procedural (quique e balanço ao andar, inclinação ao correr, respiração parado) para os três personagens, já que não há rig (GDD §15.4 permite animações pequenas no Unity); aproximar a câmera de 28 m para cerca de 16 m.
 - **Próximo passo: o usuário testa o Marco 1 e os passos 2.1 a 2.6 juntos** (rodar `Montar Fase 1` e `Montar Sandbox de Teste`, Play, Test Runner e builds). Ainda falta escolher a câmera (perspectiva ou ortográfica) e registrar no GDD §3.1. Depois, marcar os passos e seguir para o 2.7.
 
 Atualize esta seção ao fim de cada passo.

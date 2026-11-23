@@ -64,12 +64,14 @@ namespace Guaxinim.EditorTools
             }
         }
 
-        /// <summary>Um item de cada efeito, perto do início: frágil (2.5), volumoso (2.4) e pesado (2.2).</summary>
+        /// <summary>Um item de cada efeito, perto do início: frágil, volumoso, pesado e os dois consumíveis.</summary>
         private static void PlaceTestItems(Transform root)
         {
             LevelBuildKit.Place(ItemFactory.PrefabPath("Jam"), root, new Vector3(-5.5f, 0f, 3f), 0f);
             LevelBuildKit.Place(ItemFactory.PrefabPath("ToiletPaper"), root, new Vector3(-4.5f, 0f, 3.5f), 0f);
             LevelBuildKit.Place(ItemFactory.PrefabPath("Watermelon"), root, new Vector3(-3.5f, 0f, 4.5f), 0f);
+            LevelBuildKit.Place(ItemFactory.PrefabPath("EnergyDrink"), root, new Vector3(-5.5f, 0f, 1.5f), 0f);
+            LevelBuildKit.Place(ItemFactory.PrefabPath("ProteinBar"), root, new Vector3(-4.5f, 0f, 1.5f), 0f);
         }
 
         private static void BuildShelves(Transform root)

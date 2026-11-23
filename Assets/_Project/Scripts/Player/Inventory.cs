@@ -7,13 +7,16 @@ namespace Guaxinim.Player
 {
     /// <summary>
     /// Itens carregados pelo guaxinim (GDD §7): soma de peso e volume, com os limites do
-    /// <see cref="PlayerData"/>. Avisa qualquer mudança em <see cref="OnChanged"/>.
+    /// <see cref="PlayerData"/> e o bônus da barra de proteína. Consumíveis viram efeito na hora (GDD §8.1).
+    /// Avisa qualquer mudança em <see cref="OnChanged"/>.
     /// </summary>
+    [RequireComponent(typeof(RaccoonEffects))]
     public class Inventory : MonoBehaviour, IItemCarrier
     {
         [SerializeField] private PlayerData _data;
 
         private readonly List<PickupItem> _items = new List<PickupItem>();
+        private RaccoonEffects _effects;
 
         public event Action OnChanged;
 
@@ -21,11 +24,15 @@ namespace Guaxinim.Player
         public float CurrentWeight { get; private set; }
         public float CurrentVolume { get; private set; }
         public bool HasFragile { get; private set; }
-        public float MaxWeight => _data.MaxWeight;
+        public float MaxWeight => _data.MaxWeight + _effects.MaxWeightBonus;
+
+        /// <summary>GDD §8.1: a proteína acabou com mais peso que o máximo; fica lento e não pega nada.</summary>
+        public bool IsOverweight => CurrentWeight > MaxWeight;
         public float MaxVolume => _data.MaxVolume;
 
         private void Awake()
         {
+            _effects = GetComponent<RaccoonEffects>();
             if (_data == null)
             {
                 Debug.LogError("Inventory needs Player Data assigned.", this);
@@ -33,10 +40,21 @@ namespace Guaxinim.Player
             }
         }
 
-        /// <summary>Pega o item se couber: ele sai do mundo e entra na lista.</summary>
+        /// <summary>Pega o item se couber: ele sai do mundo e entra na lista. Consumível é usado na hora.</summary>
         public bool TryPickUp(PickupItem item)
         {
-            if (item == null || _items.Contains(item) || !CanCarry(item.Data))
+            if (item == null || _items.Contains(item))
+            {
+                return false;
+            }
+
+            if (item.Data.IsConsumable)
+            {
+                Consume(item);
+                return true;
+            }
+
+            if (!CanCarry(item.Data))
             {
                 return false;
             }
@@ -93,6 +111,20 @@ namespace Guaxinim.Player
             }
 
             return false;
+        }
+
+        private void Consume(PickupItem item)
+        {
+            if (item.Data.Effect != null)
+            {
+                _effects.Apply(item.Data.Effect.CreateEffect());
+            }
+            else
+            {
+                Debug.LogError($"Consumable {item.Data.name} has no Effect assigned.", item);
+            }
+
+            Destroy(item.gameObject);
         }
 
         public bool CanCarry(ItemData item) =>
