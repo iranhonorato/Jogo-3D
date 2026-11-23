@@ -8,6 +8,7 @@ namespace Guaxinim.EditorTools
     public static class EditorAssets
     {
         private const string LitShaderName = "Universal Render Pipeline/Lit";
+        private const string UnlitShaderName = "Universal Render Pipeline/Unlit";
         private const string ParticlesUnlitShaderName = "Universal Render Pipeline/Particles/Unlit";
         private const string BaseColorProperty = "_BaseColor";
         private const int TransparentQueue = (int)RenderQueue.Transparent;
@@ -29,6 +30,15 @@ namespace Guaxinim.EditorTools
         public static Material LoadOrCreateLitMaterial(string path, Color color)
         {
             Material material = LoadOrCreateMaterial(path, LitShaderName);
+            material.SetColor(BaseColorProperty, color);
+            EditorUtility.SetDirty(material);
+            return material;
+        }
+
+        /// <summary>Material opaco sem luz (ícones sobre os personagens).</summary>
+        public static Material LoadOrCreateUnlitMaterial(string path, Color color)
+        {
+            Material material = LoadOrCreateMaterial(path, UnlitShaderName);
             material.SetColor(BaseColorProperty, color);
             EditorUtility.SetDirty(material);
             return material;

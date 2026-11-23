@@ -19,7 +19,15 @@ namespace Guaxinim.EditorTools
         private const string DataPath = "Assets/_Project/Data/Guards/GuardData.asset";
         private const string VisionDataPath = "Assets/_Project/Data/Guards/VisionData_Guard.asset";
         private const string ConeMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_VisionCone_Guard.mat";
-        private const string ModelPath = "Assets/_Project/Art/Models/Characters/Char_Guard.fbx";
+        private const string DetectionDataPath = "Assets/_Project/Data/Guards/DetectionData.asset";
+        private const string IconBackgroundMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Icon_Background.mat";
+        private const string IconFillMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Icon_Fill.mat";
+        private const float IconHeight = 2.25f;
+        private const float IconWidth = 0.8f;
+        private const float IconBarHeight = 0.12f;
+        private const float IconBorder = 0.06f;
+        private static readonly Color IconBackgroundColor = new Color(0.08f, 0.07f, 0.1f);
+        private const string ModelPath ="Assets/_Project/Art/Models/Characters/Char_Guard.fbx";
         private const string FlashlightSocket = "Socket_Flashlight";
 
         private const float Height = 1.8f;
@@ -45,6 +53,7 @@ namespace Guaxinim.EditorTools
             VisionData visionData = EditorAssets.LoadOrCreate<VisionData>(VisionDataPath);
             VisionCone visionCone = AddVision(root, visionData);
             AddConeMesh(root.transform, visionCone);
+            AddDetection(root, visionCone);
             GameObject model = AddModel(root.transform);
             AddFlashlight(root.transform, model, visionData);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Guard));
@@ -94,6 +103,45 @@ namespace Guaxinim.EditorTools
 
             var coneMesh = coneObject.AddComponent<VisionConeMesh>();
             EditorAssets.SetReference(coneMesh, "_visionCone", visionCone);
+        }
+
+        private static void AddDetection(GameObject root, VisionCone visionCone)
+        {
+            var meter = root.AddComponent<DetectionMeter>();
+            EditorAssets.SetReference(meter, "_visionCone", visionCone);
+            EditorAssets.SetReference(meter, "_data", EditorAssets.LoadOrCreate<DetectionData>(DetectionDataPath));
+
+            var iconObject = new GameObject("DetectionIcon");
+            iconObject.transform.SetParent(root.transform, false);
+            iconObject.transform.localPosition = Vector3.up * IconHeight;
+            var visual = new GameObject("Visual");
+            visual.transform.SetParent(iconObject.transform, false);
+
+            Material backgroundMaterial = EditorAssets.LoadOrCreateUnlitMaterial(IconBackgroundMaterialPath, IconBackgroundColor);
+            GameObject background = CreateQuad("Background", visual.transform, backgroundMaterial);
+            background.transform.localScale = new Vector3(IconWidth + IconBorder, IconBarHeight + IconBorder, 1f);
+            Material fillMaterial = EditorAssets.LoadOrCreateUnlitMaterial(IconFillMaterialPath, Color.white);
+            GameObject fill = CreateQuad("Fill", visual.transform, fillMaterial);
+
+            var icon = iconObject.AddComponent<UI.DetectionMeterIcon>();
+            EditorAssets.SetReference(icon, "_meter", meter);
+            EditorAssets.SetReference(icon, "_visualRoot", visual);
+            EditorAssets.SetReference(icon, "_fill", fill.transform);
+            EditorAssets.SetReference(icon, "_fillRenderer", fill.GetComponent<MeshRenderer>());
+            visual.SetActive(false);
+        }
+
+        private static GameObject CreateQuad(string name, Transform parent, Material material)
+        {
+            GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            quad.name = name;
+            quad.transform.SetParent(parent, false);
+            Object.DestroyImmediate(quad.GetComponent<Collider>());
+            var renderer = quad.GetComponent<MeshRenderer>();
+            renderer.sharedMaterial = material;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            return quad;
         }
 
         private static GameObject AddModel(Transform root)
