@@ -1,5 +1,6 @@
 using Guaxinim.Core;
 using Guaxinim.Guards;
+using Guaxinim.Items;
 using Guaxinim.Player;
 using Guaxinim.Shared;
 using Unity.AI.Navigation;
@@ -66,12 +67,51 @@ namespace Guaxinim.EditorTools
             }
         }
 
-        /// <summary>Põe o LevelSystems, o guaxinim e o rig de câmera, e liga tudo entre si.</summary>
-        public static GameObject PlacePlayer(Transform root, Vector3 start, float yawDegrees)
+        /// <summary>Cria (ou carrega) o LevelData de uma fase com a lista de compras pelos nomes dos itens.</summary>
+        public static LevelData LoadOrCreateLevelData(string path, string displayName, string[] shoppingListItems)
+        {
+            var level = EditorAssets.LoadOrCreate<LevelData>(path);
+            var serialized = new SerializedObject(level);
+            serialized.FindProperty("_displayName").stringValue = displayName;
+            SerializedProperty list = serialized.FindProperty("_shoppingList");
+            list.arraySize = shoppingListItems.Length;
+            for (int i = 0; i < shoppingListItems.Length; i++)
+            {
+                list.GetArrayElementAtIndex(i).objectReferenceValue = ItemFactory.LoadData(shoppingListItems[i]);
+            }
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return level;
+        }
+
+        /// <summary>Põe o LevelSystems com a lista de compras da fase.</summary>
+        public static GameObject PlaceLevelSystems(Transform root, LevelData level)
         {
             GameObject systems = Place(LevelSystemsFactory.SystemsPrefabPath, root, Vector3.zero, 0f);
+            var listItems = new Object[level.ShoppingList.Count];
+            for (int i = 0; i < listItems.Length; i++)
+            {
+                listItems[i] = level.ShoppingList[i];
+            }
+
+            EditorAssets.SetReferenceArray(systems.GetComponent<ShoppingList>(), "_required", listItems);
+            return systems;
+        }
+
+        /// <summary>Põe a toca, ligada à lista de compras da fase.</summary>
+        public static GameObject PlaceDen(Transform root, GameObject systems, Vector3 position, float yawDegrees)
+        {
+            GameObject den = Place(EnvironmentKitFactory.DenPath, root, position, yawDegrees);
+            EditorAssets.SetReference(den.GetComponent<Den>(), "_shoppingList", systems.GetComponent<ShoppingList>());
+            return den;
+        }
+
+        /// <summary>Põe o guaxinim e o rig de câmera, e liga os dois aos sistemas da fase.</summary>
+        public static GameObject PlacePlayer(Transform root, GameObject systems, Vector3 start, float yawDegrees)
+        {
             GameObject raccoon = Place(GreyboxRaccoonFactory.PrefabPath, root, start, yawDegrees);
             EditorAssets.SetReference(systems.GetComponent<LevelFlow>(), "_player", raccoon.GetComponent<PlayerState>());
+            EditorAssets.SetReference(systems.GetComponent<ShoppingListHighlighter>(), "_player", raccoon.transform);
 
             GameObject cameraRig = Place(CameraRigFactory.PerspectivePath, root, Vector3.zero, 0f);
             DisableOtherMainCameras(cameraRig);

@@ -31,6 +31,7 @@ namespace Guaxinim.EditorTools
         private const float TapeFloorOffset = 0.01f;
         private const string TapeMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_NarrowGapTape.mat";
 
+        private static readonly Vector3 DenTriggerSize = new Vector3(1.2f, 1f, 1.2f);
         private static readonly Color TapeColor = new Color(1f, 0.8f, 0.1f);
 
         [MenuItem("Tools/Guaxinim/Greybox/Kit de Cenário")]
@@ -46,7 +47,21 @@ namespace Guaxinim.EditorTools
             CreatePiece("Shelf_Aisle_2m", Shelf2mPath, StandingBox(2f, ShelfHeight, ShelfDepth), obstacle);
             CreatePiece("Shelf_Aisle_4m", Shelf4mPath, StandingBox(4f, ShelfHeight, ShelfDepth), obstacle);
             CreatePiece("Den_Manhole", DenPath, null, defaultLayer);
+            AddDenTrigger();
             CreateNarrowGap();
+        }
+
+        /// <summary>A toca (GDD §7.7): área de entrega (trigger) com o Den. A lista da fase é ligada na cena.</summary>
+        private static void AddDenTrigger()
+        {
+            GameObject root = PrefabUtility.LoadPrefabContents(DenPath);
+            var trigger = root.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+            trigger.center = Vector3.up * DenTriggerSize.y / 2f;
+            trigger.size = DenTriggerSize;
+            root.AddComponent<Items.Den>();
+            PrefabUtility.SaveAsPrefabAsset(root, DenPath);
+            PrefabUtility.UnloadPrefabContents(root);
         }
 
         /// <summary>

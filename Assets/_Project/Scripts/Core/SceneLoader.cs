@@ -16,6 +16,7 @@ namespace Guaxinim.Core
                 return;
             }
 
+            Time.timeScale = 1f; // a tela de resultado (e, depois, a pausa) congela o tempo
             SceneManager.LoadScene(active.buildIndex);
         }
     }

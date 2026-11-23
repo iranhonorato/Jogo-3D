@@ -62,6 +62,19 @@ namespace Guaxinim.Player
             return true;
         }
 
+        /// <summary>Entrega tudo na toca (GDD §7.7): os itens saem do inventário e vão para a lista.</summary>
+        public void HandOverAll(List<PickupItem> into)
+        {
+            if (_items.Count == 0)
+            {
+                return;
+            }
+
+            into.AddRange(_items);
+            _items.Clear();
+            Recalculate();
+        }
+
         /// <summary>Quebra o último item frágil pego (GDD §7.5): ele some de vez.</summary>
         public bool TryBreakLastFragile()
         {

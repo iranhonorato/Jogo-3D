@@ -12,6 +12,9 @@ namespace Guaxinim.Items
     {
         [SerializeField] private ItemData _data;
 
+        [Tooltip("Contorno mostrado quando o item é da lista e o guaxinim está perto (GDD §7.1)")]
+        [SerializeField] private GameObject _highlight;
+
         public ItemData Data => _data;
         public Vector3 InteractionPoint => transform.position;
 
@@ -28,6 +31,14 @@ namespace Guaxinim.Items
             if (interactor.TryGetComponent(out IItemCarrier carrier))
             {
                 carrier.TryPickUp(this);
+            }
+        }
+
+        public void SetHighlighted(bool isHighlighted)
+        {
+            if (_highlight != null && _highlight.activeSelf != isHighlighted)
+            {
+                _highlight.SetActive(isHighlighted);
             }
         }
 

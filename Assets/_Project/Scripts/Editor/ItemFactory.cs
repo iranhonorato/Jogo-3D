@@ -20,6 +20,10 @@ namespace Guaxinim.EditorTools
         private const float BaseSize = 0.18f;
         private const float SizePerVolume = 0.07f;
         private const float TriggerPadding = 0.1f;
+        private const float HighlightScale = 1.18f;
+        private const string HighlightMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_ItemHighlight.mat";
+
+        private static readonly Color HighlightColor = new Color(1f, 1f, 0.85f);
 
         private static readonly ItemRow[] Rows =
         {
@@ -45,6 +49,9 @@ namespace Guaxinim.EditorTools
         };
 
         public static string PrefabPath(string itemName) => $"{PrefabsFolder}/Item_{itemName}.prefab";
+
+        public static ItemData LoadData(string itemName) =>
+            AssetDatabase.LoadAssetAtPath<ItemData>($"{DataFolder}/Item_{itemName}.asset");
 
         [MenuItem("Tools/Guaxinim/Greybox/Itens da Tabela")]
         internal static void CreateItems()
@@ -97,10 +104,27 @@ namespace Guaxinim.EditorTools
             visual.transform.localPosition = Vector3.up * size / 2f;
             Object.DestroyImmediate(visual.GetComponent<Collider>());
             visual.GetComponent<MeshRenderer>().sharedMaterial = CategoryMaterial(row);
+            EditorAssets.SetReference(pickup, "_highlight", CreateHighlight(root.transform, size));
 
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Interactable));
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath(row.Name));
             Object.DestroyImmediate(root);
+        }
+
+        /// <summary>Contorno (GDD §7.1): cópia maior da caixa, só com as faces de trás. Começa escondido.</summary>
+        private static GameObject CreateHighlight(Transform root, float size)
+        {
+            GameObject highlight = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            highlight.name = "Highlight";
+            highlight.transform.SetParent(root, false);
+            highlight.transform.localScale = Vector3.one * size * HighlightScale;
+            highlight.transform.localPosition = Vector3.up * size / 2f;
+            Object.DestroyImmediate(highlight.GetComponent<Collider>());
+            var renderer = highlight.GetComponent<MeshRenderer>();
+            renderer.sharedMaterial = EditorAssets.LoadOrCreateOutlineMaterial(HighlightMaterialPath, HighlightColor);
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            highlight.SetActive(false);
+            return highlight;
         }
 
         private static Material CategoryMaterial(ItemRow row)

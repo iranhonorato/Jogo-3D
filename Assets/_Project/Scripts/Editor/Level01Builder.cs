@@ -1,4 +1,5 @@
 using System.Linq;
+using Guaxinim.Core;
 using Unity.AI.Navigation;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -19,6 +20,8 @@ namespace Guaxinim.EditorTools
         private const string LevelsFolder = "Assets/_Project/Scenes/Levels";
         private const string ScenePath = LevelsFolder + "/Level_01_Mercadinho.unity";
         private const string NavMeshDataPath = LevelsFolder + "/Level_01_Mercadinho_NavMesh.asset";
+        private const string LevelDataPath = "Assets/_Project/Data/Levels/Level_01_Mercadinho.asset";
+        private const string LevelName = "Mercadinho do Seu Zé";
         private const int FloorColumns = 6;
         private const int FloorRows = 5;
         private const float StoreLightHeight = 2.4f;
@@ -26,6 +29,8 @@ namespace Guaxinim.EditorTools
         private const float StoreLightIntensity = 1.2f;
         private const float MoonlightIntensity = 0.35f;
         private const float ShelfBaseTop = 0.12f;
+
+        private static readonly string[] ShoppingListItems = { "Bread", "Banana", "Cheese" }; // GDD §11
 
         private static readonly Vector3 DenPosition = new Vector3(-5f, 0f, 4f);
         private static readonly Vector3 RaccoonStart = new Vector3(-4.2f, 0f, 2.6f);
@@ -68,8 +73,10 @@ namespace Guaxinim.EditorTools
             var root = new GameObject("Level_01");
             LevelBuildKit.BuildRoom(root.transform, FloorColumns, FloorRows);
             BuildShelves(root.transform);
-            LevelBuildKit.Place(EnvironmentKitFactory.DenPath, root.transform, DenPosition, 0f);
-            GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, RaccoonStart, 180f);
+            LevelData level = LevelBuildKit.LoadOrCreateLevelData(LevelDataPath, LevelName, ShoppingListItems);
+            GameObject systems = LevelBuildKit.PlaceLevelSystems(root.transform, level);
+            LevelBuildKit.PlaceDen(root.transform, systems, DenPosition, 0f);
+            GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, systems, RaccoonStart, 180f);
             LevelBuildKit.PlaceGuard(root.transform, GuardFactory.SeuZePrefabPath, SeuZeWaypoints, 0, -90f);
             PlaceItems(root.transform);
             SetUpNightLighting(root.transform, raccoon.scene);

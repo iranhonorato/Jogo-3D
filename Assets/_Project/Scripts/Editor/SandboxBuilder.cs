@@ -1,3 +1,4 @@
+using Guaxinim.Core;
 using Unity.AI.Navigation;
 using Unity.AI.Navigation.Editor;
 using UnityEditor;
@@ -16,6 +17,9 @@ namespace Guaxinim.EditorTools
         private const string RootName = "Sandbox";
         private const int FloorColumns = 8;
         private const int FloorRows = 6;
+        private const string LevelDataPath = "Assets/_Project/Data/Levels/Level_Sandbox.asset";
+
+        private static readonly string[] ShoppingListItems = { "Jam", "Watermelon" };
 
         private static readonly Vector3 RaccoonStart = new Vector3(-6.5f, 0f, 4.5f);
 
@@ -37,8 +41,10 @@ namespace Guaxinim.EditorTools
             Undo.RegisterCreatedObjectUndo(root, "Build sandbox");
             LevelBuildKit.BuildRoom(root.transform, FloorColumns, FloorRows);
             BuildShelves(root.transform);
-            LevelBuildKit.Place(EnvironmentKitFactory.DenPath, root.transform, new Vector3(6f, 0f, -4.5f), 0f);
-            GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, RaccoonStart, 0f);
+            LevelData level = LevelBuildKit.LoadOrCreateLevelData(LevelDataPath, "Sandbox", ShoppingListItems);
+            GameObject systems = LevelBuildKit.PlaceLevelSystems(root.transform, level);
+            LevelBuildKit.PlaceDen(root.transform, systems, new Vector3(6f, 0f, -4.5f), 0f);
+            GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, systems, RaccoonStart, 0f);
             LevelBuildKit.PlaceGuard(root.transform, GuardFactory.GuardPrefabPath, GuardWaypoints, 3, 90f);
             PlaceTestItems(root.transform);
 

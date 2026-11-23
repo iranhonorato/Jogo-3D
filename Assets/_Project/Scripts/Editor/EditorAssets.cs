@@ -44,6 +44,15 @@ namespace Guaxinim.EditorTools
             return material;
         }
 
+        /// <summary>Material sem luz que desenha só as faces de trás: numa cópia um pouco maior, vira contorno.</summary>
+        public static Material LoadOrCreateOutlineMaterial(string path, Color color)
+        {
+            Material material = LoadOrCreateUnlitMaterial(path, color);
+            material.SetFloat("_Cull", (float)CullMode.Front);
+            EditorUtility.SetDirty(material);
+            return material;
+        }
+
         /// <summary>Material sem luz, transparente e que usa a cor do vértice (anéis e linhas).</summary>
         public static Material LoadOrCreateTransparentUnlitMaterial(string path, Color color)
         {
