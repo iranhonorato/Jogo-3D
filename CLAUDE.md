@@ -26,8 +26,9 @@ As rubricas premiam acabamento, não quantidade de mecânicas: uma fase polida v
 - **Pronto:** Unity 6000.3.24f1 com URP; pacotes (Input System, Cinemachine 3, AI Navigation, uGUI/TMP, Test Framework); pastas de `Assets/_Project/`; assemblies `Guaxinim.Runtime`, `Guaxinim.EditorTools` e `Guaxinim.Tests.EditMode`; layers 6 a 11 (`Player`, `Guard`, `Obstacle`, `ShelfTop`, `NarrowGap`, `Interactable`); `.gitignore` e `.gitattributes`.
 - **Adiantado a pedido do usuário (parte do passo 3.10):** modelos estáticos do guaxinim, do segurança e do Seu Zé em `Art/Models/Characters/`, gerados pelos scripts de `Tools/Blender/` e validados na Unity (escala, frente em +Z, textura ligada). Em 23/11 também foram gerados a câmera de segurança (`Art/Models/Hazards/`) e o kit modular (gôndolas de 2 m e 4 m, parede, piso e toca, em `Art/Models/Environment/`, com um atlas só), ainda sem conferência na Unity. Faltam rig e animações.
 - **Prazo confirmado:** entrega em 25/11/2026, com cerca de 15 h de trabalho por dia em 23 e 24/11. O plano dos 2 dias: marcos 0 e 1 no dia 23; no dia 24, passos 2.1 a 2.6, 3.3 e 3.4 (alerta e câmeras), 3.5, 3.6 e 3.8, e a troca do greybox pela arte; no dia 25, build final e página do itch.io. Lixeiras, aspirador, consumíveis, cogumelo, save e as fases 2 e 3 ficam como extras.
-- **Ainda não existe:** nenhum script de gameplay. A única cena é `Scenes/Sandbox/SampleScene`. As Input Actions são o template padrão da Unity.
-- **Próximo passo: 0.1.**
+- **Passo 0.1 feito (falta o teste no Play Mode pelo usuário):** mapa `Player` com as ações da §3.2, classe gerada `Core/GameInput.cs` e `Core/InputReader` (eventos e troca para o mapa `UI` na pausa); `UI/Cancel` também aceita o Start do controle.
+- **Ainda não existe:** nenhum script de gameplay. A única cena é `Scenes/Sandbox/SampleScene`.
+- **Próximo passo: 0.2.**
 
 Atualize esta seção ao fim de cada passo.
 
@@ -103,6 +104,7 @@ Se uma skill e o GDD divergirem, o GDD manda no design e as skills mandam na for
 - **Não escreva YAML de cena, prefab ou asset à mão.** Para gerar assets em lote (os itens da tabela §7.8, os `LevelData`, os prefabs de greybox), crie em `Scripts/Editor/` um `MenuItem` no menu `Tools/Guaxinim/...`, usando `AssetDatabase` e `PrefabUtility`.
 - O Unity gera os `.meta` ao importar. Faça commit do `.meta` junto com o arquivo e nunca apague nem recrie o `.meta` de um asset existente: as referências são por GUID.
 - O `.inputactions` é JSON e pode ser editado direto.
+- O `.inputactions` gera a classe `Core/GameInput.cs` (opção "Generate C# Class" no `.meta`). Ela só é regenerada quando o asset é reimportado, e a Unity não reimporta nada se houver erro de compilação: ao renomear ou adicionar uma ação usada no código, gere a classe antes de usar a ação nova. O `Dispose()` dela usa `Destroy`; em testes EditMode, use `Object.DestroyImmediate(input.asset)`.
 - O Editor sobrescreve `ProjectSettings/*.asset` se estiver aberto. Peça ao usuário para mudar no Editor, ou edite com o Editor fechado.
 - **Modelos do Blender:** frente em −Y no Blender, que vira +Z na Unity (verificado). O FBX traz o material `M_<Nome>`, e o `BlenderModelPostprocessor` o liga à textura `Art/Textures/<pasta>/<Nome>_BaseColor.png`. Pontos de encaixe são empties `Socket_<Uso>`. Detalhes em [Tools/Blender/README.md](Tools/Blender/README.md).
 
@@ -112,7 +114,6 @@ Se uma skill e o GDD divergirem, o GDD manda no design e as skills mandam na for
 - `productName` está "Jogo-3D" e `companyName` está "DefaultCompany". Passo 0.2.
 - A matriz de colisão das layers está toda ligada. Configurar nos passos que usam `NarrowGap` (2.4) e `ShelfTop` (3.2).
 - **Qualidade por plataforma:** o WebGL usa o nível Mobile (renderer Forward, render scale 0,8) e o Windows usa o nível PC (Forward+). Confira o visual nos dois.
-- As Input Actions são o template: sobram `Look`, `Attack`, `Crouch`, `Previous` e `Next`, e faltam `Drop`, `Whistle`, `MushroomPower`, `ShowList` e `Pause`. Passo 0.1.
 
 ## Comandos
 
@@ -134,7 +135,7 @@ Os marcos seguem o GDD §16, quebrados em passos pequenos. Cada passo termina em
 
 ### Marco 0: fundação
 
-- [ ] **0.1 Input Actions do jogo.** Reescrever o mapa `Player` com as ações da §3.2: `Move`, `Sprint`, `Interact`, `Drop`, `Whistle`, `MushroomPower`, `Jump`, `ShowList` e `Pause`, com teclado e gamepad da tabela. Remover as ações que sobram e manter o mapa `UI`. Criar um único ponto de leitura de input (`Core/InputReader`) que o resto do jogo usa e que troca para o mapa `UI` na pausa. *Pronto:* cada ação dispara no Input Debugger.
+- [x] **0.1 Input Actions do jogo.** Reescrever o mapa `Player` com as ações da §3.2: `Move`, `Sprint`, `Interact`, `Drop`, `Whistle`, `MushroomPower`, `Jump`, `ShowList` e `Pause`, com teclado e gamepad da tabela. Remover as ações que sobram e manter o mapa `UI`. Criar um único ponto de leitura de input (`Core/InputReader`) que o resto do jogo usa e que troca para o mapa `UI` na pausa. *Pronto:* cada ação dispara no Input Debugger.
 - [ ] **0.2 Player Settings.** Nome do produto e da empresa, compressão WebGL (ver Armadilhas). O usuário muda no Editor e Claude lista os campos.
 - [ ] **0.3 Script de build.** `Scripts/Editor/BuildScript.cs` com `MenuItem` e métodos para `-executeMethod`, gerando Windows e WebGL em `Builds/<plataforma>/`. *Pronto:* os dois builds da Sandbox abrem.
 
