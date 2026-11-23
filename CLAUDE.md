@@ -35,8 +35,9 @@ As rubricas premiam acabamento, não quantidade de mecânicas: uma fase polida v
   - 1.3: `Noise/` (`NoiseSystem` mediador estático, `NoiseListener`, `NoiseRadius` testado, `NoiseRingVFX` com pool no `NoiseRingSpawner`) e `Player/RaccoonNoiseMaker` (correr em intervalos, assobio de 8 m). Menu `Tools/Guaxinim/Greybox/Sistema de Som` gera `NoiseData`, o anel e o prefab `Prefabs/Systems/LevelSystems` (vai em toda fase). Rodar de novo o menu do guaxinim para ele ganhar o `RaccoonNoiseMaker`.
   - 1.4: `EnvironmentKitFactory` (menu `Kit de Cenário`): prefabs de piso, parede, gôndolas de 2 m e 4 m e toca em `Prefabs/Environment/`, **já com os modelos do Blender** (decisão para não ter que trocar o greybox depois) e BoxColliders; paredes e gôndolas na layer `Obstacle`, todos estáticos.
   - 1.5: `Guards/` (`GuardData`, `IGuardState`, `GuardAI`, `PatrolRoute` e `LookAround` testados, `States/PatrolState`) e `GuardFactory` (prefab com NavMeshAgent e o modelo `Char_Guard`). A Sandbox ganha um segurança com 4 waypoints.
+  - 1.6: `Shared/IDetectable` e `Shared/DetectableRegistry` (os detectores encontram o guaxinim sem buscar na cena), `Player/PlayerState` mínimo, `Guards/VisionData` (SO próprio, para a câmera reaproveitar), `VisionMath` testado, `VisionCone` (raycast na layer `Obstacle`), `VisionConeMesh` (leque no chão recortado pelas paredes) e lanterna spot no `Socket_Flashlight`, sem sombras.
 - **Ferramentas:** **`Tools/Guaxinim/Montar Sandbox de Teste`** gera todos os prefabs e monta na cena aberta um mercadinho de teste já ligado (guaxinim, câmera em perspectiva, LevelSystems, NavMesh assado). É o jeito de testar tudo no Play Mode. `Tools/Guaxinim/Vitrine de Modelos` mostra os modelos lado a lado.
-- **Próximo passo: 1.6.**
+- **Próximo passo: 1.7.** O usuário testa tudo no Play Mode ao chegar no 1.10.
 
 Atualize esta seção ao fim de cada passo.
 

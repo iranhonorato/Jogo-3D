@@ -42,6 +42,7 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(controller, "_data", EditorAssets.LoadOrCreate<PlayerData>(DataPath));
             EditorAssets.SetReference(controller, "_input", input);
             AddNoiseMaker(root, input, controller);
+            root.AddComponent<PlayerState>();
             AddBody(root.transform);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Player));
 

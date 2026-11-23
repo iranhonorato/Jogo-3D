@@ -33,7 +33,7 @@ namespace Guaxinim.EditorTools
         {
             var ring = new GameObject("NoiseRing");
             var line = ring.AddComponent<LineRenderer>();
-            line.sharedMaterial = EditorAssets.LoadOrCreateTransparentUnlitMaterial(RingMaterialPath);
+            line.sharedMaterial = EditorAssets.LoadOrCreateTransparentUnlitMaterial(RingMaterialPath, Color.white);
             line.widthMultiplier = RingLineWidth;
             line.shadowCastingMode = ShadowCastingMode.Off;
             line.receiveShadows = false;

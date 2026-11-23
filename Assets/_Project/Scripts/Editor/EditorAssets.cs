@@ -35,7 +35,7 @@ namespace Guaxinim.EditorTools
         }
 
         /// <summary>Material sem luz, transparente e que usa a cor do vértice (anéis e linhas).</summary>
-        public static Material LoadOrCreateTransparentUnlitMaterial(string path)
+        public static Material LoadOrCreateTransparentUnlitMaterial(string path, Color color)
         {
             Material material = LoadOrCreateMaterial(path, ParticlesUnlitShaderName);
             material.SetFloat("_Surface", 1f);
@@ -46,7 +46,7 @@ namespace Guaxinim.EditorTools
             material.SetOverrideTag("RenderType", "Transparent");
             material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
             material.renderQueue = TransparentQueue;
-            material.SetColor(BaseColorProperty, Color.white);
+            material.SetColor(BaseColorProperty, color);
             EditorUtility.SetDirty(material);
             return material;
         }
