@@ -26,9 +26,13 @@ As rubricas premiam acabamento, não quantidade de mecânicas: uma fase polida v
 - **Pronto:** Unity 6000.3.24f1 com URP; pacotes (Input System, Cinemachine 3, AI Navigation, uGUI/TMP, Test Framework); pastas de `Assets/_Project/`; assemblies `Guaxinim.Runtime`, `Guaxinim.EditorTools` e `Guaxinim.Tests.EditMode`; layers 6 a 11 (`Player`, `Guard`, `Obstacle`, `ShelfTop`, `NarrowGap`, `Interactable`); `.gitignore` e `.gitattributes`.
 - **Adiantado a pedido do usuário (parte do passo 3.10):** modelos estáticos do guaxinim, do segurança e do Seu Zé em `Art/Models/Characters/`, gerados pelos scripts de `Tools/Blender/` e validados na Unity (escala, frente em +Z, textura ligada). Em 23/11 também foram gerados a câmera de segurança (`Art/Models/Hazards/`) e o kit modular (gôndolas de 2 m e 4 m, parede, piso e toca, em `Art/Models/Environment/`, com um atlas só), ainda sem conferência na Unity. Faltam rig e animações.
 - **Prazo confirmado:** entrega em 25/11/2026, com cerca de 15 h de trabalho por dia em 23 e 24/11. O plano dos 2 dias: marcos 0 e 1 no dia 23; no dia 24, passos 2.1 a 2.6, 3.3 e 3.4 (alerta e câmeras), 3.5, 3.6 e 3.8, e a troca do greybox pela arte; no dia 25, build final e página do itch.io. Lixeiras, aspirador, consumíveis, cogumelo, save e as fases 2 e 3 ficam como extras.
-- **Passo 0.1 feito (falta o teste no Play Mode pelo usuário):** mapa `Player` com as ações da §3.2, classe gerada `Core/GameInput.cs` e `Core/InputReader` (eventos e troca para o mapa `UI` na pausa); `UI/Cancel` também aceita o Start do controle.
-- **Ainda não existe:** nenhum script de gameplay. A única cena é `Scenes/Sandbox/SampleScene`.
-- **Próximo passo: 0.2.**
+- **Feito, falta testar no Play Mode (o usuário vai testar tudo junto mais adiante):**
+  - 0.1: mapa `Player` com as ações da §3.2, classe gerada `Core/GameInput.cs` e `Core/InputReader` (eventos e troca para o mapa `UI` na pausa); `UI/Cancel` também aceita o Start do controle.
+  - 0.2: WebGL em Gzip com Decompression Fallback. **Nome do produto e da empresa ficaram para depois**, a pedido do usuário.
+  - 0.3: `BuildScript` (menu `Tools/Guaxinim/Build`). O build Windows abriu; falta abrir o WebGL.
+  - 1.1: `PlayerData`, `RaccoonLocomotion` (testado), `RaccoonController` e o menu `Tools/Guaxinim/Greybox/Prefab do Guaxinim`. A Sandbox ainda não tem chão com colisão: para testar, pôr um Plane e cubos, e a Main Camera em (45, 45, 0).
+- **Ferramentas:** `Tools/Guaxinim/Vitrine de Modelos` monta os modelos de `Art/Models` na cena aberta.
+- **Próximo passo: 1.2.**
 
 Atualize esta seção ao fim de cada passo.
 
@@ -136,7 +140,7 @@ Os marcos seguem o GDD §16, quebrados em passos pequenos. Cada passo termina em
 ### Marco 0: fundação
 
 - [x] **0.1 Input Actions do jogo.** Reescrever o mapa `Player` com as ações da §3.2: `Move`, `Sprint`, `Interact`, `Drop`, `Whistle`, `MushroomPower`, `Jump`, `ShowList` e `Pause`, com teclado e gamepad da tabela. Remover as ações que sobram e manter o mapa `UI`. Criar um único ponto de leitura de input (`Core/InputReader`) que o resto do jogo usa e que troca para o mapa `UI` na pausa. *Pronto:* cada ação dispara no Input Debugger.
-- [ ] **0.2 Player Settings.** Nome do produto e da empresa, compressão WebGL (ver Armadilhas). O usuário muda no Editor e Claude lista os campos.
+- [x] **0.2 Player Settings.** Nome do produto e da empresa, compressão WebGL (ver Armadilhas). O usuário muda no Editor e Claude lista os campos.
 - [ ] **0.3 Script de build.** `Scripts/Editor/BuildScript.cs` com `MenuItem` e métodos para `-executeMethod`, gerando Windows e WebGL em `Builds/<plataforma>/`. *Pronto:* os dois builds da Sandbox abrem.
 
 ### Marco 1: núcleo furtivo em greybox (GDD §16, semana 1)
