@@ -85,8 +85,9 @@ namespace Guaxinim.EditorTools
             foreach (float z in new[] { 1.5f, -1.5f })
             {
                 LevelBuildKit.Place(EnvironmentKitFactory.Shelf4mPath, root, new Vector3(-1.5f, 0f, z), 0f);
-                // Vão de 1,2 m entre as gôndolas: um atalho de um corredor para o outro.
                 LevelBuildKit.Place(EnvironmentKitFactory.Shelf2mPath, root, new Vector3(2.7f, 0f, z), 0f);
+                // Vão de 1,2 m entre as gôndolas: atalho só do guaxinim, e só sem carga volumosa (GDD §7.4).
+                LevelBuildKit.Place(EnvironmentKitFactory.NarrowGapPath, root, new Vector3(1.1f, 0f, z), 0f);
             }
         }
 

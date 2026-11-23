@@ -2,8 +2,10 @@ using Guaxinim.Core;
 using Guaxinim.Noise;
 using Guaxinim.Player;
 using Guaxinim.Shared;
+using Guaxinim.UI;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Guaxinim.EditorTools
 {
@@ -27,6 +29,7 @@ namespace Guaxinim.EditorTools
         private const float UnityCapsuleHeight = 2f;
         private const float UnityCapsuleDiameter = 1f;
         private const float NoseHeightFraction = 0.65f;
+        private const int VignetteSortingOrder = 5; // abaixo do aviso de pego (ordem 10)
 
         private static readonly Vector3 NoseSize = new Vector3(0.1f, 0.08f, 0.12f);
         private static readonly Color RaccoonColor = new Color(0.62f, 0.52f, 0.42f); // GDD §15.2: tons quentes
@@ -49,6 +52,7 @@ namespace Guaxinim.EditorTools
             AddNoiseMaker(root, input, controller, inventory);
             AddInteractor(root, data, input);
             AddDropper(root, input);
+            AddBulkyLoad(root, data);
             AddBody(root.transform);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Player));
 
@@ -98,6 +102,33 @@ namespace Guaxinim.EditorTools
             var serialized = new SerializedObject(dropper);
             serialized.FindProperty("_obstacleMask").intValue = LayerMask.GetMask(Layers.Obstacle);
             serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        /// <summary>Carga volumosa (GDD §7.4) e a vinheta na tela, num canvas próprio dentro do prefab.</summary>
+        private static void AddBulkyLoad(GameObject root, PlayerData data)
+        {
+            var bulkyLoad = root.AddComponent<RaccoonBulkyLoad>();
+            EditorAssets.SetReference(bulkyLoad, "_data", data);
+
+            var canvasObject = new GameObject("BulkyVignette");
+            canvasObject.transform.SetParent(root.transform, false);
+            var canvas = canvasObject.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = VignetteSortingOrder;
+
+            var imageObject = new GameObject("Image", typeof(RectTransform));
+            imageObject.transform.SetParent(canvasObject.transform, false);
+            var rect = (RectTransform)imageObject.transform;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            var image = imageObject.AddComponent<RawImage>();
+            image.raycastTarget = false;
+
+            var vignette = canvasObject.AddComponent<BulkyVignetteUI>();
+            EditorAssets.SetReference(vignette, "_bulkyLoad", bulkyLoad);
+            EditorAssets.SetReference(vignette, "_image", image);
         }
 
         private static void AddBody(Transform root)

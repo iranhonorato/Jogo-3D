@@ -39,6 +39,12 @@ namespace Guaxinim.Player
         [Tooltip("Fração da velocidade perdida com o peso máximo (GDD §7.3: 0,5 = metade da velocidade)")]
         [SerializeField, Range(0f, 1f)] private float _weightSpeedPenalty = 0.5f;
 
+        [Tooltip("Volume a partir do qual a carga tapa a visão e não passa em vãos (GDD §7.4)")]
+        [SerializeField, Min(0f)] private float _bulkyVolumeThreshold = 4f;
+
+        [Tooltip("Metros: com carga volumosa, cones de visão mais longe que isto deixam de ser desenhados")]
+        [SerializeField, Min(0f)] private float _bulkyClearViewRadius = 6f;
+
         [Header("Interação")]
         [Tooltip("Metros: alcance do E para pegar itens e usar objetos")]
         [SerializeField, Min(0.1f)] private float _interactionRadius = 1.1f;
@@ -53,6 +59,8 @@ namespace Guaxinim.Player
         public float MaxWeight => _maxWeight;
         public float MaxVolume => _maxVolume;
         public float WeightSpeedPenalty => _weightSpeedPenalty;
+        public float BulkyVolumeThreshold => _bulkyVolumeThreshold;
+        public float BulkyClearViewRadius => _bulkyClearViewRadius;
         public float InteractionRadius => _interactionRadius;
 
         private void OnValidate()

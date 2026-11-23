@@ -1,3 +1,4 @@
+using Guaxinim.Shared;
 using UnityEngine;
 
 namespace Guaxinim.Guards
@@ -16,6 +17,7 @@ namespace Guaxinim.Guards
         [SerializeField] private VisionCone _visionCone;
 
         private Mesh _mesh;
+        private MeshRenderer _renderer;
         private readonly Vector3[] _vertices = new Vector3[Segments + 2];
 
         private void Awake()
@@ -32,10 +34,23 @@ namespace Guaxinim.Guards
             _mesh.vertices = _vertices;
             _mesh.triangles = BuildTriangles();
             GetComponent<MeshFilter>().sharedMesh = _mesh;
+            _renderer = GetComponent<MeshRenderer>();
         }
 
         private void LateUpdate()
         {
+            // GDD §7.4: com carga volumosa, cones longe do guaxinim deixam de ser desenhados.
+            bool isHidden = ViewObstruction.IsHidden(transform.position);
+            if (_renderer.enabled == isHidden)
+            {
+                _renderer.enabled = !isHidden;
+            }
+
+            if (isHidden)
+            {
+                return;
+            }
+
             VisionData data = _visionCone.Data;
             float halfAngle = data.AngleDegrees / 2f;
             Vector3 rayOrigin = transform.position + Vector3.up * RayHeight;
