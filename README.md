@@ -76,7 +76,7 @@ Tools/Blender/  Scripts bpy que geram os modelos
 | `Guaxinim.EditorTools` | `Scripts/Editor/` | Ferramentas do Editor |
 | `Guaxinim.Tests.EditMode` | `Tests/EditMode/` | Testes da lógica pura (fórmulas de peso, raio de som, etc.) |
 
-O namespace do Editor é `Guaxinim.EditorTools`, e não `Guaxinim.Editor`, para não colidir com a classe `UnityEditor.Editor`.
+O namespace do Editor é `Guaxinim.EditorTools`, e não `Guaxinim.Editor`, para não colidir com a classe `UnityEditor.Editor`. Pelo mesmo motivo, a pasta `Camera` usa o namespace `Guaxinim.CameraSystem`, e não `Guaxinim.Camera`, que esconderia o tipo `UnityEngine.Camera` em todo o projeto.
 
 ### Regras de dependência
 

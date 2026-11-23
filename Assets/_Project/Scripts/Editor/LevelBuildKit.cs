@@ -1,3 +1,4 @@
+using Guaxinim.CameraSystem;
 using Guaxinim.Core;
 using Guaxinim.Guards;
 using Guaxinim.Items;
@@ -165,6 +166,8 @@ namespace Guaxinim.EditorTools
         {
             Transform mainCamera = cameraRig.GetComponentInChildren<Camera>().transform;
             EditorAssets.SetReference(raccoon.GetComponent<RaccoonController>(), "_cameraTransform", mainCamera);
+
+            EditorAssets.SetReference(cameraRig.GetComponentInChildren<ObstacleFader>(), "_target", raccoon.transform);
 
             var isometricCamera = cameraRig.GetComponentInChildren<CinemachineCamera>();
             isometricCamera.Target.TrackingTarget = raccoon.transform;

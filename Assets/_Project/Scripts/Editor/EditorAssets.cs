@@ -57,14 +57,7 @@ namespace Guaxinim.EditorTools
         public static Material LoadOrCreateTransparentUnlitMaterial(string path, Color color)
         {
             Material material = LoadOrCreateMaterial(path, ParticlesUnlitShaderName);
-            material.SetFloat("_Surface", 1f);
-            material.SetFloat("_Blend", 0f);
-            material.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha);
-            material.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
-            material.SetFloat("_ZWrite", 0f);
-            material.SetOverrideTag("RenderType", "Transparent");
-            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-            material.renderQueue = TransparentQueue;
+            MakeTransparent(material);
             material.SetColor(BaseColorProperty, color);
             EditorUtility.SetDirty(material);
             return material;
@@ -82,6 +75,32 @@ namespace Guaxinim.EditorTools
             string parent = path.Substring(0, lastSlash);
             EnsureFolder(parent);
             AssetDatabase.CreateFolder(parent, path.Substring(lastSlash + 1));
+        }
+
+        /// <summary>
+        /// Cópia translúcida de um material URP (para o ObstacleFader), salva como asset. Se já existe, é
+        /// atualizada no lugar (mantém o GUID e as referências).
+        /// </summary>
+        public static Material CreateFadedCopy(Material source, string path, float alpha)
+        {
+            var faded = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (faded == null)
+            {
+                faded = new Material(source);
+                AssetDatabase.CreateAsset(faded, path);
+            }
+            else
+            {
+                faded.shader = source.shader;
+                faded.CopyPropertiesFromMaterial(source);
+            }
+
+            MakeTransparent(faded);
+            Color color = faded.GetColor(BaseColorProperty);
+            color.a = alpha;
+            faded.SetColor(BaseColorProperty, color);
+            EditorUtility.SetDirty(faded);
+            return faded;
         }
 
         public static void SetLayerRecursively(GameObject target, int layer)
@@ -111,6 +130,18 @@ namespace Guaxinim.EditorTools
             }
 
             serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void MakeTransparent(Material material)
+        {
+            material.SetFloat("_Surface", 1f);
+            material.SetFloat("_Blend", 0f);
+            material.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha);
+            material.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
+            material.SetFloat("_ZWrite", 0f);
+            material.SetOverrideTag("RenderType", "Transparent");
+            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            material.renderQueue = TransparentQueue;
         }
 
         private static Material LoadOrCreateMaterial(string path, string shaderName)

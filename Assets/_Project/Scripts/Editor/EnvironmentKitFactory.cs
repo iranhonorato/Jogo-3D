@@ -1,3 +1,4 @@
+using System.Linq;
 using Guaxinim.Shared;
 using UnityEditor;
 using UnityEngine;
@@ -19,6 +20,8 @@ namespace Guaxinim.EditorTools
         public const string NarrowGapPath = "Assets/_Project/Prefabs/Environment/NarrowGap_1.2m.prefab";
 
         private const string ModelsFolder = "Assets/_Project/Art/Models/Environment/";
+        private const string FadedKitMaterialPath = "Assets/_Project/Art/Materials/M_Env_Kit_Faded.mat";
+        private const float FadedAlpha = 0.25f;
         private const float TileSize = 2f;
         private const float FloorThickness = 0.2f;
         private const float WallHeight = 2.5f;
@@ -33,6 +36,23 @@ namespace Guaxinim.EditorTools
 
         private static readonly Vector3 DenTriggerSize = new Vector3(1.2f, 1f, 1.2f);
         private static readonly Color TapeColor = new Color(1f, 0.8f, 0.1f);
+
+        /// <summary>Nome do material do atlas do kit, como vem dos FBX do Blender.</summary>
+        public const string KitMaterialName = "M_Env_Kit";
+
+        /// <summary>Versão translúcida do material do kit, para o ObstacleFader (GDD §3.1).</summary>
+        public static Material CreateFadedKitMaterial()
+        {
+            Material source = AssetDatabase.LoadAllAssetsAtPath(ModelsFolder + "Shelf_Aisle_2m.fbx")
+                .OfType<Material>().FirstOrDefault(material => material.name == KitMaterialName);
+            if (source == null)
+            {
+                Debug.LogError($"Material {KitMaterialName} not found in the kit FBX.");
+                return null;
+            }
+
+            return EditorAssets.CreateFadedCopy(source, FadedKitMaterialPath, FadedAlpha);
+        }
 
         [MenuItem("Tools/Guaxinim/Greybox/Kit de Cenário")]
         internal static void CreateKitPrefabs()
