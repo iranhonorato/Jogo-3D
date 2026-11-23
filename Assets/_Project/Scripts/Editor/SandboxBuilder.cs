@@ -40,6 +40,7 @@ namespace Guaxinim.EditorTools
             LevelBuildKit.Place(EnvironmentKitFactory.DenPath, root.transform, new Vector3(6f, 0f, -4.5f), 0f);
             GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, RaccoonStart, 0f);
             LevelBuildKit.PlaceGuard(root.transform, GuardFactory.GuardPrefabPath, GuardWaypoints, 3, 90f);
+            PlaceTestItems(root.transform);
 
             NavMeshSurface surface = LevelBuildKit.AddNavMeshSurface(root);
             NavMeshAssetManager.instance.StartBakingSurfaces(new Object[] { surface });
@@ -55,6 +56,14 @@ namespace Guaxinim.EditorTools
             {
                 Undo.DestroyObjectImmediate(previous);
             }
+        }
+
+        /// <summary>Um item de cada efeito, perto do início: frágil (2.5), volumoso (2.4) e pesado (2.2).</summary>
+        private static void PlaceTestItems(Transform root)
+        {
+            LevelBuildKit.Place(ItemFactory.PrefabPath("Jam"), root, new Vector3(-5.5f, 0f, 3f), 0f);
+            LevelBuildKit.Place(ItemFactory.PrefabPath("ToiletPaper"), root, new Vector3(-4.5f, 0f, 3.5f), 0f);
+            LevelBuildKit.Place(ItemFactory.PrefabPath("Watermelon"), root, new Vector3(-3.5f, 0f, 4.5f), 0f);
         }
 
         private static void BuildShelves(Transform root)

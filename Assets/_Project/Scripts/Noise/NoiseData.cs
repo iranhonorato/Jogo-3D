@@ -24,10 +24,14 @@ namespace Guaxinim.Noise
         [Tooltip("Metros, ao largar um item (Q)")]
         [SerializeField, Min(0f)] private float _dropRadius = 3f;
 
+        [Tooltip("Metros, quando um item frágil quebra")]
+        [SerializeField, Min(0f)] private float _fragileBreakRadius = 10f;
+
         public float RunRadius => _runRadius;
         public float RunCarryBonusRadius => _runCarryBonusRadius;
         public float RunEmitIntervalSeconds => _runEmitIntervalSeconds;
         public float WhistleRadius => _whistleRadius;
         public float DropRadius => _dropRadius;
+        public float FragileBreakRadius => _fragileBreakRadius;
     }
 }

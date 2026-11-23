@@ -20,6 +20,7 @@ namespace Guaxinim.Player
         public IReadOnlyList<PickupItem> Items => _items;
         public float CurrentWeight { get; private set; }
         public float CurrentVolume { get; private set; }
+        public bool HasFragile { get; private set; }
         public float MaxWeight => _data.MaxWeight;
         public float MaxVolume => _data.MaxVolume;
 
@@ -61,6 +62,26 @@ namespace Guaxinim.Player
             return true;
         }
 
+        /// <summary>Quebra o último item frágil pego (GDD §7.5): ele some de vez.</summary>
+        public bool TryBreakLastFragile()
+        {
+            for (int i = _items.Count - 1; i >= 0; i--)
+            {
+                if (!_items[i].Data.IsFragile)
+                {
+                    continue;
+                }
+
+                PickupItem broken = _items[i];
+                _items.RemoveAt(i);
+                Destroy(broken.gameObject);
+                Recalculate();
+                return true;
+            }
+
+            return false;
+        }
+
         public bool CanCarry(ItemData item) =>
             CarryCapacity.CanCarry(CurrentWeight, CurrentVolume, item.Weight, item.Volume, MaxWeight, MaxVolume);
 
@@ -68,10 +89,12 @@ namespace Guaxinim.Player
         {
             CurrentWeight = 0f;
             CurrentVolume = 0f;
+            HasFragile = false;
             for (int i = 0; i < _items.Count; i++)
             {
                 CurrentWeight += _items[i].Data.Weight;
                 CurrentVolume += _items[i].Data.Volume;
+                HasFragile |= _items[i].Data.IsFragile;
             }
 
             OnChanged?.Invoke();

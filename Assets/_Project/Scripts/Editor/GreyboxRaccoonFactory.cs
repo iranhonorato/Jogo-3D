@@ -29,8 +29,15 @@ namespace Guaxinim.EditorTools
         private const float UnityCapsuleHeight = 2f;
         private const float UnityCapsuleDiameter = 1f;
         private const float NoseHeightFraction = 0.65f;
+        private const string PuddlePrefabPath = "Assets/_Project/Prefabs/Items/Puddle.prefab";
+        private const string PuddleMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Puddle.mat";
+        private const float ShakeIconHeight = 0.95f;
         private const int VignetteSortingOrder = 5; // abaixo do aviso de pego (ordem 10)
 
+        private static readonly Vector3 PuddleScale = new Vector3(0.9f, 0.003f, 0.7f);
+        private static readonly Color PuddleColor = new Color(0.95f, 0.6f, 0.2f, 0.6f);
+        private static readonly Color ShakeLowColor = new Color(1f, 1f, 1f);
+        private static readonly Color ShakeFullColor = new Color(0.95f, 0.15f, 0.1f);
         private static readonly Vector3 NoseSize = new Vector3(0.1f, 0.08f, 0.12f);
         private static readonly Color RaccoonColor = new Color(0.62f, 0.52f, 0.42f); // GDD §15.2: tons quentes
         private static readonly Color NoseColor = new Color(0.15f, 0.13f, 0.12f);
@@ -53,6 +60,7 @@ namespace Guaxinim.EditorTools
             AddInteractor(root, data, input);
             AddDropper(root, input);
             AddBulkyLoad(root, data);
+            AddFragileShake(root, data);
             AddBody(root.transform);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Player));
 
@@ -129,6 +137,33 @@ namespace Guaxinim.EditorTools
             var vignette = canvasObject.AddComponent<BulkyVignetteUI>();
             EditorAssets.SetReference(vignette, "_bulkyLoad", bulkyLoad);
             EditorAssets.SetReference(vignette, "_image", image);
+        }
+
+        /// <summary>Barra de chacoalhar dos frágeis (GDD §7.5), com a barra sobre a cabeça e a poça.</summary>
+        private static void AddFragileShake(GameObject root, PlayerData data)
+        {
+            var shake = root.AddComponent<FragileShake>();
+            EditorAssets.SetReference(shake, "_data", data);
+            EditorAssets.SetReference(shake, "_noiseData",
+                EditorAssets.LoadOrCreate<NoiseData>(NoiseSystemFactory.NoiseDataPath));
+            EditorAssets.SetReference(shake, "_puddlePrefab", CreatePuddlePrefab());
+            WorldMeterIconBuilder.Build("ShakeIcon", root.transform, ShakeIconHeight, shake, ShakeLowColor,
+                ShakeFullColor);
+        }
+
+        private static GameObject CreatePuddlePrefab()
+        {
+            GameObject puddle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            puddle.name = "Puddle";
+            Object.DestroyImmediate(puddle.GetComponent<Collider>());
+            puddle.transform.localScale = PuddleScale;
+            var renderer = puddle.GetComponent<MeshRenderer>();
+            renderer.sharedMaterial = EditorAssets.LoadOrCreateTransparentUnlitMaterial(PuddleMaterialPath, PuddleColor);
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(puddle, PuddlePrefabPath);
+            Object.DestroyImmediate(puddle);
+            return prefab;
         }
 
         private static void AddBody(Transform root)

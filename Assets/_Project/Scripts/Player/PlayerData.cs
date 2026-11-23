@@ -45,6 +45,13 @@ namespace Guaxinim.Player
         [Tooltip("Metros: com carga volumosa, cones de visão mais longe que isto deixam de ser desenhados")]
         [SerializeField, Min(0f)] private float _bulkyClearViewRadius = 6f;
 
+        [Header("Frágeis")]
+        [Tooltip("Segundos de corrida seguida até um item frágil quebrar (GDD §7.5)")]
+        [SerializeField, Min(0.1f)] private float _shakeFillSeconds = 2f;
+
+        [Tooltip("Fração da barra de chacoalhar que esvazia por segundo andando")]
+        [SerializeField, Min(0f)] private float _shakeDrainPerSecond = 0.5f;
+
         [Header("Interação")]
         [Tooltip("Metros: alcance do E para pegar itens e usar objetos")]
         [SerializeField, Min(0.1f)] private float _interactionRadius = 1.1f;
@@ -61,6 +68,8 @@ namespace Guaxinim.Player
         public float WeightSpeedPenalty => _weightSpeedPenalty;
         public float BulkyVolumeThreshold => _bulkyVolumeThreshold;
         public float BulkyClearViewRadius => _bulkyClearViewRadius;
+        public float ShakeFillSeconds => _shakeFillSeconds;
+        public float ShakeDrainPerSecond => _shakeDrainPerSecond;
         public float InteractionRadius => _interactionRadius;
 
         private void OnValidate()
