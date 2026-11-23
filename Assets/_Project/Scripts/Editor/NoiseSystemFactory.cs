@@ -15,12 +15,12 @@ namespace Guaxinim.EditorTools
 
         private const string RingMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_NoiseRing.mat";
         private const string RingPrefabPath = "Assets/_Project/Prefabs/Systems/NoiseRing.prefab";
-        private const string SystemsPrefabPath = "Assets/_Project/Prefabs/Systems/LevelSystems.prefab";
+        public const string SystemsPrefabPath = "Assets/_Project/Prefabs/Systems/LevelSystems.prefab";
         private const string SystemsFolder = "Assets/_Project/Prefabs/Systems";
         private const float RingLineWidth = 0.08f;
 
         [MenuItem("Tools/Guaxinim/Greybox/Sistema de Som")]
-        private static void CreateNoiseAssets()
+        internal static void CreateNoiseAssets()
         {
             EnsureFolder(SystemsFolder);
             EditorAssets.LoadOrCreate<NoiseData>(NoiseDataPath);

@@ -14,7 +14,7 @@ namespace Guaxinim.EditorTools
     /// </summary>
     public static class GreyboxRaccoonFactory
     {
-        private const string PrefabPath = "Assets/_Project/Prefabs/Player/Raccoon.prefab";
+        public const string PrefabPath = "Assets/_Project/Prefabs/Player/Raccoon.prefab";
         private const string DataPath = "Assets/_Project/Data/Player/PlayerData.asset";
         private const string BodyMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Greybox_Raccoon.mat";
         private const string NoseMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Greybox_RaccoonNose.mat";
@@ -33,7 +33,7 @@ namespace Guaxinim.EditorTools
         private static readonly Color NoseColor = new Color(0.15f, 0.13f, 0.12f);
 
         [MenuItem("Tools/Guaxinim/Greybox/Prefab do Guaxinim")]
-        private static void CreateRaccoonPrefab()
+        internal static void CreateRaccoonPrefab()
         {
             var root = new GameObject("Raccoon");
             ConfigureCharacterController(root.AddComponent<CharacterController>());

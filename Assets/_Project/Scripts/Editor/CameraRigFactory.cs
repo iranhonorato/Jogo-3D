@@ -13,7 +13,7 @@ namespace Guaxinim.EditorTools
     /// </summary>
     public static class CameraRigFactory
     {
-        private const string PerspectivePath = "Assets/_Project/Prefabs/Camera/CameraRig_Perspective.prefab";
+        public const string PerspectivePath = "Assets/_Project/Prefabs/Camera/CameraRig_Perspective.prefab";
         private const string OrthographicPath = "Assets/_Project/Prefabs/Camera/CameraRig_Orthographic.prefab";
         private const string MainCameraTag = "MainCamera";
 
@@ -30,7 +30,7 @@ namespace Guaxinim.EditorTools
         private const float LookaheadSmoothing = 0.4f;
 
         [MenuItem("Tools/Guaxinim/Greybox/Rigs de Câmera Isométrica")]
-        private static void CreateCameraRigs()
+        internal static void CreateCameraRigs()
         {
             SaveRig(BuildRig("CameraRig_Perspective", isOrthographic: false), PerspectivePath);
             SaveRig(BuildRig("CameraRig_Orthographic", isOrthographic: true), OrthographicPath);

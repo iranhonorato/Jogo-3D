@@ -30,11 +30,12 @@ As rubricas premiam acabamento, não quantidade de mecânicas: uma fase polida v
   - 0.1: mapa `Player` com as ações da §3.2, classe gerada `Core/GameInput.cs` e `Core/InputReader` (eventos e troca para o mapa `UI` na pausa); `UI/Cancel` também aceita o Start do controle.
   - 0.2: WebGL em Gzip com Decompression Fallback. **Nome do produto e da empresa ficaram para depois**, a pedido do usuário.
   - 0.3: `BuildScript` (menu `Tools/Guaxinim/Build`). O build Windows abriu; falta abrir o WebGL.
-  - 1.1: `PlayerData`, `RaccoonLocomotion` (testado), `RaccoonController` e o menu `Tools/Guaxinim/Greybox/Prefab do Guaxinim`. A Sandbox ainda não tem chão com colisão: para testar, pôr um Plane e cubos, e a Main Camera em (45, 45, 0).
+  - 1.1: `PlayerData`, `RaccoonLocomotion` (testado), `RaccoonController` e o menu `Tools/Guaxinim/Greybox/Prefab do Guaxinim`.
   - 1.2: menu `Tools/Guaxinim/Greybox/Rigs de Câmera Isométrica` gera `Prefabs/Camera/CameraRig_Perspective` (FOV 25°) e `CameraRig_Orthographic` (tamanho 6), com Position Composer e lookahead. **O usuário ainda escolhe qual usar**; registrar a escolha no GDD §3.1.
   - 1.3: `Noise/` (`NoiseSystem` mediador estático, `NoiseListener`, `NoiseRadius` testado, `NoiseRingVFX` com pool no `NoiseRingSpawner`) e `Player/RaccoonNoiseMaker` (correr em intervalos, assobio de 8 m). Menu `Tools/Guaxinim/Greybox/Sistema de Som` gera `NoiseData`, o anel e o prefab `Prefabs/Systems/LevelSystems` (vai em toda fase). Rodar de novo o menu do guaxinim para ele ganhar o `RaccoonNoiseMaker`.
-- **Ferramentas:** `Tools/Guaxinim/Vitrine de Modelos` monta os modelos de `Art/Models` na cena aberta.
-- **Próximo passo: 1.4.**
+  - 1.4: `EnvironmentKitFactory` (menu `Kit de Cenário`): prefabs de piso, parede, gôndolas de 2 m e 4 m e toca em `Prefabs/Environment/`, **já com os modelos do Blender** (decisão para não ter que trocar o greybox depois) e BoxColliders; paredes e gôndolas na layer `Obstacle`, todos estáticos.
+- **Ferramentas:** **`Tools/Guaxinim/Montar Sandbox de Teste`** gera todos os prefabs e monta na cena aberta um mercadinho de teste já ligado (guaxinim, câmera em perspectiva, LevelSystems, NavMesh assado). É o jeito de testar tudo no Play Mode. `Tools/Guaxinim/Vitrine de Modelos` mostra os modelos lado a lado.
+- **Próximo passo: 1.5.**
 
 Atualize esta seção ao fim de cada passo.
 

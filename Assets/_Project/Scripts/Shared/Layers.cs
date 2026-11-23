@@ -4,5 +4,6 @@ namespace Guaxinim.Shared
     public static class Layers
     {
         public const string Player = "Player";
+        public const string Obstacle = "Obstacle";
     }
 }
