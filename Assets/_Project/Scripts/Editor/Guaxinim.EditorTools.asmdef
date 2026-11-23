@@ -2,7 +2,10 @@
     "name": "Guaxinim.EditorTools",
     "rootNamespace": "Guaxinim.EditorTools",
     "references": [
-        "Guaxinim.Runtime"
+        "Guaxinim.Runtime",
+        "Unity.Cinemachine",
+        "Unity.AI.Navigation",
+        "Unity.AI.Navigation.Editor"
     ],
     "includePlatforms": [
         "Editor"
