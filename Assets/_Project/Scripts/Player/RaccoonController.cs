@@ -20,6 +20,9 @@ namespace Guaxinim.Player
         private Vector3 _horizontalVelocity;
         private float _verticalVelocity;
 
+        /// <summary>Correndo de verdade: Shift segurado e com input de movimento (GDD §5: faz barulho).</summary>
+        public bool IsRunning { get; private set; }
+
         private void Awake()
         {
             _controller = GetComponent<CharacterController>();
@@ -34,6 +37,7 @@ namespace Guaxinim.Player
         {
             float deltaTime = Time.deltaTime;
             Vector3 direction = RaccoonLocomotion.GetMoveDirection(_input.Move, _cameraTransform.eulerAngles.y);
+            IsRunning = _input.IsSprinting && direction.sqrMagnitude > 0f;
 
             UpdateHorizontalVelocity(direction, deltaTime);
             _verticalVelocity = RaccoonLocomotion.StepVerticalVelocity(_verticalVelocity, _controller.isGrounded,

@@ -32,8 +32,9 @@ As rubricas premiam acabamento, não quantidade de mecânicas: uma fase polida v
   - 0.3: `BuildScript` (menu `Tools/Guaxinim/Build`). O build Windows abriu; falta abrir o WebGL.
   - 1.1: `PlayerData`, `RaccoonLocomotion` (testado), `RaccoonController` e o menu `Tools/Guaxinim/Greybox/Prefab do Guaxinim`. A Sandbox ainda não tem chão com colisão: para testar, pôr um Plane e cubos, e a Main Camera em (45, 45, 0).
   - 1.2: menu `Tools/Guaxinim/Greybox/Rigs de Câmera Isométrica` gera `Prefabs/Camera/CameraRig_Perspective` (FOV 25°) e `CameraRig_Orthographic` (tamanho 6), com Position Composer e lookahead. **O usuário ainda escolhe qual usar**; registrar a escolha no GDD §3.1.
+  - 1.3: `Noise/` (`NoiseSystem` mediador estático, `NoiseListener`, `NoiseRadius` testado, `NoiseRingVFX` com pool no `NoiseRingSpawner`) e `Player/RaccoonNoiseMaker` (correr em intervalos, assobio de 8 m). Menu `Tools/Guaxinim/Greybox/Sistema de Som` gera `NoiseData`, o anel e o prefab `Prefabs/Systems/LevelSystems` (vai em toda fase). Rodar de novo o menu do guaxinim para ele ganhar o `RaccoonNoiseMaker`.
 - **Ferramentas:** `Tools/Guaxinim/Vitrine de Modelos` monta os modelos de `Art/Models` na cena aberta.
-- **Próximo passo: 1.3.**
+- **Próximo passo: 1.4.**
 
 Atualize esta seção ao fim de cada passo.
 
