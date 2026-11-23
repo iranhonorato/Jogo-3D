@@ -1,4 +1,5 @@
 using System.Linq;
+using Guaxinim.Core;
 using Unity.AI.Navigation;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -19,12 +20,18 @@ namespace Guaxinim.EditorTools
         private const string LevelsFolder = "Assets/_Project/Scenes/Levels";
         private const string ScenePath = LevelsFolder + "/Level_01_Mercadinho.unity";
         private const string NavMeshDataPath = LevelsFolder + "/Level_01_Mercadinho_NavMesh.asset";
+        private const string LevelDataPath = "Assets/_Project/Data/Levels/Level_01_Mercadinho.asset";
+        private const string LevelName = "Mercadinho do Seu Zé";
+        private const float TargetTimeSeconds = 90f; // fase tutorial e pequena; ajustável no LevelData
         private const int FloorColumns = 6;
         private const int FloorRows = 5;
         private const float StoreLightHeight = 2.4f;
         private const float StoreLightRange = 7f;
         private const float StoreLightIntensity = 1.2f;
         private const float MoonlightIntensity = 0.35f;
+        private const float ShelfBaseTop = 0.12f;
+
+        private static readonly string[] ShoppingListItems = { "Bread", "Banana", "Cheese" }; // GDD §11
 
         private static readonly Vector3 DenPosition = new Vector3(-5f, 0f, 4f);
         private static readonly Vector3 RaccoonStart = new Vector3(-4.2f, 0f, 2.6f);
@@ -36,6 +43,15 @@ namespace Guaxinim.EditorTools
             new Vector3(-5f, 0f, -3.5f),
             new Vector3(-5f, 0f, 0f),
             new Vector3(5f, 0f, 0f),
+        };
+
+        // Na base das gôndolas (0,12 m), na borda virada para o corredor, ao alcance do guaxinim.
+        private static readonly ItemSpot[] ItemSpots =
+        {
+            new ItemSpot("Bread", new Vector3(-2.5f, ShelfBaseTop, 1.12f), 0f),
+            new ItemSpot("Banana", new Vector3(2.5f, ShelfBaseTop, -1.12f), 20f),
+            new ItemSpot("Cheese", new Vector3(-1f, ShelfBaseTop, -1.88f), -15f),
+            new ItemSpot("Cookies", new Vector3(3f, ShelfBaseTop, 1.88f), 10f),
         };
 
         private static readonly Color MoonlightColor = new Color(0.55f, 0.6f, 0.95f); // GDD §15.1: sombras frias
@@ -58,9 +74,14 @@ namespace Guaxinim.EditorTools
             var root = new GameObject("Level_01");
             LevelBuildKit.BuildRoom(root.transform, FloorColumns, FloorRows);
             BuildShelves(root.transform);
-            LevelBuildKit.Place(EnvironmentKitFactory.DenPath, root.transform, DenPosition, 0f);
-            GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, RaccoonStart, 180f);
+            LevelData level = LevelBuildKit.LoadOrCreateLevelData(LevelDataPath, LevelName, ShoppingListItems,
+                TargetTimeSeconds);
+            GameObject systems = LevelBuildKit.PlaceLevelSystems(root.transform, level);
+            LevelBuildKit.PlaceDen(root.transform, systems, DenPosition, 0f);
+            GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, systems, RaccoonStart, 180f);
             LevelBuildKit.PlaceGuard(root.transform, GuardFactory.SeuZePrefabPath, SeuZeWaypoints, 0, -90f);
+            PlaceItems(root.transform);
+            PlaceBins(root.transform);
             SetUpNightLighting(root.transform, raccoon.scene);
             BakeNavMesh(root);
 
@@ -74,9 +95,28 @@ namespace Guaxinim.EditorTools
             foreach (float z in new[] { 1.5f, -1.5f })
             {
                 LevelBuildKit.Place(EnvironmentKitFactory.Shelf4mPath, root, new Vector3(-1.5f, 0f, z), 0f);
-                // Vão de 1,2 m entre as gôndolas: um atalho de um corredor para o outro.
                 LevelBuildKit.Place(EnvironmentKitFactory.Shelf2mPath, root, new Vector3(2.7f, 0f, z), 0f);
+                // Vão de 1,2 m entre as gôndolas: atalho só do guaxinim, e só sem carga volumosa (GDD §7.4).
+                LevelBuildKit.Place(EnvironmentKitFactory.NarrowGapPath, root, new Vector3(1.1f, 0f, z), 0f);
             }
+        }
+
+        /// <summary>GDD §11: lista da Fase 1 (pão, banana e queijo) e o biscoito de bônus, na prateleira de baixo.</summary>
+        private static void PlaceItems(Transform root)
+        {
+            var items = new GameObject("Items").transform;
+            items.SetParent(root, false);
+            foreach (ItemSpot spot in ItemSpots)
+            {
+                LevelBuildKit.Place(ItemFactory.PrefabPath(spot.ItemName), items, spot.Position, spot.YawDegrees);
+            }
+        }
+
+        /// <summary>GDD §11: a Fase 1 ensina a lixeira. Duas no fundo, longe da patrulha, com a saída para o corredor.</summary>
+        private static void PlaceBins(Transform root)
+        {
+            LevelBuildKit.Place(HidingSpotFactory.BinPrefabPath, root, new Vector3(-1f, 0f, 3.6f), 180f);
+            LevelBuildKit.Place(HidingSpotFactory.BinPrefabPath, root, new Vector3(3.5f, 0f, 3.8f), 180f);
         }
 
         private static void SetUpNightLighting(Transform root, Scene scene)
@@ -137,6 +177,20 @@ namespace Guaxinim.EditorTools
             var scenes = EditorBuildSettings.scenes.Where(buildScene => buildScene.path != ScenePath).ToList();
             scenes.Insert(0, new EditorBuildSettingsScene(ScenePath, true));
             EditorBuildSettings.scenes = scenes.ToArray();
+        }
+
+        private readonly struct ItemSpot
+        {
+            public ItemSpot(string itemName, Vector3 position, float yawDegrees)
+            {
+                ItemName = itemName;
+                Position = position;
+                YawDegrees = yawDegrees;
+            }
+
+            public string ItemName { get; }
+            public Vector3 Position { get; }
+            public float YawDegrees { get; }
         }
     }
 }

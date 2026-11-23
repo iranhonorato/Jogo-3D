@@ -1,4 +1,5 @@
 using System;
+using Guaxinim.Shared;
 using UnityEngine;
 
 namespace Guaxinim.Guards
@@ -8,7 +9,7 @@ namespace Guaxinim.Guards
     /// avisa em <see cref="OnFilled"/>. O mesmo componente serve ao segurança (entra em Perseguição)
     /// e à câmera de segurança (dispara o alerta); muda só quem escuta.
     /// </summary>
-    public class DetectionMeter : MonoBehaviour
+    public class DetectionMeter : MonoBehaviour, IMeterValue
     {
         [SerializeField] private VisionCone _visionCone;
         [SerializeField] private DetectionData _data;

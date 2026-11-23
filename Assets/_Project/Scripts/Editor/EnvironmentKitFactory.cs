@@ -1,3 +1,4 @@
+using System.Linq;
 using Guaxinim.Shared;
 using UnityEditor;
 using UnityEngine;
@@ -16,14 +17,42 @@ namespace Guaxinim.EditorTools
         public const string Shelf2mPath = "Assets/_Project/Prefabs/Environment/Shelf_Aisle_2m.prefab";
         public const string Shelf4mPath = "Assets/_Project/Prefabs/Environment/Shelf_Aisle_4m.prefab";
         public const string DenPath = "Assets/_Project/Prefabs/Environment/Den_Manhole.prefab";
+        public const string NarrowGapPath = "Assets/_Project/Prefabs/Environment/NarrowGap_1.2m.prefab";
 
         private const string ModelsFolder = "Assets/_Project/Art/Models/Environment/";
+        private const string FadedKitMaterialPath = "Assets/_Project/Art/Materials/M_Env_Kit_Faded.mat";
+        private const float FadedAlpha = 0.25f;
         private const float TileSize = 2f;
         private const float FloorThickness = 0.2f;
         private const float WallHeight = 2.5f;
         private const float WallThickness = 0.2f;
         private const float ShelfHeight = 1.8f;
         private const float ShelfDepth = 0.9f;
+        private const float NarrowGapWidth = 1.2f;
+        private const float NarrowGapHeight = 1f;
+        private const float TapeWidth = 0.08f;
+        private const float TapeFloorOffset = 0.01f;
+        private const string TapeMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_NarrowGapTape.mat";
+
+        private static readonly Vector3 DenTriggerSize = new Vector3(1.2f, 1f, 1.2f);
+        private static readonly Color TapeColor = new Color(1f, 0.8f, 0.1f);
+
+        /// <summary>Nome do material do atlas do kit, como vem dos FBX do Blender.</summary>
+        public const string KitMaterialName = "M_Env_Kit";
+
+        /// <summary>Versão translúcida do material do kit, para o ObstacleFader (GDD §3.1).</summary>
+        public static Material CreateFadedKitMaterial()
+        {
+            Material source = AssetDatabase.LoadAllAssetsAtPath(ModelsFolder + "Shelf_Aisle_2m.fbx")
+                .OfType<Material>().FirstOrDefault(material => material.name == KitMaterialName);
+            if (source == null)
+            {
+                Debug.LogError($"Material {KitMaterialName} not found in the kit FBX.");
+                return null;
+            }
+
+            return EditorAssets.CreateFadedCopy(source, FadedKitMaterialPath, FadedAlpha);
+        }
 
         [MenuItem("Tools/Guaxinim/Greybox/Kit de Cenário")]
         internal static void CreateKitPrefabs()
@@ -38,6 +67,51 @@ namespace Guaxinim.EditorTools
             CreatePiece("Shelf_Aisle_2m", Shelf2mPath, StandingBox(2f, ShelfHeight, ShelfDepth), obstacle);
             CreatePiece("Shelf_Aisle_4m", Shelf4mPath, StandingBox(4f, ShelfHeight, ShelfDepth), obstacle);
             CreatePiece("Den_Manhole", DenPath, null, defaultLayer);
+            AddDenTrigger();
+            CreateNarrowGap();
+        }
+
+        /// <summary>A toca (GDD §7.7): área de entrega (trigger) com o Den. A lista da fase é ligada na cena.</summary>
+        private static void AddDenTrigger()
+        {
+            GameObject root = PrefabUtility.LoadPrefabContents(DenPath);
+            var trigger = root.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+            trigger.center = Vector3.up * DenTriggerSize.y / 2f;
+            trigger.size = DenTriggerSize;
+            root.AddComponent<Items.Den>();
+            PrefabUtility.SaveAsPrefabAsset(root, DenPath);
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+
+        /// <summary>
+        /// Vão estreito (GDD §7.4): collider invisível na layer NarrowGap, que só barra o guaxinim com carga
+        /// volumosa e entra no NavMesh como obstáculo (seguranças não passam). Fitas no chão marcam o vão.
+        /// </summary>
+        private static void CreateNarrowGap()
+        {
+            var root = new GameObject("NarrowGap_1.2m");
+            var box = root.AddComponent<BoxCollider>();
+            box.center = Vector3.up * NarrowGapHeight / 2f;
+            box.size = new Vector3(NarrowGapWidth, NarrowGapHeight, ShelfDepth);
+
+            Material tape = EditorAssets.LoadOrCreateUnlitMaterial(TapeMaterialPath, TapeColor);
+            foreach (float side in new[] { -1f, 1f })
+            {
+                GameObject strip = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                strip.name = "Tape";
+                strip.transform.SetParent(root.transform, false);
+                Object.DestroyImmediate(strip.GetComponent<Collider>());
+                strip.transform.localPosition = new Vector3(0f, TapeFloorOffset, side * ShelfDepth / 2f);
+                strip.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                strip.transform.localScale = new Vector3(NarrowGapWidth, TapeWidth, 1f);
+                strip.GetComponent<MeshRenderer>().sharedMaterial = tape;
+            }
+
+            EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.NarrowGap));
+            SetStaticRecursively(root);
+            PrefabUtility.SaveAsPrefabAsset(root, NarrowGapPath);
+            Object.DestroyImmediate(root);
         }
 
         private static Bounds StandingBox(float width, float height, float depth) =>

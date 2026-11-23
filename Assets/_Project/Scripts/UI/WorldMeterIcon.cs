@@ -1,20 +1,21 @@
-using Guaxinim.Guards;
+using Guaxinim.Shared;
 using UnityEngine;
 
 namespace Guaxinim.UI
 {
     /// <summary>
-    /// Barra sobre a cabeça do segurança que mostra o <see cref="DetectionMeter"/> (GDD §6.3): some
-    /// quando vazia, cresce da esquerda para a direita e vai do amarelo ao vermelho. Sempre de frente
-    /// para a câmera.
+    /// Barra sobre a cabeça de um personagem que mostra um <see cref="IMeterValue"/>: o medidor de detecção
+    /// do segurança (GDD §6.3) ou a barra de chacoalhar do guaxinim (§7.5). Some quando vazia, cresce da
+    /// esquerda para a direita, muda de cor e fica sempre de frente para a câmera.
     /// </summary>
-    public class DetectionMeterIcon : MonoBehaviour
+    public class WorldMeterIcon : MonoBehaviour
     {
         private const float FillDepthOffset = -0.01f; // na frente do fundo, do lado da câmera
 
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
-        [SerializeField] private DetectionMeter _meter;
+        [Tooltip("Componente que implementa IMeterValue (DetectionMeter, FragileShake)")]
+        [SerializeField] private MonoBehaviour _source;
 
         [Tooltip("Objeto com o fundo e a barra; fica escondido com o medidor vazio")]
         [SerializeField] private GameObject _visualRoot;
@@ -31,14 +32,16 @@ namespace Guaxinim.UI
         [SerializeField] private Color _lowColor = new Color(1f, 0.85f, 0.2f);
         [SerializeField] private Color _fullColor = new Color(0.95f, 0.15f, 0.1f);
 
+        private IMeterValue _meter;
         private MaterialPropertyBlock _propertyBlock;
         private Transform _cameraTransform;
 
         private void Awake()
         {
+            _meter = _source as IMeterValue; // o Inspector não serializa interfaces
             if (_meter == null || _visualRoot == null || _fill == null || _fillRenderer == null)
             {
-                Debug.LogError("DetectionMeterIcon is missing references.", this);
+                Debug.LogError("WorldMeterIcon is missing references (the source must implement IMeterValue).", this);
                 enabled = false;
                 return;
             }

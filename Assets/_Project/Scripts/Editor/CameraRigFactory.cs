@@ -1,3 +1,5 @@
+using Guaxinim.CameraSystem;
+using Guaxinim.Shared;
 using Unity.Cinemachine;
 using UnityEditor;
 using UnityEngine;
@@ -29,9 +31,12 @@ namespace Guaxinim.EditorTools
         private const float LookaheadSeconds = 0.35f;
         private const float LookaheadSmoothing = 0.4f;
 
+        private static Material _fadedKitMaterial;
+
         [MenuItem("Tools/Guaxinim/Greybox/Rigs de Câmera Isométrica")]
         internal static void CreateCameraRigs()
         {
+            _fadedKitMaterial = EnvironmentKitFactory.CreateFadedKitMaterial();
             SaveRig(BuildRig("CameraRig_Perspective", isOrthographic: false), PerspectivePath);
             SaveRig(BuildRig("CameraRig_Orthographic", isOrthographic: true), OrthographicPath);
             Selection.activeObject = AssetDatabase.LoadAssetAtPath<GameObject>(PerspectivePath);
@@ -57,6 +62,21 @@ namespace Guaxinim.EditorTools
             unityCamera.farClipPlane = FarClip;
             cameraObject.AddComponent<AudioListener>();
             cameraObject.AddComponent<CinemachineBrain>();
+            AddObstacleFader(cameraObject);
+        }
+
+        /// <summary>GDD §3.1: o que fica entre a câmera e o guaxinim fica translúcido. O alvo é ligado na fase.</summary>
+        private static void AddObstacleFader(GameObject cameraObject)
+        {
+            var fader = cameraObject.AddComponent<ObstacleFader>();
+            var serialized = new SerializedObject(fader);
+            serialized.FindProperty("_obstacleMask").intValue = LayerMask.GetMask(Layers.Obstacle);
+            SerializedProperty pairs = serialized.FindProperty("_fadePairs");
+            pairs.arraySize = 1;
+            SerializedProperty pair = pairs.GetArrayElementAtIndex(0);
+            pair.FindPropertyRelative("_sourceMaterialName").stringValue = EnvironmentKitFactory.KitMaterialName;
+            pair.FindPropertyRelative("_fadedMaterial").objectReferenceValue = _fadedKitMaterial;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void CreateIsometricCamera(Transform parent, bool isOrthographic)

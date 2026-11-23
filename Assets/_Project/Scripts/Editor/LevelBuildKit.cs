@@ -1,7 +1,10 @@
+using Guaxinim.CameraSystem;
 using Guaxinim.Core;
 using Guaxinim.Guards;
+using Guaxinim.Items;
 using Guaxinim.Player;
 using Guaxinim.Shared;
+using Guaxinim.UI;
 using Unity.AI.Navigation;
 using Unity.Cinemachine;
 using UnityEditor;
@@ -29,6 +32,8 @@ namespace Guaxinim.EditorTools
             GreyboxRaccoonFactory.CreateRaccoonPrefab();
             CameraRigFactory.CreateCameraRigs();
             GuardFactory.CreateGuardPrefabs();
+            ItemFactory.CreateItems();
+            HidingSpotFactory.CreateBinPrefab();
         }
 
         public static GameObject Place(string prefabPath, Transform parent, Vector3 position, float yawDegrees)
@@ -65,12 +70,55 @@ namespace Guaxinim.EditorTools
             }
         }
 
-        /// <summary>Põe o LevelSystems, o guaxinim e o rig de câmera, e liga tudo entre si.</summary>
-        public static GameObject PlacePlayer(Transform root, Vector3 start, float yawDegrees)
+        /// <summary>Cria (ou carrega) o LevelData de uma fase com a lista de compras pelos nomes dos itens.</summary>
+        public static LevelData LoadOrCreateLevelData(string path, string displayName, string[] shoppingListItems,
+            float targetTimeSeconds)
+        {
+            var level = EditorAssets.LoadOrCreate<LevelData>(path);
+            var serialized = new SerializedObject(level);
+            serialized.FindProperty("_displayName").stringValue = displayName;
+            serialized.FindProperty("_targetTimeSeconds").floatValue = targetTimeSeconds;
+            SerializedProperty list = serialized.FindProperty("_shoppingList");
+            list.arraySize = shoppingListItems.Length;
+            for (int i = 0; i < shoppingListItems.Length; i++)
+            {
+                list.GetArrayElementAtIndex(i).objectReferenceValue = ItemFactory.LoadData(shoppingListItems[i]);
+            }
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return level;
+        }
+
+        /// <summary>Põe o LevelSystems com a lista de compras da fase.</summary>
+        public static GameObject PlaceLevelSystems(Transform root, LevelData level)
         {
             GameObject systems = Place(LevelSystemsFactory.SystemsPrefabPath, root, Vector3.zero, 0f);
+            var listItems = new Object[level.ShoppingList.Count];
+            for (int i = 0; i < listItems.Length; i++)
+            {
+                listItems[i] = level.ShoppingList[i];
+            }
+
+            EditorAssets.SetReferenceArray(systems.GetComponent<ShoppingList>(), "_required", listItems);
+            EditorAssets.SetReference(systems.GetComponent<LevelFlow>(), "_level", level);
+            return systems;
+        }
+
+        /// <summary>Põe a toca, ligada à lista de compras da fase.</summary>
+        public static GameObject PlaceDen(Transform root, GameObject systems, Vector3 position, float yawDegrees)
+        {
+            GameObject den = Place(EnvironmentKitFactory.DenPath, root, position, yawDegrees);
+            EditorAssets.SetReference(den.GetComponent<Den>(), "_shoppingList", systems.GetComponent<ShoppingList>());
+            return den;
+        }
+
+        /// <summary>Põe o guaxinim e o rig de câmera, e liga os dois aos sistemas da fase.</summary>
+        public static GameObject PlacePlayer(Transform root, GameObject systems, Vector3 start, float yawDegrees)
+        {
             GameObject raccoon = Place(GreyboxRaccoonFactory.PrefabPath, root, start, yawDegrees);
             EditorAssets.SetReference(systems.GetComponent<LevelFlow>(), "_player", raccoon.GetComponent<PlayerState>());
+            EditorAssets.SetReference(systems.GetComponent<ShoppingListHighlighter>(), "_player", raccoon.transform);
+            ConnectHud(systems, raccoon);
 
             GameObject cameraRig = Place(CameraRigFactory.PerspectivePath, root, Vector3.zero, 0f);
             DisableOtherMainCameras(cameraRig);
@@ -107,6 +155,20 @@ namespace Guaxinim.EditorTools
             return surface;
         }
 
+        /// <summary>A HUD vive no LevelSystems; o que é do guaxinim é ligado aqui, na cena.</summary>
+        private static void ConnectHud(GameObject systems, GameObject raccoon)
+        {
+            var input = raccoon.GetComponent<InputReader>();
+            EditorAssets.SetReference(systems.GetComponentInChildren<ShoppingListUI>(), "_input", input);
+            EditorAssets.SetReference(systems.GetComponent<PauseController>(), "_input", input);
+            var loadUI = systems.GetComponentInChildren<CarryLoadUI>();
+            EditorAssets.SetReference(loadUI, "_inventory", raccoon.GetComponent<Inventory>());
+            EditorAssets.SetReference(loadUI, "_effects", raccoon.GetComponent<RaccoonEffects>());
+            EditorAssets.SetReference(loadUI, "_bulkyLoad", raccoon.GetComponent<RaccoonBulkyLoad>());
+            EditorAssets.SetReference(systems.GetComponentInChildren<EffectsUI>(), "_effects",
+                raccoon.GetComponent<RaccoonEffects>());
+        }
+
         private static void DisableOtherMainCameras(GameObject cameraRig)
         {
             foreach (GameObject cameraObject in GameObject.FindGameObjectsWithTag(MainCameraTag))
@@ -123,6 +185,8 @@ namespace Guaxinim.EditorTools
         {
             Transform mainCamera = cameraRig.GetComponentInChildren<Camera>().transform;
             EditorAssets.SetReference(raccoon.GetComponent<RaccoonController>(), "_cameraTransform", mainCamera);
+
+            EditorAssets.SetReference(cameraRig.GetComponentInChildren<ObstacleFader>(), "_target", raccoon.transform);
 
             var isometricCamera = cameraRig.GetComponentInChildren<CinemachineCamera>();
             isometricCamera.Target.TrackingTarget = raccoon.transform;

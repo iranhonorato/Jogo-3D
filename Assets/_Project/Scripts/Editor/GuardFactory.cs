@@ -24,8 +24,6 @@ namespace Guaxinim.EditorTools
         private const string VisionDataPath = "Assets/_Project/Data/Guards/VisionData_Guard.asset";
         private const string DetectionDataPath = "Assets/_Project/Data/Guards/DetectionData.asset";
         private const string ConeMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_VisionCone_Guard.mat";
-        private const string IconBackgroundMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Icon_Background.mat";
-        private const string IconFillMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_Icon_Fill.mat";
         private const string FlashlightSocket = "Socket_Flashlight";
 
         private const float Height = 1.8f;
@@ -36,13 +34,11 @@ namespace Guaxinim.EditorTools
         private const float FlashlightTiltDegrees = 20f;
         private const float FlashlightIntensity = 6f;
         private const float IconHeight = 2.25f;
-        private const float IconWidth = 0.8f;
-        private const float IconBarHeight = 0.12f;
-        private const float IconBorder = 0.06f;
 
         private static readonly Color ConeColor = new Color(1f, 0.85f, 0.45f, 0.22f); // GDD §15.2: luz quente
         private static readonly Color FlashlightColor = new Color(1f, 0.86f, 0.6f);
-        private static readonly Color IconBackgroundColor = new Color(0.08f, 0.07f, 0.1f);
+        private static readonly Color DetectionLowColor = new Color(1f, 0.85f, 0.2f);
+        private static readonly Color DetectionFullColor = new Color(0.95f, 0.15f, 0.1f);
 
         /// <summary>Gera o segurança comum e o Seu Zé (GDD §11: o segurança da Fase 1 é o dono do mercadinho).</summary>
         [MenuItem("Tools/Guaxinim/Greybox/Prefabs dos Seguranças")]
@@ -124,38 +120,9 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(meter, "_visionCone", visionCone);
             EditorAssets.SetReference(meter, "_data", EditorAssets.LoadOrCreate<DetectionData>(DetectionDataPath));
 
-            var iconObject = new GameObject("DetectionIcon");
-            iconObject.transform.SetParent(root.transform, false);
-            iconObject.transform.localPosition = Vector3.up * IconHeight;
-            var visual = new GameObject("Visual");
-            visual.transform.SetParent(iconObject.transform, false);
-
-            Material backgroundMaterial = EditorAssets.LoadOrCreateUnlitMaterial(IconBackgroundMaterialPath, IconBackgroundColor);
-            GameObject background = CreateQuad("Background", visual.transform, backgroundMaterial);
-            background.transform.localScale = new Vector3(IconWidth + IconBorder, IconBarHeight + IconBorder, 1f);
-            Material fillMaterial = EditorAssets.LoadOrCreateUnlitMaterial(IconFillMaterialPath, Color.white);
-            GameObject fill = CreateQuad("Fill", visual.transform, fillMaterial);
-
-            var icon = iconObject.AddComponent<UI.DetectionMeterIcon>();
-            EditorAssets.SetReference(icon, "_meter", meter);
-            EditorAssets.SetReference(icon, "_visualRoot", visual);
-            EditorAssets.SetReference(icon, "_fill", fill.transform);
-            EditorAssets.SetReference(icon, "_fillRenderer", fill.GetComponent<MeshRenderer>());
-            visual.SetActive(false);
+            WorldMeterIconBuilder.Build("DetectionIcon", root.transform, IconHeight, meter, DetectionLowColor,
+                DetectionFullColor);
             return meter;
-        }
-
-        private static GameObject CreateQuad(string name, Transform parent, Material material)
-        {
-            GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            quad.name = name;
-            quad.transform.SetParent(parent, false);
-            Object.DestroyImmediate(quad.GetComponent<Collider>());
-            var renderer = quad.GetComponent<MeshRenderer>();
-            renderer.sharedMaterial = material;
-            renderer.shadowCastingMode = ShadowCastingMode.Off;
-            renderer.receiveShadows = false;
-            return quad;
         }
 
         private static GameObject AddModel(Transform root, string modelPath)

@@ -13,14 +13,15 @@ namespace Guaxinim.Player
         [SerializeField] private NoiseData _noiseData;
         [SerializeField] private InputReader _input;
         [SerializeField] private RaccoonController _controller;
+        [SerializeField] private Inventory _inventory;
 
         private float _secondsUntilNextRunNoise;
 
         private void Awake()
         {
-            if (_noiseData == null || _input == null || _controller == null)
+            if (_noiseData == null || _input == null || _controller == null || _inventory == null)
             {
-                Debug.LogError("RaccoonNoiseMaker needs Noise Data, Input and Controller assigned.", this);
+                Debug.LogError("RaccoonNoiseMaker needs Noise Data, Input, Controller and Inventory assigned.", this);
                 enabled = false;
             }
         }
@@ -56,8 +57,8 @@ namespace Guaxinim.Player
             }
 
             _secondsUntilNextRunNoise = _noiseData.RunEmitIntervalSeconds;
-            // TODO(passo 2.2): passar o peso carregado do Inventory.
-            float radius = NoiseRadius.ForRunning(_noiseData.RunRadius, _noiseData.RunCarryBonusRadius, 0f, 1f);
+            float radius = NoiseRadius.ForRunning(_noiseData.RunRadius, _noiseData.RunCarryBonusRadius,
+                _inventory.CurrentWeight, _inventory.MaxWeight);
             NoiseSystem.Emit(transform.position, radius);
         }
 

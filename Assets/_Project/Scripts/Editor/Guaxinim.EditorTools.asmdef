@@ -6,7 +6,8 @@
         "Unity.Cinemachine",
         "Unity.AI.Navigation",
         "Unity.AI.Navigation.Editor",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor"

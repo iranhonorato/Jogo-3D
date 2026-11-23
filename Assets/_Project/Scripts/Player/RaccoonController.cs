@@ -5,9 +5,11 @@ namespace Guaxinim.Player
 {
     /// <summary>
     /// Move o guaxinim com o CharacterController (GDD §4): anda e corre relativo à câmera
-    /// isométrica, gira para a direção do movimento e cai com gravidade.
+    /// isométrica, fica mais lento com o peso e mais rápido com o energético (GDD §7.3 e §8.1), gira para a direção do movimento
+    /// e cai com gravidade.
     /// </summary>
-    [RequireComponent(typeof(CharacterController), typeof(PlayerState))]
+    [RequireComponent(typeof(CharacterController), typeof(PlayerState), typeof(Inventory))]
+    [RequireComponent(typeof(RaccoonEffects))]
     public class RaccoonController : MonoBehaviour
     {
         [SerializeField] private PlayerData _data;
@@ -18,6 +20,8 @@ namespace Guaxinim.Player
 
         private CharacterController _controller;
         private PlayerState _state;
+        private Inventory _inventory;
+        private RaccoonEffects _effects;
         private Vector3 _horizontalVelocity;
         private float _verticalVelocity;
 
@@ -28,6 +32,8 @@ namespace Guaxinim.Player
         {
             _controller = GetComponent<CharacterController>();
             _state = GetComponent<PlayerState>();
+            _inventory = GetComponent<Inventory>();
+            _effects = GetComponent<RaccoonEffects>();
             if (_data == null || _input == null || _cameraTransform == null)
             {
                 Debug.LogError("RaccoonController needs Data, Input and Camera Transform assigned.", this);
@@ -39,6 +45,12 @@ namespace Guaxinim.Player
 
         private void Update()
         {
+            if (!_state.CanMove)
+            {
+                StandStill(); // na lixeira ou entrando nela
+                return;
+            }
+
             float deltaTime = Time.deltaTime;
             Vector3 direction = RaccoonLocomotion.GetMoveDirection(_input.Move, _cameraTransform.eulerAngles.y);
             IsRunning = _input.IsSprinting && direction.sqrMagnitude > 0f;
@@ -57,15 +69,35 @@ namespace Guaxinim.Player
             _state.OnCaught -= HandleCaught;
         }
 
-        private void HandleCaught() => enabled = false; // GDD §6.5: pego, para de se mexer até reiniciar
+        private void HandleCaught() => enabled = false;
+
+        private void StandStill()
+        {
+            IsRunning = false;
+            _horizontalVelocity = Vector3.zero;
+            _verticalVelocity = 0f;
+        } // GDD §6.5: pego, para de se mexer até reiniciar
 
         private void UpdateHorizontalVelocity(Vector3 direction, float deltaTime)
         {
-            float speed = RaccoonLocomotion.GetTargetSpeed(direction.magnitude, _input.IsSprinting,
+            float baseSpeed = RaccoonLocomotion.GetTargetSpeed(direction.magnitude, _input.IsSprinting,
                 _data.WalkSpeed, _data.SprintSpeed);
+            float speed = GetLoadedSpeed(baseSpeed) * _effects.SpeedMultiplier;
             Vector3 target = direction.sqrMagnitude > 0f ? direction.normalized * speed : Vector3.zero;
             _horizontalVelocity = RaccoonLocomotion.StepHorizontalVelocity(_horizontalVelocity, target,
                 _data.Acceleration, _data.Deceleration, deltaTime);
+        }
+
+        /// <summary>GDD §7.3 e §8.1: mais lento com peso; com excesso de peso, velocidade mínima.</summary>
+        private float GetLoadedSpeed(float baseSpeed)
+        {
+            if (_inventory.IsOverweight)
+            {
+                return baseSpeed * _data.OverweightSpeedFraction;
+            }
+
+            float penalty = _data.WeightSpeedPenalty * _effects.WeightPenaltyScale;
+            return CarrySpeed.Calculate(baseSpeed, _inventory.CurrentWeight, _inventory.MaxWeight, penalty);
         }
 
         private void TurnTowards(Vector3 direction, float deltaTime)

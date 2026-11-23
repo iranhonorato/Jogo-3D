@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Guaxinim.Noise
 {
-    /// <summary>Raios dos barulhos do guaxinim (GDD §5). Somente leitura durante o jogo.</summary>
+    /// <summary>Raios dos barulhos do guaxinim e dos itens (GDD §5). Somente leitura durante o jogo.</summary>
     [CreateAssetMenu(fileName = "NoiseData", menuName = "Guaxinim/Noise Data")]
     public class NoiseData : ScriptableObject
     {
@@ -20,9 +20,18 @@ namespace Guaxinim.Noise
         [Tooltip("Metros")]
         [SerializeField, Min(0f)] private float _whistleRadius = 8f;
 
+        [Header("Itens")]
+        [Tooltip("Metros, ao largar um item (Q)")]
+        [SerializeField, Min(0f)] private float _dropRadius = 3f;
+
+        [Tooltip("Metros, quando um item frágil quebra")]
+        [SerializeField, Min(0f)] private float _fragileBreakRadius = 10f;
+
         public float RunRadius => _runRadius;
         public float RunCarryBonusRadius => _runCarryBonusRadius;
         public float RunEmitIntervalSeconds => _runEmitIntervalSeconds;
         public float WhistleRadius => _whistleRadius;
+        public float DropRadius => _dropRadius;
+        public float FragileBreakRadius => _fragileBreakRadius;
     }
 }
