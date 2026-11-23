@@ -46,6 +46,21 @@ namespace Guaxinim.Player
             return true;
         }
 
+        /// <summary>Larga o último item pego (GDD §7.6): ele volta ao mundo e pode ser pego de novo.</summary>
+        public bool TryDropLast(Vector3 position, Quaternion rotation)
+        {
+            if (_items.Count == 0)
+            {
+                return false;
+            }
+
+            PickupItem item = _items[_items.Count - 1];
+            _items.RemoveAt(_items.Count - 1);
+            item.PlaceAt(position, rotation);
+            Recalculate();
+            return true;
+        }
+
         public bool CanCarry(ItemData item) =>
             CarryCapacity.CanCarry(CurrentWeight, CurrentVolume, item.Weight, item.Volume, MaxWeight, MaxVolume);
 

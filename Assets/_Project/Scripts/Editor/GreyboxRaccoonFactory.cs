@@ -48,6 +48,7 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(controller, "_input", input);
             AddNoiseMaker(root, input, controller, inventory);
             AddInteractor(root, data, input);
+            AddDropper(root, input);
             AddBody(root.transform);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Player));
 
@@ -85,6 +86,17 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(interactor, "_input", input);
             var serialized = new SerializedObject(interactor);
             serialized.FindProperty("_interactableMask").intValue = LayerMask.GetMask(Layers.Interactable);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void AddDropper(GameObject root, InputReader input)
+        {
+            var dropper = root.AddComponent<RaccoonDropper>();
+            EditorAssets.SetReference(dropper, "_input", input);
+            EditorAssets.SetReference(dropper, "_noiseData",
+                EditorAssets.LoadOrCreate<NoiseData>(NoiseSystemFactory.NoiseDataPath));
+            var serialized = new SerializedObject(dropper);
+            serialized.FindProperty("_obstacleMask").intValue = LayerMask.GetMask(Layers.Obstacle);
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
