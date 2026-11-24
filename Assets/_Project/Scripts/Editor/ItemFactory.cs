@@ -7,9 +7,10 @@ using UnityEngine;
 namespace Guaxinim.EditorTools
 {
     /// <summary>
-    /// Gera os itens da tabela do GDD §7.8 (passo 2.1): um ItemData em Data/Items/ e um prefab greybox em
-    /// Prefabs/Items/ para cada um. O prefab é uma caixa na cor saturada da categoria (GDD §15.2: itens se
-    /// destacam do cenário), com tamanho pelo volume, trigger na layer Interactable e o PickupItem.
+    /// Gera os itens da tabela do GDD §7.8 (passo 2.1): um ItemData em Data/Items/ e um prefab em Prefabs/Items/
+    /// para cada um, com trigger na layer Interactable e o PickupItem. O visual é o modelo do Blender
+    /// (Art/Models/Items/Item_&lt;Nome&gt;.fbx, de Tools/Blender/items_kit.py) quando existe; senão, uma caixa
+    /// greybox na cor saturada da categoria (GDD §15.2), com tamanho pelo volume.
     /// Um ItemData que já existe não é sobrescrito (mantém os números ajustados).
     /// </summary>
     public static class ItemFactory
@@ -27,6 +28,7 @@ namespace Guaxinim.EditorTools
         private const float TriggerPadding = 0.1f;
         private const float HighlightScale = 1.18f;
         private const string HighlightMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_ItemHighlight.mat";
+        private const string ModelsFolder = "Assets/_Project/Art/Models/Items";
 
         private static readonly Color HighlightColor = new Color(1f, 1f, 0.85f);
 
@@ -130,14 +132,78 @@ namespace Guaxinim.EditorTools
 
         private static void CreatePrefab(ItemRow row, ItemData data)
         {
-            float size = BaseSize + SizePerVolume * row.Volume;
             var root = new GameObject($"Item_{row.Name}");
-            var trigger = root.AddComponent<BoxCollider>();
+            var trigger = root.AddComponent<BoxCollider>(); // antes do PickupItem, que exige um Collider
             trigger.isTrigger = true;
-            trigger.size = Vector3.one * (size + TriggerPadding);
-            trigger.center = Vector3.up * size / 2f;
             var pickup = root.AddComponent<PickupItem>();
             EditorAssets.SetReference(pickup, "_data", data);
+
+            var model = AssetDatabase.LoadAssetAtPath<GameObject>($"{ModelsFolder}/Item_{row.Name}.fbx");
+            if (model != null)
+            {
+                AddModelVisual(root, pickup, trigger, model);
+            }
+            else
+            {
+                AddGreyboxVisual(root, pickup, trigger, row);
+            }
+
+            EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Interactable));
+            PrefabUtility.SaveAsPrefabAsset(root, PrefabPath(row.Name));
+            Object.DestroyImmediate(root);
+        }
+
+        /// <summary>Modelo do Blender, trigger do tamanho dele e contorno: uma cópia maior com o material de contorno.</summary>
+        private static void AddModelVisual(GameObject root, PickupItem pickup, BoxCollider trigger, GameObject model)
+        {
+            var visual = (GameObject)PrefabUtility.InstantiatePrefab(model, root.transform);
+            visual.name = "Visual";
+            Bounds bounds = LocalBounds(root.transform, visual);
+            trigger.size = bounds.size + Vector3.one * TriggerPadding;
+            trigger.center = bounds.center;
+
+            var highlight = (GameObject)PrefabUtility.InstantiatePrefab(model, root.transform);
+            highlight.name = "Highlight";
+            highlight.transform.localScale = Vector3.one * HighlightScale;
+            highlight.transform.localPosition = -bounds.center * (HighlightScale - 1f); // cresce em volta do centro
+            Material outline = EditorAssets.LoadOrCreateOutlineMaterial(HighlightMaterialPath, HighlightColor);
+            foreach (MeshRenderer renderer in highlight.GetComponentsInChildren<MeshRenderer>())
+            {
+                renderer.sharedMaterial = outline;
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            }
+
+            highlight.SetActive(false);
+            EditorAssets.SetReference(pickup, "_highlight", highlight);
+        }
+
+        private static Bounds LocalBounds(Transform root, GameObject visual)
+        {
+            var bounds = new Bounds(Vector3.zero, Vector3.zero);
+            bool hasBounds = false;
+            foreach (Renderer renderer in visual.GetComponentsInChildren<Renderer>())
+            {
+                Bounds world = renderer.bounds;
+                var local = new Bounds(root.InverseTransformPoint(world.center), world.size);
+                if (hasBounds)
+                {
+                    bounds.Encapsulate(local);
+                }
+                else
+                {
+                    bounds = local;
+                    hasBounds = true;
+                }
+            }
+
+            return bounds;
+        }
+
+        private static void AddGreyboxVisual(GameObject root, PickupItem pickup, BoxCollider trigger, ItemRow row)
+        {
+            float size = BaseSize + SizePerVolume * row.Volume;
+            trigger.size = Vector3.one * (size + TriggerPadding);
+            trigger.center = Vector3.up * size / 2f;
 
             GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
             visual.name = "Visual";
@@ -147,10 +213,6 @@ namespace Guaxinim.EditorTools
             Object.DestroyImmediate(visual.GetComponent<Collider>());
             visual.GetComponent<MeshRenderer>().sharedMaterial = CategoryMaterial(row);
             EditorAssets.SetReference(pickup, "_highlight", CreateHighlight(root.transform, size));
-
-            EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Interactable));
-            PrefabUtility.SaveAsPrefabAsset(root, PrefabPath(row.Name));
-            Object.DestroyImmediate(root);
         }
 
         /// <summary>Contorno (GDD §7.1): cópia maior da caixa, só com as faces de trás. Começa escondido.</summary>

@@ -11,6 +11,7 @@ Scripts Python (`bpy`) que geram os modelos 3D do jogo. Cada modelo é criado po
 | `char_seu_ze.py` | `Char_SeuZe.fbx` | Seu Zé (dono e faxineiro do Mercadinho), 1,56 m, avental, vassoura, lanterna (`Socket_Flashlight`) |
 | `hazard_security_camera.py` | `Hazards/Hazard_SecurityCamera.fbx` | Câmera de teto, pivô no ponto de fixação (z = 0, pende para baixo). A cabeça é o filho `Head`, com pivô no eixo da varredura (girar em Y na Unity). `Socket_Lens` na ponta da lente |
 | `env_kit.py` | `Environment/Shelf_Aisle_2m.fbx`, `Shelf_Aisle_4m.fbx`, `Wall_2m.fbx`, `Floor_2m.fbx`, `Den_Manhole.fbx` | Kit modular com um atlas só (`M_Env_Kit`, `Env_Kit_BaseColor.png`). Gôndola dupla de 1,8 × 0,9 m, parede de 2 × 2,5 × 0,2 m, piso de 2 × 2 m com o topo em z = 0 e toca (bueiro aberto) |
+| `items_kit.py` | `Items/Item_<Nome>.fbx` (os 19 itens da tabela §7.8) | Atlas `M_Items_Kit` (`Items_Kit_BaseColor.png`). Um pouco maiores que o real, para ler de longe. O `ItemFactory` usa o modelo quando o FBX existe e cai no cubo greybox quando não |
 | `guaxinim_common.py` | — | Funções compartilhadas: geometria, pintura, bake, exportação e prévia. `run_character` para personagens e `run_model` para objetos com várias peças e textura compartilhada |
 
 ## Como rodar
@@ -41,7 +42,7 @@ Para mudar cores ou proporções, edite as constantes no topo do script do perso
 - **Material e textura:** o FBX traz o material `M_<Nome>`. O `BlenderModelPostprocessor` (em `Assets/_Project/Scripts/Editor/`) liga esse material à textura `Art/Textures/<pasta>/<Nome>_BaseColor.png` na importação. Siga essa convenção nos próximos modelos.
 - **Pontos de encaixe:** empties chamados `Socket_<Uso>` viram GameObjects vazios na Unity (por exemplo, `Socket_Flashlight`, onde fica a luz spot da lanterna).
 - Ícones dos itens: render ortográfico 256×256 com fundo transparente em `Assets/_Project/Art/Icons/`.
-- Limite de triângulos: guaxinim e segurança até 3 mil, itens até 500, peças de cenário até 1.500.
+- Limite de triângulos: guaxinim e segurança até 3,3 mil, itens até 500, peças de cenário até 1.500 (a gôndola de 4 m tem cerca de 2.900, com os potes).
 - Texturas agrupadas em atlas por conjunto (personagens, itens, cenário) para manter poucos draw calls.
 
 O estilo visual segue a seção 15.1 do GDD e a imagem de referência em `docs/`.

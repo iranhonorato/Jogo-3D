@@ -114,7 +114,7 @@ Todo asset de terceiros ou gerado por IA entra aqui, com fonte e licença (GDD, 
 
 | Asset | Autor | Fonte | Licença |
 | --- | --- | --- | --- |
-| Modelos e texturas em `Art/Models/` e `Art/Textures/` (personagens, câmera de segurança, kit modular) | Gerados por scripts Python do Blender escritos com o Claude (Anthropic) | `Tools/Blender/` | Feitos para este projeto |
+| Modelos e texturas em `Art/Models/` e `Art/Textures/` (personagens, câmera de segurança, kit modular e itens) | Gerados por scripts Python do Blender escritos com o Claude (Anthropic) | `Tools/Blender/` | Feitos para este projeto |
 | Ilustração de fundo do menu principal (`Art/UI/Background_MainMenu.jpg`) | Gerada por IA (ferramenta e prompt a confirmar) | _a preencher_ | _a preencher_ |
 | Fonte do título do jogo (`Art/Fonts/LilitaOne-Regular.ttf`) | Juan Montoreano | [Lilita One no Google Fonts](https://fonts.google.com/specimen/Lilita+One), arquivo do repositório [google/fonts](https://github.com/google/fonts/tree/main/ofl/lilitaone) | SIL Open Font License 1.1 (cópia em `Art/Fonts/OFL.txt`) |
 | Fonte dos textos do jogo (`Art/Fonts/Sniglet-ExtraBold.ttf`) | Haley Fiege, Brenda Gallo e Pablo Impallari | [Sniglet no Google Fonts](https://fonts.google.com/specimen/Sniglet), arquivo do repositório [google/fonts](https://github.com/google/fonts/tree/main/ofl/sniglet) | SIL Open Font License 1.1 (cópia em `Art/Fonts/OFL_Sniglet.txt`) |
