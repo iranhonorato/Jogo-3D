@@ -23,7 +23,7 @@ PANTS = gc.srgb("#2b365b")
 CAP = gc.srgb("#2a355a")
 VISOR = gc.srgb("#14182a")
 BLACK = gc.srgb("#19191b")
-BOOT = gc.srgb("#1d1916")
+BOOT = gc.srgb("#4a3022")  # botas marrons da referência
 GOLD = gc.srgb("#c2a253")
 STEEL = gc.srgb("#8e9298")
 SKIN = gc.srgb("#dca886")
@@ -32,6 +32,8 @@ STUBBLE = gc.srgb("#a98370")
 HAIR = gc.srgb("#2a211c")
 EYE = gc.srgb("#1a1410")
 LENS = gc.srgb("#fff0b0")
+TEE = gc.srgb("#ecebe6")
+SLEEVE_LENGTH = 0.2  # metros do ombro até a dobra da manga curta
 
 HEAD_CENTER = Vector((0.0, -0.02, 1.665))
 HEAD_RADII = (0.095, 0.105, 0.12)
@@ -83,18 +85,23 @@ def paint_body(co, n):
     badge = gc.band(co.x, 0.085, 0.02, 0.006) * gc.band(co.z, 1.395, 0.022, 0.006) * front
     shirt = gc.lerp(gc.shade(SHIRT, 1.0 - 0.18 * pocket), GOLD, badge)
     color = gc.lerp(color, shirt, gc.above(co.z, BELT_Z[1]))
+    tee = gc.band(co.x, 0.0, 0.05, 0.01) * gc.band(co.z, 1.51, 0.025, 0.006) * front  # camiseta na gola
+    color = gc.lerp(color, TEE, tee)
     return gc.lerp(color, SKIN, gc.above(co.z, 1.53))  # pescoço
 
 
 def build_arm(points, name, hand):
+    shoulder = Vector(points[0][0])
     skeleton = gc.Skeleton()
     skeleton.chain(None, points)
     arm = gc.skin(name, skeleton)
 
     def paint_arm(co, n):
-        distance = (co - hand).length
-        color = gc.lerp(SHIRT, gc.shade(SHIRT, 0.75), gc.band(distance, 0.085, 0.01, 0.005))
-        return gc.lerp(color, SKIN, 1.0 - gc.smoothstep(0.065, 0.075, distance))
+        # Manga curta dobrada (referência de arte): a dobra mais escura e o antebraço à mostra.
+        from_shoulder = (co - shoulder).length
+        cuff = gc.band(from_shoulder, SLEEVE_LENGTH - 0.02, 0.022, 0.006)
+        sleeve = gc.lerp(SHIRT, gc.shade(SHIRT, 0.7), cuff)
+        return gc.lerp(sleeve, SKIN, gc.smoothstep(SLEEVE_LENGTH, SLEEVE_LENGTH + 0.008, from_shoulder))
 
     return gc.Part(arm, paint_arm, 200)
 
