@@ -85,6 +85,9 @@ namespace Guaxinim.Core
         /// <summary>Ligado ao botão Reiniciar fase no Inspector.</summary>
         public void RestartLevel() => SceneLoader.ReloadActiveScene();
 
+        /// <summary>Ligado ao botão Mapa no Inspector.</summary>
+        public void GoToCityMap() => SceneLoader.LoadCityMap();
+
         private void LockPlayerInput() => _input.EnableUIInput();
     }
 }

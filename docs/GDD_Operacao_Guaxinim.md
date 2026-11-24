@@ -352,8 +352,8 @@ Cada fase é uma cena (`Level_01_Mercadinho`, etc.) com um `LevelData` (lista, t
 | Tela | Conteúdo |
 | --- | --- |
 | Menu principal | Jogar, Como jogar, Créditos, Sair (Sair escondido no WebGL) |
-| Mapa da cidade | Fachadas dos mercados como botões; bloqueados em cinza; estrelas de cada fase |
-| Início da fase | Nome do mercado e a lista de compras, com botão Começar |
+| Mapa da cidade | Fachadas dos mercados como botões; bloqueados em cinza; estrelas e melhor tempo de cada fase. Fase ainda sem cena aparece como "Em breve" |
+| Início da fase | Nome do mercado, lista de compras, tempo-alvo e melhor resultado, com botões Começar e Voltar. Aparece **no mapa da cidade**, depois de escolher uma fase liberada, e não dentro da cena da fase (reiniciar a fase não repete a tela) |
 | HUD | Lista (canto superior esquerdo), barras de peso e volume, contador de cogumelos (x/3, brilhando com "R" quando o poder está pronto), ícones de efeitos ativos, cronômetro, aviso de alerta geral |
 | Pausa | Continuar, Reiniciar fase, Mapa |
 | Pego | "Você foi pego!", e a fase reinicia após 1,5 s ou com um botão |
@@ -375,9 +375,9 @@ Os **ícones dos itens** na HUD são renderizados a partir dos próprios modelos
 
 ```
 Assets/_Project/
-  Scenes/       Boot, MainMenu, CityMap, Level_01_Mercadinho, Level_02_XOXO, Level_03_PaoDeMel, Level_04_Carrecinco, Level_05_Atacadaco
+  Scenes/       MainMenu, CityMap, Levels/Level_01_Mercadinho, Level_02_XOXO, Level_03_PaoDeMel, Level_04_Carrecinco, Level_05_Atacadaco (sem cena Boot: o build abre no MainMenu)
   Scripts/
-    Core/       GameManager, SceneLoader, SaveSystem, LevelData
+    Core/       LevelFlow, SceneLoader, SaveSystem, LevelData, LevelCatalog
     Player/     RaccoonController, PlayerState, Inventory, FragileShake
     Items/      ItemData, PickupItem, ShoppingList, Den
     Effects/    ConsumableEffect, EnergyDrinkEffect, ProteinBarEffect, MushroomPower
@@ -385,7 +385,7 @@ Assets/_Project/
     Guards/     GuardAI, GuardData, VisionCone, VisionConeMesh, DetectionMeter, AlertManager
     Hazards/    RobotVacuum, HidingSpot, SecurityCamera
     Camera/     CameraRig, ObstacleFader
-    UI/         HUD, ShoppingListUI, LevelResultUI, PauseMenu, CityMapUI, MainMenuUI
+    UI/         HUD, ShoppingListUI, LevelResultUI, PauseMenuUI, CityMapUI, LevelButtonUI, MainMenuUI
   Data/         Items/, Guards/, Levels/
   Art/
     Models/     (FBX exportados do Blender)
@@ -547,3 +547,18 @@ A história se passa em um supermercado à noite. A iluminação combina sombras
 - Câmeras de segurança: nas fases 4 e 5 (seção 6.6).
 - Itens e valores: tabela da seção 7.8 e listas da seção 11, a balancear nos testes.
 - Fases: 5 no total, sem o mercado de orgânicos; o MVP são as 3 primeiras (seção 11).
+
+---
+
+## 18. Registro de mudanças
+
+Mudanças de rumo em relação ao texto acima, para o GDD continuar sendo a referência (exigência da disciplina).
+
+| Data | Mudança | Motivo |
+| --- | --- | --- |
+| 23/11/2026 | **Sem `GameManager` persistente.** O estado da fase (pego, vitória, cronômetro, resultado) fica no `LevelFlow`, que vive na cena da fase. Pausa e troca de cenas ficam em `PauseController` e `SceneLoader`. | Reiniciar a fase recarrega a cena e zera o estado de graça; um singleton persistente guardaria lixo da fase anterior. |
+| 23/11/2026 | **Tempo-alvo da Fase 1: 90 s.** Fica no `LevelData`, ajustável no Inspector. | Fase tutorial e pequena. |
+| 24/11/2026 | **Fluxo de cenas (passos 3.7 e 3.8).** `LevelData` ganhou id (usado no save) e nome da cena; o `LevelCatalog` lista as 5 fases em ordem. Cada fase só libera depois que a anterior foi completa; fase sem cena aparece como "Em breve" no mapa. O build abre direto no MainMenu (sem cena Boot). | Fechar o ciclo menu, mapa, fase, resultado e mapa sem becos sem saída (rubrica 4). |
+| 24/11/2026 | **A tela de início da fase vive no mapa da cidade** (depois de escolher a fase), e não dentro da cena da fase. | Reiniciar ou perder a fase não repete a tela, e a cena da fase não precisa de um estado "ainda não começou". |
+| 24/11/2026 | **A Sandbox de teste fica fora do Build Profile.** | É só para desenvolvimento. |
+| a decidir | Câmera em perspectiva ou ortográfica (§3.1) e o nome do jogo (§17). | Ainda em aberto. |

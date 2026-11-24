@@ -7,8 +7,6 @@ namespace Guaxinim.UI
     /// <summary>Cronômetro da fase na HUD (GDD §13), em minutos e segundos; o texto muda uma vez por segundo.</summary>
     public class LevelTimerUI : MonoBehaviour
     {
-        private const int SecondsPerMinute = 60;
-
         [SerializeField] private LevelFlow _levelFlow;
         [SerializeField] private Text _text;
 
@@ -32,7 +30,7 @@ namespace Guaxinim.UI
             }
 
             _lastShownSeconds = seconds;
-            _text.text = $"{seconds / SecondsPerMinute:00}:{seconds % SecondsPerMinute:00}";
+            _text.text = TimeFormat.MinutesAndSeconds(seconds);
         }
     }
 }

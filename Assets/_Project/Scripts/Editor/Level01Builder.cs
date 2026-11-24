@@ -1,4 +1,3 @@
-using System.Linq;
 using Guaxinim.Core;
 using Unity.AI.Navigation;
 using UnityEditor;
@@ -12,7 +11,7 @@ namespace Guaxinim.EditorTools
     /// <summary>
     /// Cria a cena Level_01_Mercadinho (passo 1.10, GDD §11): mercadinho de 12 × 10 m com 2 corredores,
     /// o Seu Zé patrulhando e a toca no fundo, onde o guaxinim começa. Luz noturna com no máximo 4 luzes
-    /// em tempo real (GDD §14.6), NavMesh assado e a cena como primeira do Build Profile.
+    /// em tempo real (GDD §14.6), NavMesh assado e a cena no catálogo de fases e no Build Profile.
     /// Rodar de novo recria a cena do zero.
     /// </summary>
     public static class Level01Builder
@@ -86,7 +85,8 @@ namespace Guaxinim.EditorTools
             BakeNavMesh(root);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
-            AddAsFirstBuildScene();
+            LevelCatalogFactory.CreateOrUpdate(); // marca a cena da fase 1 no LevelData e atualiza o catálogo
+            BuildSceneList.Refresh();
             Selection.activeGameObject = raccoon;
         }
 
@@ -170,13 +170,6 @@ namespace Guaxinim.EditorTools
             surface.BuildNavMesh();
             AssetDatabase.DeleteAsset(NavMeshDataPath); // recriar a fase troca o NavMesh antigo
             AssetDatabase.CreateAsset(surface.navMeshData, NavMeshDataPath);
-        }
-
-        private static void AddAsFirstBuildScene()
-        {
-            var scenes = EditorBuildSettings.scenes.Where(buildScene => buildScene.path != ScenePath).ToList();
-            scenes.Insert(0, new EditorBuildSettingsScene(ScenePath, true));
-            EditorBuildSettings.scenes = scenes.ToArray();
         }
 
         private readonly struct ItemSpot

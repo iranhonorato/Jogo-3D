@@ -32,7 +32,8 @@ Projeto 3D Hiper-Casual — Jogos Digitais, Insper 2026.2.
 1. Clone o repositório.
 2. No Unity Hub: **Add → Add project from disk** e selecione a pasta do repositório.
 3. Abra com a versão **6000.3.24f1**. A primeira abertura importa tudo e leva alguns minutos.
-4. Cena de testes: `Assets/_Project/Scenes/Sandbox/SampleScene`.
+4. As cenas do jogo são geradas por menus do Editor (`Tools/Guaxinim/`): **Montar Fase 1** e depois **Montar Menu e Mapa**. O jogo começa na cena `MainMenu`, segue para o `CityMap` e daí para a fase escolhida.
+5. Cena de testes: `Assets/_Project/Scenes/Sandbox/SampleScene` (menu **Montar Sandbox de Teste**; fica fora do build).
 
 ## Estrutura do projeto
 
@@ -42,7 +43,7 @@ Assets/_Project/
 ├── Audio/      Music/ e SFX/
 ├── Data/       ScriptableObjects: Items, Guards, Levels, Player, Noise, Effects
 ├── Prefabs/    Camera, Environment (kit modular), Guards, Hazards, Items, Player, UI
-├── Scenes/     Cenas do jogo (Sandbox/ para testes)
+├── Scenes/     MainMenu, CityMap, Levels/ (uma cena por fase) e Sandbox/ (testes)
 ├── Scripts/    Código, um módulo por pasta
 ├── Settings/   URP (Rendering/) e Input Actions (Input/)
 └── Tests/      Testes automatizados (EditMode/)
