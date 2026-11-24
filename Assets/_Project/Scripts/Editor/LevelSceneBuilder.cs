@@ -18,7 +18,6 @@ namespace Guaxinim.EditorTools
         private const string LevelsFolder = "Assets/_Project/Scenes/Levels";
         private const string LevelDataFolder = "Assets/_Project/Data/Levels";
         private const string MenuRoot = "Tools/Guaxinim/Montar Fase/";
-        private const float StoreLightRange = 7f;
         private const float StoreLightIntensity = 1.2f;
         private const float MoonlightIntensity = 0.35f;
 
@@ -175,11 +174,23 @@ namespace Guaxinim.EditorTools
             {
                 Light storeLight = CreateLight("StoreLight", root, LightType.Point, StoreLightColor, StoreLightIntensity);
                 storeLight.transform.position = position;
-                storeLight.range = StoreLightRange;
+                storeLight.range = blueprint.StoreLightRange;
                 storeLight.shadows = LightShadows.None;
             }
 
+            PlaceLightPools(root, blueprint.LightPools);
+
             SetCameraBackground(scene);
+        }
+
+        private static void PlaceLightPools(Transform root, Vector3[] positions)
+        {
+            var pools = new GameObject("LightPools").transform;
+            pools.SetParent(root, false);
+            foreach (Vector3 position in positions)
+            {
+                LevelBuildKit.Place(LightPoolFactory.PrefabPath, pools, position, 0f);
+            }
         }
 
         private static Light CreateLight(string name, Transform parent, LightType type, Color color, float intensity)

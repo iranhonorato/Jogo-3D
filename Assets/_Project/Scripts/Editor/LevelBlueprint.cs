@@ -45,6 +45,12 @@ namespace Guaxinim.EditorTools
         /// <summary>Luzes quentes da loja, além da lua (GDD §14.6: no máximo 4 ou 5 em tempo real com as lanternas).</summary>
         public Vector3[] StoreLights { get; set; } = new Vector3[0];
 
+        /// <summary>Metros de alcance das luzes da loja: maior nas fases grandes.</summary>
+        public float StoreLightRange { get; set; } = 7f;
+
+        /// <summary>Poças de luz quente no chão (sem custo de luz em tempo real), espalhadas pelos corredores.</summary>
+        public Vector3[] LightPools { get; set; } = new Vector3[0];
+
         /// <summary>A fase liga as dicas do tutorial (só a Fase 1).</summary>
         public bool HasTutorialTips { get; set; }
 

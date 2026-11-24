@@ -29,6 +29,7 @@ namespace Guaxinim.EditorTools
         public static void GenerateAllPrefabs()
         {
             EnvironmentKitFactory.CreateKitPrefabs();
+            LightPoolFactory.CreatePrefab();
             LevelSystemsFactory.CreateLevelSystemsPrefab();
             GreyboxRaccoonFactory.CreateRaccoonPrefab();
             CameraRigFactory.CreateCameraRigs();
