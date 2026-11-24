@@ -27,7 +27,7 @@ namespace Guaxinim.UI
         [Tooltip("Painel da tela; começa escondido")]
         [SerializeField] private GameObject _panel;
 
-        [Tooltip("As três estrelas, na ordem: lista, tempo, sem alerta")]
+        [Tooltip("As três estrelas, na ordem: lista, tempo, sem ser perseguido")]
         [SerializeField] private Image[] _stars = new Image[0];
 
         [SerializeField] private Text _details;
@@ -87,18 +87,27 @@ namespace Guaxinim.UI
                 return;
             }
 
-            SceneLoader.LoadLevel(_nextLevel);
+            MapTravelRequest.Request(_levelFlow.Level, _nextLevel); // o mapa mostra a viagem e abre o início dela
+            SceneLoader.LoadCityMap();
         }
 
-        /// <summary>Ligado ao botão "Mapa" no Inspector.</summary>
-        public void GoToCityMap() => SceneLoader.LoadCityMap();
+        /// <summary>Ligado ao botão "Mapa" no Inspector. Se esta vitória liberou a próxima fase, o mapa mostra a viagem.</summary>
+        public void GoToCityMap()
+        {
+            if (_levelFlow.IsFirstCompletion && _nextLevel != null)
+            {
+                MapTravelRequest.Request(_levelFlow.Level, _nextLevel);
+            }
+
+            SceneLoader.LoadCityMap();
+        }
 
         private void HandleLevelWon()
         {
             LevelResult result = _levelFlow.Result;
             SetStar(0, result.IsListComplete);
             SetStar(1, result.BeatTargetTime);
-            SetStar(2, !result.HadAlert);
+            SetStar(2, !result.WasChased);
             _details.text = BuildDetails(result, _shoppingList.Progress);
             _recordLabel.gameObject.SetActive(_levelFlow.IsNewRecord);
 
@@ -125,7 +134,7 @@ namespace Guaxinim.UI
             text.AppendLine($"{Mark(result.IsListComplete)} Lista completa");
             text.AppendLine($"{Mark(result.BeatTargetTime)} Tempo {TimeFormat.MinutesAndSeconds(result.ElapsedSeconds)} " +
                 $"(meta {TimeFormat.MinutesAndSeconds(result.TargetSeconds)})");
-            text.AppendLine($"{Mark(!result.HadAlert)} Sem alerta geral");
+            text.AppendLine($"{Mark(!result.WasChased)} Sem ser perseguido");
             text.AppendLine();
             for (int i = 0; i < progress.RequiredCount; i++)
             {

@@ -1,3 +1,4 @@
+using System;
 using Guaxinim.Core;
 using Guaxinim.Noise;
 using UnityEngine;
@@ -21,6 +22,8 @@ namespace Guaxinim.Player
 
         private Inventory _inventory;
         private PlayerState _state;
+
+        public event Action OnDropped;
 
         private void Awake()
         {
@@ -60,6 +63,7 @@ namespace Guaxinim.Player
             if (_inventory.TryDropLast(dropPosition, transform.rotation))
             {
                 NoiseSystem.Emit(dropPosition, _noiseData.DropRadius);
+                OnDropped?.Invoke();
             }
         }
 

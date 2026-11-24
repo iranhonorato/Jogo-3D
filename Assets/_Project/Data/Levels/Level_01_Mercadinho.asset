@@ -12,8 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c50d7ae223c934e908d499405fe280, type: 3}
   m_Name: Level_01_Mercadinho
   m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Core.LevelData
+  _id: level_01_mercadinho
+  _sceneName: Level_01_Mercadinho
   _displayName: "Mercadinho do Seu Z\xE9"
   _shoppingList:
   - {fileID: 11400000, guid: a08b631010433024c82380d0f3e1c107, type: 2}
   - {fileID: 11400000, guid: be2733857069a904da29d3231056214b, type: 2}
   - {fileID: 11400000, guid: ec73f6aedd73c5b4db86f3017c5a95b7, type: 2}
+  _targetTimeSeconds: 90
+  _tips: {fileID: 11400000, guid: c536a4c85f31cd942ba83b80f817ef3c, type: 2}

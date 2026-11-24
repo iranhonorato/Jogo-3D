@@ -24,7 +24,7 @@ namespace Guaxinim.UI
         [SerializeField] private Text _nameLabel;
         [SerializeField] private Text _statusLabel;
 
-        [Tooltip("As três estrelas da fase, na ordem: lista, tempo, sem alerta")]
+        [Tooltip("As três estrelas da fase, na ordem: lista, tempo, sem ser perseguido")]
         [SerializeField] private Image[] _stars = new Image[0];
 
         [SerializeField] private Color _unlockedColor = new Color(1f, 0.78f, 0.3f);

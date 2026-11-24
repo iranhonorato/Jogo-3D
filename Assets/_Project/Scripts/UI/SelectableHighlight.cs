@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -35,6 +36,9 @@ namespace Guaxinim.UI
         private bool _isSelected;
         private bool _isPressed;
 
+        /// <summary>Algum botão foi selecionado (o áudio toca o clique de navegação).</summary>
+        public static event Action OnAnySelected;
+
         private void Awake()
         {
             bool isButtonStyleComplete = _style == HighlightStyle.Card || (_background != null && _label != null);
@@ -54,10 +58,14 @@ namespace Guaxinim.UI
 
         private void OnDisable() => transform.localScale = Vector3.one;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics() => OnAnySelected = null;
+
         public void OnSelect(BaseEventData eventData)
         {
             _isSelected = true;
             Refresh();
+            OnAnySelected?.Invoke();
         }
 
         public void OnDeselect(BaseEventData eventData)

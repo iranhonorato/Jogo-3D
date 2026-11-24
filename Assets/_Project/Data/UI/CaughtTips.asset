@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c27cc0268c29434428b0721752813c17, type: 3}
+  m_Name: CaughtTips
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.UI.CaughtTipsData
+  _tips:
+  - "Andar n\xE3o faz barulho: corra s\xF3 quando precisar."
+  - "Largue itens (Q) para fugir mais r\xE1pido."
+  - "Lixeiras escondem, mas n\xE3o com carga volumosa."
+  - "Sem carga, voc\xEA corre mais r\xE1pido que o seguran\xE7a."
+  - "Item fr\xE1gil quebra se voc\xEA correr com ele."
+  - "Assobie (F) para atrair o seguran\xE7a para longe."

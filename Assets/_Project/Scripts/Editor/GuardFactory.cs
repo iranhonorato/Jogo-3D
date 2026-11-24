@@ -1,3 +1,4 @@
+using Guaxinim.Animation;
 using Guaxinim.Guards;
 using Guaxinim.Noise;
 using Guaxinim.Shared;
@@ -9,18 +10,33 @@ using UnityEngine.Rendering;
 namespace Guaxinim.EditorTools
 {
     /// <summary>
-    /// Gera os prefabs dos seguranças (passos 1.5 a 1.10, GDD §6) em Prefabs/Guards/: NavMeshAgent, collider,
-    /// GuardAI, visão (VisionCone e o cone desenhado no chão), a lanterna (luz spot no Socket_Flashlight)
-    /// e o modelo do Blender (segurança comum ou Seu Zé), na layer Guard. Os waypoints são ligados na cena.
+    /// Gera os prefabs dos dois tipos de inimigo (GDD §6.2) em Prefabs/Guards/: o segurança (rápido) e o faxineiro
+    /// (metade da velocidade, com o modelo do Seu Zé). Cada um tem NavMeshAgent, collider, GuardAI com o seu
+    /// GuardData, visão (VisionCone e o cone no chão), a lanterna (luz spot no Socket_Flashlight) e o modelo do
+    /// Blender, na layer Guard. Os waypoints são ligados na cena.
     /// </summary>
     public static class GuardFactory
     {
         public const string GuardPrefabPath = "Assets/_Project/Prefabs/Guards/Guard.prefab";
-        public const string SeuZePrefabPath = "Assets/_Project/Prefabs/Guards/SeuZe.prefab";
+        public const string JanitorPrefabPath = "Assets/_Project/Prefabs/Guards/Janitor.prefab";
+
+        /// <summary>O faxineiro anda, desconfia e procura a esta fração da velocidade do segurança.</summary>
+        public const float JanitorSpeedFactor = 0.5f;
+
+        /// <summary>
+        /// Perseguição do faxineiro, em m/s: pega o guaxinim que anda (3 m/s) e perde para o que corre (6 m/s). Com a
+        /// metade da velocidade do segurança ele não pegava ninguém.
+        /// </summary>
+        public const float JanitorChaseSpeed = 4.5f;
 
         private const string GuardModelPath = "Assets/_Project/Art/Models/Characters/Char_Guard.fbx";
         private const string SeuZeModelPath = "Assets/_Project/Art/Models/Characters/Char_SeuZe.fbx";
-        private const string DataPath = "Assets/_Project/Data/Guards/GuardData.asset";
+        public const string GuardDataPath = "Assets/_Project/Data/Guards/GuardData_Guard.asset";
+        public const string JanitorDataPath = "Assets/_Project/Data/Guards/GuardData_Janitor.asset";
+
+        // Caminhos antigos: renomeados com MoveAsset (mantém o GUID e as referências das cenas).
+        private const string LegacyGuardDataPath = "Assets/_Project/Data/Guards/GuardData.asset";
+        private const string LegacySeuZePrefabPath = "Assets/_Project/Prefabs/Guards/SeuZe.prefab";
         private const string VisionDataPath = "Assets/_Project/Data/Guards/VisionData_Guard.asset";
         private const string DetectionDataPath = "Assets/_Project/Data/Guards/DetectionData.asset";
         private const string ConeMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_VisionCone_Guard.mat";
@@ -40,22 +56,94 @@ namespace Guaxinim.EditorTools
         private static readonly Color DetectionLowColor = new Color(1f, 0.85f, 0.2f);
         private static readonly Color DetectionFullColor = new Color(0.95f, 0.15f, 0.1f);
 
-        /// <summary>Gera o segurança comum e o Seu Zé (GDD §11: o segurança da Fase 1 é o dono do mercadinho).</summary>
+        /// <summary>Gera o segurança e o faxineiro (na Fase 1, o faxineiro é o Seu Zé, dono do mercadinho).</summary>
         [MenuItem("Tools/Guaxinim/Greybox/Prefabs dos Seguranças")]
         internal static void CreateGuardPrefabs()
         {
-            CreateGuardPrefab("Guard", GuardModelPath, GuardPrefabPath);
-            CreateGuardPrefab("SeuZe", SeuZeModelPath, SeuZePrefabPath);
+            RenameLegacyAssets();
+            GuardData guardData = EditorAssets.LoadOrCreate<GuardData>(GuardDataPath);
+            GuardData janitorData = LoadOrCreateJanitorData(guardData);
+            CreateGuardPrefab("Guard", GuardModelPath, GuardPrefabPath, guardData, MotionDataFactory.LoadOrCreateGuard());
+            CreateGuardPrefab("Janitor", SeuZeModelPath, JanitorPrefabPath, janitorData,
+                MotionDataFactory.LoadOrCreateJanitor());
         }
 
-        private static void CreateGuardPrefab(string name, string modelPath, string prefabPath)
+        private static void RenameLegacyAssets()
+        {
+            MoveIfOnlyOldExists(LegacyGuardDataPath, GuardDataPath);
+            MoveIfOnlyOldExists(LegacySeuZePrefabPath, JanitorPrefabPath);
+        }
+
+        private static void MoveIfOnlyOldExists(string oldPath, string newPath)
+        {
+            bool hasOld = AssetDatabase.LoadMainAssetAtPath(oldPath) != null;
+            bool hasNew = AssetDatabase.LoadMainAssetAtPath(newPath) != null;
+            if (!hasOld || hasNew)
+            {
+                return;
+            }
+
+            string error = AssetDatabase.MoveAsset(oldPath, newPath);
+            if (!string.IsNullOrEmpty(error))
+            {
+                Debug.LogError($"Could not rename {oldPath} to {newPath}: {error}");
+            }
+        }
+
+        /// <summary>
+        /// Faxineiro: as velocidades do segurança vezes <see cref="JanitorSpeedFactor"/> e a perseguição em
+        /// <see cref="JanitorChaseSpeed"/>, escritas uma vez ao criar o asset. Depois, os números se ajustam no próprio
+        /// asset.
+        /// </summary>
+        private static GuardData LoadOrCreateJanitorData(GuardData guardData)
+        {
+            var janitorData = AssetDatabase.LoadAssetAtPath<GuardData>(JanitorDataPath);
+            if (janitorData != null)
+            {
+                UpgradeHalfSpeedChase(janitorData, guardData);
+                return janitorData;
+            }
+
+            janitorData = Object.Instantiate(guardData);
+            var serialized = new SerializedObject(janitorData);
+            ScaleSpeed(serialized, "_patrolSpeed");
+            ScaleSpeed(serialized, "_suspiciousSpeed");
+            ScaleSpeed(serialized, "_searchSpeed");
+            serialized.FindProperty("_chaseSpeed").floatValue = JanitorChaseSpeed;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            AssetDatabase.CreateAsset(janitorData, JanitorDataPath);
+            return janitorData;
+        }
+
+        /// <summary>Asset da versão antiga, com a perseguição na metade da do segurança: passa para a nova.</summary>
+        private static void UpgradeHalfSpeedChase(GuardData janitorData, GuardData guardData)
+        {
+            if (!Mathf.Approximately(janitorData.ChaseSpeed, guardData.ChaseSpeed * JanitorSpeedFactor))
+            {
+                return; // ajustado à mão: fica como está
+            }
+
+            var serialized = new SerializedObject(janitorData);
+            serialized.FindProperty("_chaseSpeed").floatValue = JanitorChaseSpeed;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(janitorData);
+        }
+
+        private static void ScaleSpeed(SerializedObject data, string propertyName)
+        {
+            SerializedProperty speed = data.FindProperty(propertyName);
+            speed.floatValue *= JanitorSpeedFactor;
+        }
+
+        private static void CreateGuardPrefab(string name, string modelPath, string prefabPath, GuardData data,
+            MotionData motionData)
         {
             var root = new GameObject(name);
             ConfigureAgent(root.AddComponent<NavMeshAgent>());
             AddBodyCollider(root);
 
             var guard = root.AddComponent<GuardAI>();
-            EditorAssets.SetReference(guard, "_data", EditorAssets.LoadOrCreate<GuardData>(DataPath));
+            EditorAssets.SetReference(guard, "_data", data);
             VisionData visionData = EditorAssets.LoadOrCreate<VisionData>(VisionDataPath);
             VisionCone visionCone = AddVision(root, visionData);
             AddConeMesh(root.transform, visionCone);
@@ -65,10 +153,22 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(guard, "_hearing", root.AddComponent<NoiseListener>());
             GameObject model = AddModel(root.transform, modelPath);
             AddFlashlight(root.transform, model, visionData);
+            AddMotion(root, model, motionData, meter);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Guard));
 
             PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
             Object.DestroyImmediate(root);
+        }
+
+        /// <summary>Animação procedural de cada tipo e o pulinho de susto quando o medidor enche.</summary>
+        private static void AddMotion(GameObject root, GameObject model, MotionData motionData, DetectionMeter meter)
+        {
+            var motion = root.AddComponent<ProceduralMotion>();
+            EditorAssets.SetReference(motion, "_data", motionData);
+            EditorAssets.SetReference(motion, "_model", model.transform);
+            var startle = root.AddComponent<DetectionStartle>();
+            EditorAssets.SetReference(startle, "_meter", meter);
+            EditorAssets.SetReference(startle, "_motion", motion);
         }
 
         private static void ConfigureAgent(NavMeshAgent agent)

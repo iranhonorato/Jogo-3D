@@ -51,6 +51,7 @@ Cada conceito do GDD tem **um só** nome em inglês no código. Os nomes de clas
 | --- | --- | --- | --- |
 | guaxinim | `Raccoon` | lixeira (esconderijo) | `HidingSpot` |
 | segurança | `Guard` | robô aspirador | `RobotVacuum` |
+| faxineiro | `Janitor` | | |
 | toca | `Den` | montar / descer | `Mount` / `Dismount` |
 | lista de compras | `ShoppingList` | câmera de segurança | `SecurityCamera` |
 | pegar / largar / entregar | `PickUp` / `Drop` / `Deliver` | cogumelo / modo cogumelo | `Mushroom` / `MushroomMode` |

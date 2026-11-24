@@ -3,6 +3,7 @@
     "rootNamespace": "Guaxinim.Tests",
     "references": [
         "Guaxinim.Runtime",
+        "Guaxinim.EditorTools",
         "Unity.InputSystem",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"

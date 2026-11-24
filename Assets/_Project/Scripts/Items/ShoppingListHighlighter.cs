@@ -15,7 +15,7 @@ namespace Guaxinim.Items
         [SerializeField] private Transform _player;
 
         [Tooltip("Metros: itens da lista mais perto que isto ganham o contorno")]
-        [SerializeField, Min(0f)] private float _radius = 3f;
+        [SerializeField, Min(0f)] private float _radius = 6f;
 
         private readonly List<PickupItem> _items = new List<PickupItem>();
 

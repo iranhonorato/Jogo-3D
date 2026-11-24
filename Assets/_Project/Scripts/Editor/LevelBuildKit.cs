@@ -23,11 +23,13 @@ namespace Guaxinim.EditorTools
 
         private const string MainCameraTag = "MainCamera";
         private const float WallThicknessOffset = 0.1f;
+        private const float SpawnHeight = 0.05f;
 
         /// <summary>Gera (ou atualiza) todos os prefabs usados nas fases.</summary>
         public static void GenerateAllPrefabs()
         {
             EnvironmentKitFactory.CreateKitPrefabs();
+            LightPoolFactory.CreatePrefab();
             LevelSystemsFactory.CreateLevelSystemsPrefab();
             GreyboxRaccoonFactory.CreateRaccoonPrefab();
             CameraRigFactory.CreateCameraRigs();
@@ -35,6 +37,7 @@ namespace Guaxinim.EditorTools
             ItemFactory.CreateItems();
             HidingSpotFactory.CreateBinPrefab();
             ScreenFaderFactory.CreatePrefab();
+            GameAudioFactory.CreatePrefab();
         }
 
         public static GameObject Place(string prefabPath, Transform parent, Vector3 position, float yawDegrees)
@@ -110,22 +113,27 @@ namespace Guaxinim.EditorTools
         {
             GameObject den = Place(EnvironmentKitFactory.DenPath, root, position, yawDegrees);
             EditorAssets.SetReference(den.GetComponent<Den>(), "_shoppingList", systems.GetComponent<ShoppingList>());
+            EditorAssets.SetReference(systems.GetComponentInChildren<DenIndicatorUI>(), "_den", den.transform);
             return den;
         }
 
         /// <summary>Põe o guaxinim e o rig de câmera, e liga os dois aos sistemas da fase.</summary>
         public static GameObject PlacePlayer(Transform root, GameObject systems, Vector3 start, float yawDegrees)
         {
-            GameObject raccoon = Place(GreyboxRaccoonFactory.PrefabPath, root, start, yawDegrees);
+            // Um pouco acima do piso: começar encostado faz o primeiro passo da gravidade atravessar a placa.
+            GameObject raccoon = Place(GreyboxRaccoonFactory.PrefabPath, root, start + Vector3.up * SpawnHeight,
+                yawDegrees);
             EditorAssets.SetReference(systems.GetComponent<LevelFlow>(), "_player", raccoon.GetComponent<PlayerState>());
             EditorAssets.SetReference(systems.GetComponent<ShoppingListHighlighter>(), "_player", raccoon.transform);
+            EditorAssets.SetReference(systems.GetComponent<FlashlightBudget>(), "_player", raccoon.transform);
             ConnectHud(systems, raccoon);
 
             GameObject cameraRig = Place(CameraRigFactory.PerspectivePath, root, Vector3.zero, 0f);
             DisableOtherMainCameras(cameraRig);
             ConnectCamera(cameraRig, raccoon);
-            EditorAssets.SetReference(systems.GetComponentInChildren<InteractionPromptUI>(), "_camera",
-                cameraRig.GetComponentInChildren<Camera>());
+            Camera gameCamera = cameraRig.GetComponentInChildren<Camera>();
+            EditorAssets.SetReference(systems.GetComponentInChildren<InteractionPromptUI>(), "_camera", gameCamera);
+            EditorAssets.SetReference(systems.GetComponentInChildren<DenIndicatorUI>(), "_camera", gameCamera);
             return raccoon;
         }
 
@@ -176,6 +184,8 @@ namespace Guaxinim.EditorTools
             var tipsUI = systems.GetComponentInChildren<TutorialTipsUI>();
             EditorAssets.SetReference(tipsUI, "_interactor", interactor);
             EditorAssets.SetReference(tipsUI, "_inventory", raccoon.GetComponent<Inventory>());
+            EditorAssets.SetReference(systems.GetComponentInChildren<DenIndicatorUI>(), "_inventory",
+                raccoon.GetComponent<Inventory>());
         }
 
         private static void DisableOtherMainCameras(GameObject cameraRig)

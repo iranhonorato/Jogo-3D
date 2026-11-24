@@ -27,7 +27,7 @@ namespace Guaxinim.EditorTools
 
             GameObject panel = EditorUI.CreateScreenPanel("EndingCanvas", root, 0);
             EditorUI.SetPanelOpacity(panel, VeilOpacity);
-            Text title = EditorUI.CreateText("Title", panel.transform, EndingTitle, TitleFontSize, EditorUI.LightTextColor);
+            Text title = EditorUI.CreateTitle("Title", panel.transform, EndingTitle, TitleFontSize, EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.8f), new Vector2(1700f, 170f));
             EditorUI.AddOutline(title.gameObject);
             Text summary = EditorUI.CreateText("Summary", panel.transform, string.Empty, SummaryFontSize, Color.white);

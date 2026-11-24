@@ -10,8 +10,8 @@ namespace Guaxinim.EditorTools
     /// <summary>
     /// Monta a HUD da fase (GDD §13): lista no canto superior esquerdo, cronômetro no superior direito, peso e
     /// volume no inferior esquerdo, efeitos no inferior direito, a faixa das dicas do tutorial no topo e a
-    /// indicação "[E] Pegar" sobre o objeto ao alcance. O que é do guaxinim (inventário, interação e câmera) é
-    /// ligado na montagem da fase.
+    /// indicação "[E] Pegar" sobre o objeto ao alcance e a seta da toca. O que é do guaxinim (inventário,
+    /// interação e câmera) e a toca são ligados na montagem da fase.
     /// </summary>
     internal static class HudBuilder
     {
@@ -24,10 +24,14 @@ namespace Guaxinim.EditorTools
         private const float BarBlockHeight = 80f;
         private const float BarLabelHeight = 40f;
         private const float TipTopMargin = 24f;
+        private const int DenLabelFontSize = 26;
+        private const string DenArrowSpritePath = "Assets/_Project/Art/UI/Arrow_Den.png";
 
         private static readonly Vector2 BarSize = new Vector2(380f, 22f);
         private static readonly Vector2 PromptSize = new Vector2(230f, 58f);
         private static readonly Vector2 TipSize = new Vector2(1100f, 84f);
+        private static readonly Vector2 DenArrowSize = new Vector2(76f, 76f);
+        private static readonly Vector2 DenLabelSize = new Vector2(140f, 40f);
         private static readonly Color HudPanelColor = new Color(0.05f, 0.03f, 0.1f, 0.6f);
         private static readonly Color PillColor = new Color(0.05f, 0.03f, 0.1f, 0.82f);
 
@@ -96,6 +100,38 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(promptUI, "_prompt", (RectTransform)prompt.transform);
             EditorAssets.SetReference(promptUI, "_text", text);
             prompt.SetActive(false);
+            AddDenIndicator(canvas, flow);
+        }
+
+        /// <summary>Seta âmbar com o rótulo "Toca", que aponta para a toca enquanto o guaxinim carrega algo.</summary>
+        private static void AddDenIndicator(GameObject canvas, LevelFlow flow)
+        {
+            var indicator = new GameObject("DenIndicator", typeof(RectTransform)) { layer = EditorUI.UILayer };
+            indicator.transform.SetParent(canvas.transform, false);
+            ((RectTransform)indicator.transform).sizeDelta = DenArrowSize;
+
+            var arrow = new GameObject("Arrow", typeof(RectTransform)) { layer = EditorUI.UILayer };
+            arrow.transform.SetParent(indicator.transform, false);
+            ((RectTransform)arrow.transform).sizeDelta = DenArrowSize;
+            var arrowImage = arrow.AddComponent<Image>();
+            arrowImage.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(DenArrowSpritePath);
+            arrowImage.raycastTarget = false;
+            if (arrowImage.sprite == null)
+            {
+                Debug.LogWarning($"Den arrow sprite not found at {DenArrowSpritePath}.");
+            }
+
+            Text label = EditorUI.CreateText("Label", indicator.transform, "Toca", DenLabelFontSize, Color.white);
+            var labelRect = (RectTransform)label.transform;
+            labelRect.sizeDelta = DenLabelSize;
+            labelRect.anchoredPosition = new Vector2(0f, -DenArrowSize.y * 0.75f);
+            EditorUI.AddOutline(label.gameObject);
+
+            var denUI = canvas.AddComponent<DenIndicatorUI>();
+            EditorAssets.SetReference(denUI, "_levelFlow", flow);
+            EditorAssets.SetReference(denUI, "_indicator", (RectTransform)indicator.transform);
+            EditorAssets.SetReference(denUI, "_arrow", (RectTransform)arrow.transform);
+            indicator.SetActive(false);
         }
 
         /// <summary>Cápsula escura com um texto claro no meio, centralizada; quem usa a posiciona.</summary>

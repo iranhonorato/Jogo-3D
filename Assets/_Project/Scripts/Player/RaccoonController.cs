@@ -12,6 +12,10 @@ namespace Guaxinim.Player
     [RequireComponent(typeof(RaccoonEffects))]
     public class RaccoonController : MonoBehaviour
     {
+        // Um quadro longo (o primeiro depois de carregar uma fase grande) não pode virar um passo enorme, que
+        // atravessaria o piso.
+        private const float MaxStepSeconds = 0.05f;
+
         [SerializeField] private PlayerData _data;
         [SerializeField] private InputReader _input;
 
@@ -24,6 +28,7 @@ namespace Guaxinim.Player
         private RaccoonEffects _effects;
         private Vector3 _horizontalVelocity;
         private float _verticalVelocity;
+        private Vector3 _spawnPosition;
 
         /// <summary>Correndo de verdade: Shift segurado e com input de movimento (GDD §5: faz barulho).</summary>
         public bool IsRunning { get; private set; }
@@ -32,6 +37,7 @@ namespace Guaxinim.Player
         {
             _controller = GetComponent<CharacterController>();
             _state = GetComponent<PlayerState>();
+            _spawnPosition = transform.position;
             _inventory = GetComponent<Inventory>();
             _effects = GetComponent<RaccoonEffects>();
             if (_data == null || _input == null || _cameraTransform == null)
@@ -51,7 +57,7 @@ namespace Guaxinim.Player
                 return;
             }
 
-            float deltaTime = Time.deltaTime;
+            float deltaTime = Mathf.Min(Time.deltaTime, MaxStepSeconds);
             Vector3 direction = RaccoonLocomotion.GetMoveDirection(_input.Move, _cameraTransform.eulerAngles.y);
             IsRunning = _input.IsSprinting && direction.sqrMagnitude > 0f;
 
@@ -60,6 +66,7 @@ namespace Guaxinim.Player
                 _data.Gravity, _data.GroundedFallSpeed, deltaTime);
 
             _controller.Move((_horizontalVelocity + Vector3.up * _verticalVelocity) * deltaTime);
+            ReturnToSpawnIfFellOff();
             TurnTowards(direction, deltaTime);
         }
 
@@ -70,6 +77,21 @@ namespace Guaxinim.Player
         }
 
         private void HandleCaught() => enabled = false;
+
+        /// <summary>Rede de segurança: se cair abaixo do piso, volta ao ponto de início em vez de cair para sempre.</summary>
+        private void ReturnToSpawnIfFellOff()
+        {
+            if (transform.position.y > _data.FallResetHeight)
+            {
+                return;
+            }
+
+            _controller.enabled = false; // o CharacterController ignora mudanças de posição enquanto está ligado
+            transform.position = _spawnPosition;
+            _controller.enabled = true;
+            _horizontalVelocity = Vector3.zero;
+            _verticalVelocity = 0f;
+        }
 
         private void StandStill()
         {

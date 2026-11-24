@@ -1,12 +1,13 @@
 using System.Collections;
+using Guaxinim.Animation;
 using Guaxinim.Shared;
 using UnityEngine;
 
 namespace Guaxinim.Player
 {
     /// <summary>
-    /// Entrar e sair da lixeira (GDD §9): 0,5 s indo até o esconderijo, e o modelo some; ao sair, o modelo
-    /// volta e o guaxinim vai até o ponto de saída. Durante a transição, ele não se mexe.
+    /// Entrar e sair da lixeira (GDD §9): 0,5 s pulando em arco até o esconderijo, e o modelo some; ao sair, o modelo
+    /// volta e o guaxinim pula até o ponto de saída. Durante a transição, ele não se mexe.
     /// </summary>
     [RequireComponent(typeof(PlayerState), typeof(CharacterController), typeof(RaccoonBulkyLoad))]
     public class RaccoonHiding : MonoBehaviour, IHider
@@ -15,6 +16,9 @@ namespace Guaxinim.Player
 
         [Tooltip("Visual do guaxinim, escondido dentro da lixeira")]
         [SerializeField] private GameObject _model;
+
+        [Tooltip("Metros do pulo em arco para dentro e para fora da lixeira")]
+        [SerializeField, Min(0f)] private float _jumpArcHeight = 0.7f;
 
         private PlayerState _state;
         private CharacterController _controller;
@@ -58,7 +62,7 @@ namespace Guaxinim.Player
             _state.SetInTransition(false);
         }
 
-        /// <summary>Desliza até o destino em 0,5 s, com a colisão desligada (atravessa a borda da lixeira).</summary>
+        /// <summary>Pula em arco até o destino em 0,5 s, com a colisão desligada (passa por cima da borda da lixeira).</summary>
         private IEnumerator MoveTo(Vector3 destination)
         {
             _controller.enabled = false;
@@ -68,7 +72,7 @@ namespace Guaxinim.Player
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
-                transform.position = Vector3.Lerp(start, destination, Mathf.Clamp01(elapsed / duration));
+                transform.position = ArcPath.Evaluate(start, destination, _jumpArcHeight, elapsed / duration);
                 yield return null;
             }
 

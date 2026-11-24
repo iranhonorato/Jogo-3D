@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Guaxinim.Items;
 using Guaxinim.Player;
+using Guaxinim.Shared;
 using UnityEngine;
 
 namespace Guaxinim.Core
@@ -38,10 +39,13 @@ namespace Guaxinim.Core
         /// <summary>O tempo desta vitória bateu o melhor tempo salvo antes (a primeira vitória não conta).</summary>
         public bool IsNewRecord { get; private set; }
 
+        /// <summary>Esta vitória foi a primeira nesta fase (e por isso liberou a próxima).</summary>
+        public bool IsFirstCompletion { get; private set; }
+
         public LevelData Level => _level;
 
-        // TODO(passo 3.3): o AlertManager marca quando um alerta geral dispara (estrela "sem alerta").
-        public bool HadAlert { get; private set; }
+        /// <summary>Algum inimigo perseguiu o guaxinim nesta tentativa (perde a estrela "sem ser perseguido").</summary>
+        public bool WasChased { get; private set; }
 
         private void Awake()
         {
@@ -63,6 +67,8 @@ namespace Guaxinim.Core
             {
                 _shoppingList.OnCompleted += HandleListCompleted;
             }
+
+            ChaseReports.OnChaseStarted += HandleChaseStarted;
         }
 
         private void Update()
@@ -84,7 +90,11 @@ namespace Guaxinim.Core
             {
                 _shoppingList.OnCompleted -= HandleListCompleted;
             }
+
+            ChaseReports.OnChaseStarted -= HandleChaseStarted;
         }
+
+        private void HandleChaseStarted() => WasChased = true;
 
         private void HandlePlayerCaught()
         {
@@ -108,7 +118,9 @@ namespace Guaxinim.Core
 
             IsLevelOver = true;
             Result = LevelResult.Create(ElapsedSeconds, _level.TargetTimeSeconds, _shoppingList.Progress.IsComplete,
-                HadAlert, _shoppingList.Progress.BonusCount, _data.PointsPerBonusItem);
+                WasChased, _shoppingList.Progress.BonusCount, _data.PointsPerBonusItem);
+            LevelRecord previous = SaveSystem.Data.Find(_level.Id);
+            IsFirstCompletion = !string.IsNullOrEmpty(_level.Id) && (previous == null || !previous.IsCompleted);
             IsNewRecord = SaveSystem.RecordLevelResult(_level.Id, Result.Stars, Result.ElapsedSeconds); // libera a próxima fase
             Time.timeScale = 0f; // o mundo para atrás da tela de resultado; o SceneLoader volta a 1
             OnLevelWon?.Invoke();

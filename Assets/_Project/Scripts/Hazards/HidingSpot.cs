@@ -1,3 +1,4 @@
+using System;
 using Guaxinim.Shared;
 using UnityEngine;
 
@@ -13,6 +14,9 @@ namespace Guaxinim.Hazards
         [SerializeField] private Transform _exitPoint;
 
         private IHider _occupant;
+
+        /// <summary>Alguém entrou ou saiu; a animação da tampa escuta.</summary>
+        public event Action OnUsed;
 
         public Vector3 InteractionPoint => transform.position;
 
@@ -39,6 +43,7 @@ namespace Guaxinim.Hazards
             {
                 _occupant = null;
                 hider.ExitHiding(_exitPoint.position);
+                OnUsed?.Invoke();
                 return;
             }
 
@@ -50,6 +55,7 @@ namespace Guaxinim.Hazards
 
             _occupant = hider;
             hider.EnterHiding(transform.position);
+            OnUsed?.Invoke();
         }
     }
 }

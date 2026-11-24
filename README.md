@@ -13,11 +13,9 @@ Projeto 3D Hiper-Casual — Jogos Digitais, Insper 2026.2.
 | --- | --- |
 | Mover (silencioso) | WASD |
 | Correr (faz barulho) | Shift |
-| Pegar item / interagir / lixeira / aspirador | E |
+| Pegar item / entrar e sair da lixeira | E |
 | Largar o último item | Q |
 | Assobiar (distração) | F |
-| Ativar o modo cogumelo (com 3 cogumelos) | R |
-| Pular (no modo cogumelo) | Espaço |
 | Ver a lista inteira | Tab (segurar) |
 | Pausar | Esc |
 
@@ -32,7 +30,7 @@ Projeto 3D Hiper-Casual — Jogos Digitais, Insper 2026.2.
 1. Clone o repositório.
 2. No Unity Hub: **Add → Add project from disk** e selecione a pasta do repositório.
 3. Abra com a versão **6000.3.24f1**. A primeira abertura importa tudo e leva alguns minutos.
-4. As cenas do jogo são geradas por menus do Editor (`Tools/Guaxinim/`): **Montar Fase 1** e depois **Montar Menu e Mapa**. O jogo começa na cena `MainMenu`, segue para o `CityMap` e daí para a fase escolhida.
+4. As cenas do jogo são geradas por menus do Editor (`Tools/Guaxinim/`): **Montar Fase/1** e depois **Montar Menu e Mapa**. O jogo começa na cena `MainMenu`, segue para o `CityMap` e daí para a fase escolhida.
 5. Cena de testes: `Assets/_Project/Scenes/Sandbox/SampleScene` (menu **Montar Sandbox de Teste**; fica fora do build).
 
 ## Estrutura do projeto
@@ -58,12 +56,14 @@ Tools/Blender/  Scripts bpy que geram os modelos
 | `Core` | Ciclo do jogo, troca de cenas, save e dados de cada fase |
 | `Player` | Movimento do guaxinim, estado, inventário e fragilidade |
 | `Items` | Itens no mundo, lista de compras e toca |
-| `Effects` | Consumíveis e modo cogumelo |
+| `Effects` | Consumíveis (energético e barra de proteína) |
 | `Noise` | Emissão e escuta de sons, anéis visuais no chão |
-| `Guards` | IA do segurança, visão, detecção e alerta geral (`States/` guarda a máquina de estados) |
-| `Hazards` | Robô aspirador, lixeiras e câmeras de segurança |
+| `Guards` | IA do segurança e do faxineiro, visão, detecção e limite de lanternas acesas (`States/` guarda a máquina de estados) |
+| `Hazards` | Lixeiras |
 | `Camera` | Câmera isométrica e transparência das prateleiras |
-| `UI` | HUD e menus |
+| `Audio` | Efeitos sonoros (escutam os eventos do guaxinim, da fase e da lixeira), música de fundo e clique dos menus (`GameAudio`) |
+| `Animation` | Animações procedurais dos personagens sem esqueleto (passo, inclinação, respiração, susto) e o arco do item coletado |
+| `UI` | HUD, seta da toca, menus e a viagem no mapa da cidade |
 | `Shared` | Interfaces e tipos usados por mais de um módulo |
 | `Editor` | Ferramentas do Editor (não entram no build) |
 
@@ -115,11 +115,16 @@ Todo asset de terceiros ou gerado por IA entra aqui, com fonte e licença (GDD, 
 
 | Asset | Autor | Fonte | Licença |
 | --- | --- | --- | --- |
-| Modelos e texturas em `Art/Models/` e `Art/Textures/` (personagens, câmera de segurança, kit modular) | Gerados por scripts Python do Blender escritos com o Claude (Anthropic) | `Tools/Blender/` | Feitos para este projeto |
+| Modelos e texturas em `Art/Models/` e `Art/Textures/` (personagens, câmera de segurança, kit modular e itens) | Gerados por scripts Python do Blender escritos com o Claude (Anthropic) | `Tools/Blender/` | Feitos para este projeto |
 | Ilustração de fundo do menu principal (`Art/UI/Background_MainMenu.jpg`) | Gerada por IA (ferramenta e prompt a confirmar) | _a preencher_ | _a preencher_ |
 | Fonte do título do jogo (`Art/Fonts/LilitaOne-Regular.ttf`) | Juan Montoreano | [Lilita One no Google Fonts](https://fonts.google.com/specimen/Lilita+One), arquivo do repositório [google/fonts](https://github.com/google/fonts/tree/main/ofl/lilitaone) | SIL Open Font License 1.1 (cópia em `Art/Fonts/OFL.txt`) |
+| Fonte dos textos do jogo (`Art/Fonts/Sniglet-ExtraBold.ttf`) | Haley Fiege, Brenda Gallo e Pablo Impallari | [Sniglet no Google Fonts](https://fonts.google.com/specimen/Sniglet), arquivo do repositório [google/fonts](https://github.com/google/fonts/tree/main/ofl/sniglet) | SIL Open Font License 1.1 (cópia em `Art/Fonts/OFL_Sniglet.txt`) |
 | Fundo do fim de jogo (`Art/UI/Background_Ending.jpg`) | Derivado da ilustração do menu (desfocada, dourada e com brilhos, por script) | `Tools/Art/make_ui_backgrounds.py` | Mesma origem e licença da ilustração do menu |
 | Mapa da cidade (`Art/UI/Background_CityMap.jpg`) | Desenhado por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_ui_backgrounds.py` | Feito para este projeto |
+| Ícones da HUD e do mapa (`Art/UI/Arrow_Den.png`, `Dot.png`, `Icon_Raccoon.png`) | Desenhados por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_ui_icons.py` | Feitos para este projeto |
+| Efeitos sonoros (`Audio/SFX/*.wav`) | Sintetizados por script com o NumPy, escrito com o Claude (Anthropic) | `Tools/Audio/make_sfx.py` | Feitos para este projeto |
+| Música de fundo (`Audio/Music/Music_Sneak.wav`) | Sintetizada por script com o NumPy, escrito com o Claude (Anthropic) | `Tools/Audio/make_music.py` | Feita para este projeto |
+| Degradê das poças de luz (`Art/Textures/Effects/LightPool_Gradient.png`) | Gerado por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_effect_textures.py` | Feito para este projeto |
 
 ### Código de terceiros
 

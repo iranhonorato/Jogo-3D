@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba7d5060d319e4546b58a97b7a7e55e1, type: 3}
+  m_Name: SoundData
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Audio.SoundData
+  _runStep:
+    _clip: {fileID: 8300000, guid: 9ab0555737f08814e9eb74ec47aa91a6, type: 3}
+    _volume: 0.35
+    _pitchJitter: 0.15
+  _whistle:
+    _clip: {fileID: 8300000, guid: d94229757b35762409d954625b7af192, type: 3}
+    _volume: 0.7
+    _pitchJitter: 0.05
+  _pickup:
+    _clip: {fileID: 8300000, guid: 92ff83659bfe1d04898c6c23b0f77060, type: 3}
+    _volume: 0.6
+    _pitchJitter: 0.1
+  _drop:
+    _clip: {fileID: 8300000, guid: d1e7cc2ca0c01c14483d143103074bc7, type: 3}
+    _volume: 0.7
+    _pitchJitter: 0.1
+  _glassBreak:
+    _clip: {fileID: 8300000, guid: f8f8f7c8d87142b48a7328a3afca0188, type: 3}
+    _volume: 0.9
+    _pitchJitter: 0.05
+  _binUse:
+    _clip: {fileID: 8300000, guid: 24c98f6cc432b5e408ef203b1e6b9b82, type: 3}
+    _volume: 0.6
+    _pitchJitter: 0.1
+  _deliver:
+    _clip: {fileID: 8300000, guid: beef47f96d057af41907a055cc02c6d6, type: 3}
+    _volume: 0.7
+    _pitchJitter: 0
+  _spotted:
+    _clip: {fileID: 8300000, guid: f03627a0f252d644db0aac197763b34b, type: 3}
+    _volume: 0.6
+    _pitchJitter: 0
+  _caught:
+    _clip: {fileID: 8300000, guid: e4bf2ec75d7d7ef4c8129c4d84c1a1ed, type: 3}
+    _volume: 0.8
+    _pitchJitter: 0
+  _win:
+    _clip: {fileID: 8300000, guid: 40d186ae84185e74fabde26cd562da8b, type: 3}
+    _volume: 0.8
+    _pitchJitter: 0

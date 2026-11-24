@@ -65,7 +65,7 @@ Um jogo 3D furtivo de roubo, com câmera isométrica, em que um guaxinim invade 
 
 ### 3.1 Câmera
 
-- **Isométrica seguindo o guaxinim**, com Cinemachine. Rotação inicial X = 45°, Y = 45°. Perspectiva com FOV baixo (cerca de 25°) ou ortográfica, a decidir no protótipo.
+- **Isométrica seguindo o guaxinim**, com Cinemachine. Rotação inicial X = 45°, Y = 45°. Perspectiva com FOV baixo (cerca de 25°) ou ortográfica, a decidir no protótipo. **Em uso nas fases:** perspectiva com FOV de 25°, a 18 m do guaxinim; o rig ortográfico (tamanho 4,5) continua pronto como alternativa.
 - A câmera segue suavemente, com um pequeno avanço na direção do movimento.
 - **Prateleiras na frente do guaxinim ficam transparentes:** qualquer objeto entre a câmera e o jogador some ou fica translúcido (`ObstacleFader`), para o guaxinim nunca ficar escondido atrás de uma gôndola.
 - Sem rotação da câmera pelo jogador no MVP.
@@ -130,11 +130,22 @@ O segurança não ouve através de paredes externas, mas ouve através das prate
 
 ### 6.2 Estados do segurança
 
+Há dois tipos de inimigo, com os mesmos estados e a mesma visão (§6.1). Só a velocidade muda:
+
+| Inimigo | Modelo | Patrulha | Desconfiado | Perseguição | Busca |
+| --- | --- | --- | --- | --- | --- |
+| **Segurança** | Segurança | 2 m/s | 3 m/s | 5,5 m/s | 3 m/s |
+| **Faxineiro** | Seu Zé | 1 m/s | 1,5 m/s | 4,5 m/s | 1,5 m/s |
+
+O segurança é rápido e patrulha os corredores principais: com carga, alcança o guaxinim. O faxineiro é lento na ronda e investiga os barulhos devagar, mas, quando vê o guaxinim, persegue a 4,5 m/s: pega quem anda (3 m/s) e perde para quem corre (6 m/s). Na Fase 1, o faxineiro é o próprio Seu Zé.
+
+As velocidades da tabela abaixo são as do segurança. As rondas seguem os corredores em linha reta (vai-e-volta ou a volta numa fileira), para o jogador conseguir prever o caminho.
+
 | Estado | Comportamento |
 | --- | --- |
 | Patrulha | Segue waypoints (NavMesh) a 2 m/s, com pausas em que olha em volta. |
 | Desconfiado | Ouviu um som ou viu o guaxinim de relance. Vai até o ponto a 3 m/s e olha em volta por 4 s. |
-| Perseguição | O medidor de detecção encheu. Corre atrás do guaxinim a 5,5 m/s e dispara o **alerta geral**. |
+| Perseguição | O medidor de detecção encheu. Corre atrás do guaxinim a 5,5 m/s. Entrar em Perseguição tira a estrela "sem ser perseguido" (§12). |
 | Busca | Perdeu o guaxinim de vista. Vai até a última posição conhecida e procura por 6 s. |
 | Retorno | Volta para a patrulha. |
 
@@ -145,6 +156,8 @@ O segurança não ouve através de paredes externas, mas ouve através das prate
 
 ### 6.4 Alerta geral
 
+> **Fora do escopo final** (ver §18): não entrou no jogo entregue.
+
 - Quando um segurança entra em Perseguição, **todos os seguranças da fase** ficam em alerta por 8 s: vão até a última posição conhecida, e a música muda.
 
 ### 6.5 Ser pego
@@ -153,6 +166,8 @@ O segurança não ouve através de paredes externas, mas ouve através das prate
 - **Repare no balanço:** sem carga, o guaxinim (6 m/s) foge do segurança (5,5 m/s). Com carga, ele fica mais lento e é pego. Fugir obriga a **largar itens**.
 
 ### 6.6 Câmeras de segurança (fases 4 e 5)
+
+> **Fora do escopo final** (ver §18): não entrou no jogo entregue.
 
 - Presas no teto, giram de um lado para o outro num ciclo fixo (ex.: 90° em 4 s, pausa de 1 s em cada ponta).
 - Têm um cone de visão desenhado no chão, como o segurança, em outra cor (vermelho), alcance de 8 m e ângulo de 50°.
@@ -263,6 +278,8 @@ Os dois efeitos podem acontecer juntos (energético + proteína). Eles herdam de
 
 ### 8.2 Superpoder: modo cogumelo
 
+> **Fora do escopo final** (ver §18): não entrou no jogo entregue.
+
 - Cada fase tem **cogumelos brilhantes** espalhados, alguns em lugares arriscados (sugestão: 6 por fase).
 - Ao juntar **3 cogumelos**, o poder fica **pronto** (o contador da HUD brilha e mostra "R"). O jogador **ativa quando quiser com R** e pode guardar o poder para o momento certo, como uma fuga.
 - Cogumelos a mais depois de 3 não acumulam: o contador fica em 3 até o poder ser usado.
@@ -290,6 +307,8 @@ Os dois efeitos podem acontecer juntos (energético + proteína). Eles herdam de
 
 ## 10. Robô aspirador
 
+> **Fora do escopo final** (ver §18): não entrou no jogo entregue.
+
 | Comportamento | Detalhe |
 | --- | --- |
 | Movimento | Anda em linha reta a 1,2 m/s. Ao bater numa parede ou prateleira, gira de 90° a 180° (aleatório) e segue. |
@@ -303,31 +322,29 @@ Os dois efeitos podem acontecer juntos (energético + proteína). Eles herdam de
 
 Os nomes são paródias. Use paletas que lembrem os originais e **logos originais** (seção 0, regra 10). As cores finais serão confirmadas com as referências que o autor vai enviar.
 
-O jogo tem **5 fases**. O mercado de orgânicos ficou de fora.
+O jogo tem **5 fases**. O mercado de orgânicos ficou de fora. Os inimigos são o segurança e o faxineiro (§6.2); o robô aspirador, as câmeras de segurança e os cogumelos ficaram fora do escopo final (§18). Cada fase tem de 1,5× a 2× a área da anterior.
 
-| # | Mercado (paródia) | Inspirado em | Tamanho | O que a fase ensina ou introduz | Inimigos |
-| --- | --- | --- | --- | --- | --- |
-| 1 | **Mercadinho do Seu Zé** | Mercado de bairro | Muito pequeno, 2 corredores | Tutorial: andar, correr e som, assobio, pegar, entregar na toca, lixeira | 1 segurança (o próprio Seu Zé com lanterna) |
-| 2 | **XOXO 24h** | Loja de conveniência | Pequeno e aberto | Robô aspirador, itens frágeis, energético | 1 segurança, 1 aspirador |
-| 3 | **Pão de Mel** | Supermercado de bairro nobre | Médio, 4 corredores | Cogumelos e modo cogumelo, itens volumosos | 2 seguranças, 1 aspirador |
-| 4 | **Carrecinco** | Hipermercado | Grande | Itens pesados, barra de proteína, várias viagens até a toca, câmeras | 3 seguranças, 2 aspiradores, 2 câmeras |
-| 5 | **Atacadaço** | Atacado | Enorme, prateleiras de pallets muito altas | Tudo junto, lista longa | 4 seguranças, 2 aspiradores, 4 câmeras |
+| # | Mercado (paródia) | Inspirado em | Tamanho e layout | O que a fase ensina ou introduz | Inimigos | Tempo-alvo |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | **Mercadinho do Seu Zé** | Mercado de bairro | 12 × 10 m, 2 corredores e 2 vãos estreitos | Tutorial (com dicas): andar, correr e som, assobio, pegar, entregar na toca, lixeira | 1 faxineiro (o próprio Seu Zé) | 1:30 |
+| 2 | **XOXO 24h** | Loja de conveniência | 16 × 12 m, pequeno e aberto, 3 fileiras curtas | Itens frágeis, energético | 1 faxineiro, 1 segurança | 2:00 |
+| 3 | **Pão de Mel** | Supermercado de bairro nobre | 20 × 16 m, 4 corredores, 2 vãos estreitos | Itens volumosos e vãos estreitos | 2 faxineiros, 1 segurança | 2:30 |
+| 4 | **Carrecinco** | Hipermercado | 26 × 20 m, dois blocos de gôndolas com um corredor largo no meio, caixas e ilhas, 3 vãos estreitos | Itens pesados, barra de proteína, várias viagens até a toca | 2 faxineiros, 2 seguranças | 3:30 |
+| 5 | **Atacadaço** | Atacado | 34 × 26 m, fileiras de tamanhos variados, depósito com ilhas de paletes, fila de caixas, 3 vãos estreitos | Tudo junto, lista longa | 3 faxineiros, 3 seguranças | 4:30 |
 
 **Lista de compras de cada fase** (itens da seção 7.8)
 
-| # | Lista (obrigatória) | Itens bônus no mapa | Consumíveis no mapa | Cogumelos |
-| --- | --- | --- | --- | --- |
-| 1 | Pão de forma, banana, queijo | Pacote de biscoito | — | — |
-| 2 | Caixa de leite, garrafa de suco, pote de geleia, pacote de biscoito | Queijo | 2 energéticos | — |
-| 3 | Caixa de ovos, queijo, salgadinho gigante, caixa de cereal, azeite | Pipoca, pão de forma | 2 energéticos | 6 |
-| 4 | Melancia, galão de água, saco de arroz, fardo de papel higiênico, pão de forma, banana, garrafa de suco | Abóbora, caixa de cereal | 2 energéticos, 2 barras de proteína | 6 |
-| 5 | Melancia, abóbora, saco de arroz, galão de água, fardo de papel higiênico, salgadinho gigante, caixa de ovos, azeite, queijo, pipoca | Melancia extra, caixa de leite | 3 energéticos, 3 barras de proteína | 9 |
+| # | Lista (obrigatória) | Itens bônus no mapa | Consumíveis no mapa |
+| --- | --- | --- | --- |
+| 1 | Pão de forma, banana, queijo | Pacote de biscoito | — |
+| 2 | Caixa de leite, garrafa de suco, pote de geleia, pacote de biscoito | Queijo | 2 energéticos |
+| 3 | Caixa de ovos, queijo, salgadinho gigante, caixa de cereal, azeite | Pipoca, pão de forma | 2 energéticos |
+| 4 | Melancia, galão de água, saco de arroz, fardo de papel higiênico, pão de forma, banana | Abóbora, caixa de cereal | 2 energéticos, 2 barras de proteína |
+| 5 | Melancia, saco de arroz, fardo de papel higiênico, salgadinho gigante, caixa de ovos, azeite, queijo | Abóbora, caixa de leite | 3 energéticos, 3 barras de proteína |
 
-Nas fases 4 e 5, a soma do peso da lista passa bastante do limite, de propósito: o jogador precisa planejar as viagens até a toca e usar bem a barra de proteína.
+Nas fases 4 e 5, a soma do peso da lista passa bastante do limite, de propósito: o jogador precisa planejar as viagens até a toca e usar bem a barra de proteína. Enquanto ele carrega algo, uma seta na tela aponta para a toca.
 
-**Escopo para o prazo:** o **MVP são as fases 1 a 3** completas. As fases 4 e 5 entram em seguida, reaproveitando o kit modular de gôndolas.
-
-Cada fase é uma cena (`Level_01_Mercadinho`, etc.) com um `LevelData` (lista, tempo-alvo, número de cogumelos, música). Os mapas são montados com um **kit modular** de peças do Blender: gôndola, ponta de gôndola, freezer, caixa, parede, piso, porta, lixeira e toca.
+Cada fase é uma cena (`Level_01_Mercadinho`, etc.) com um `LevelData` (nome, id, cena, lista e tempo-alvo). As fases são descritas em código (`Scripts/Editor/LevelBlueprints.cs`) e montadas pelo menu `Tools/Guaxinim/Montar Fase` com o **kit modular** do Blender (gôndolas de 2 m e 4 m, parede, piso, toca e lixeira). Testes EditMode conferem a progressão (área, listas e inimigos) e a geometria (gôndolas sem sobreposição, vãos estreitos, rondas retas e limite de luzes).
 
 ---
 
@@ -337,11 +354,11 @@ Cada fase é uma cena (`Level_01_Mercadinho`, etc.) com um `LevelData` (lista, t
 
 - ⭐ Completar a lista e voltar à toca (obrigatório para passar).
 - ⭐ Terminar abaixo do tempo-alvo.
-- ⭐ Não disparar nenhum alerta geral.
+- ⭐ Não ser perseguido por nenhum inimigo.
 
 **Bônus:** itens extras entregues somam pontos na tela de resultado.
 
-**Progressão:** cada fase completa desbloqueia a próxima no mapa da cidade.
+**Progressão:** cada fase completa desbloqueia a próxima no mapa da cidade. Depois de liberar uma fase, o mapa mostra o guaxinim viajando pela estrada até o próximo mercado e abre o início dela (qualquer tecla pula).
 
 **Save:** fases desbloqueadas, estrelas e melhor tempo de cada fase, em `PlayerPrefs` (funciona no WebGL), por meio de um `SaveSystem` que guarda um JSON numa chave.
 
@@ -499,44 +516,49 @@ A história se passa em um supermercado à noite. A iluminação combina sombras
 - Música: menu, furtividade (calma), alerta (tensa) e modo cogumelo (distorcida).
 - Efeitos: passos andando e correndo, pegar item, largar item, vidro quebrando, assobio, aspirador, câmera detectando, lixeira (entrar e sair), detecção do segurança ("Ei!"), alerta geral, pego, entrega na toca, fase completa.
 - Todo asset de terceiros ou gerado por IA vai para a lista de **créditos no README**, com a fonte e a licença.
+- **Na entrega:** efeitos sintetizados por script (`Tools/Audio/make_sfx.py`): pisada correndo, assobio, pegar, largar, vidro quebrando, lixeira, entrega na toca, inimigo perseguindo, pego, fase completa e clique dos menus; e uma música de furtividade em loop (`Tools/Audio/make_music.py`, lá menor, 96 bpm) que toca em todas as telas, sem recomeçar na troca de cena. Sem a música de alerta e sem o "Ei!" falado (§18).
 
 ---
 
 ## 16. Marcos (sozinho, cerca de 4 semanas)
 
+Situação na entrega (25/11/2026): `[x]` feito, `[ ]` fora do escopo final (§18).
+
 ### Semana 1: núcleo furtivo em greybox
 
-- [ ] Projeto Unity 6 (URP), pacotes, pastas, Git e `.gitignore`.
-- [ ] `RaccoonController` com andar e correr, e câmera isométrica com Cinemachine.
-- [ ] `NoiseSystem` com anéis visíveis.
-- [ ] `GuardAI` com patrulha, visão (cone visível), audição, medidor de detecção, perseguição e busca.
-- [ ] Ser pego reinicia a fase.
-- [ ] Fase 1 (Mercadinho) em greybox.
+- [x] Projeto Unity 6 (URP), pacotes, pastas, Git e `.gitignore`.
+- [x] `RaccoonController` com andar e correr, e câmera isométrica com Cinemachine.
+- [x] `NoiseSystem` com anéis visíveis.
+- [x] `GuardAI` com patrulha, visão (cone visível), audição, medidor de detecção, perseguição e busca.
+- [x] Ser pego mostra a tela com opções (Tentar de novo, Mapa, Menu inicial).
+- [x] Fase 1 (Mercadinho).
 
 ### Semana 2: saque e mundo
 
-- [ ] `ItemData`, `PickupItem`, `Inventory` com peso, volume e fragilidade, e largar item.
-- [ ] `ShoppingList`, `Den` e a condição de vitória.
-- [ ] Energético e barra de proteína.
-- [ ] Lixeiras e robô aspirador (com o modo montado).
-- [ ] `ObstacleFader`.
-- [ ] Fase 2 (XOXO) em greybox.
+- [x] `ItemData`, `PickupItem`, `Inventory` com peso, volume e fragilidade, e largar item.
+- [x] `ShoppingList`, `Den` e a condição de vitória.
+- [x] Energético e barra de proteína.
+- [x] Lixeiras.
+- [ ] Robô aspirador (com o modo montado).
+- [x] `ObstacleFader`.
+- [x] Fase 2 (XOXO).
 
 ### Semana 3: superpoder, telas e progressão
 
-- [ ] Cogumelos e modo cogumelo (poder pronto com 3, ativação com R, topo das prateleiras, pulo, descida).
-- [ ] Alerta geral e câmeras de segurança.
-- [ ] HUD, menu principal, mapa da cidade, pausa, resultado com estrelas, save.
-- [ ] Fase 3 (Pão de Mel) em greybox.
-- [ ] Primeiros modelos no Blender: guaxinim, segurança e kit modular.
+- [ ] Cogumelos e modo cogumelo.
+- [ ] Alerta geral e câmeras de segurança (a terceira estrela passou a ser "sem ser perseguido").
+- [x] HUD, menu principal, mapa da cidade (com a viagem entre as fases), pausa, resultado com estrelas, fim de jogo e save.
+- [x] Fase 3 (Pão de Mel).
+- [x] Primeiros modelos no Blender: guaxinim, segurança, Seu Zé, câmera e kit modular.
 
 ### Semana 4: arte, áudio e entrega
 
-- [ ] Modelos dos itens, ícones e fachadas; substituir o greybox nas fases 1 a 3.
-- [ ] Iluminação baked, áudio e efeitos visuais.
-- [ ] Balanceamento dos valores.
-- [ ] Build WebGL testado no itch.io e README com controles e créditos.
-- [ ] Fases 4 (Carrecinco) e 5 (Atacadaço).
+- [ ] Modelos dos itens (continuam em greybox, na cor da categoria).
+- [x] Animações procedurais dos personagens (sem rig), da coleta e da lixeira.
+- [ ] Iluminação baked e áudio (a luz é em tempo real, no limite de 5, com poças de luz no chão).
+- [x] Balanceamento dos valores pelas descrições de fase e pelos `ScriptableObject`.
+- [ ] Builds Windows e WebGL testados no itch.io, README com controles e créditos.
+- [x] Fases 4 (Carrecinco) e 5 (Atacadaço).
 
 ---
 
@@ -549,11 +571,11 @@ A história se passa em um supermercado à noite. A iluminação combina sombras
 
 - Estilo visual: Direção de arte e imagem de referência (seção 15.1).
 - Consumíveis: energético e barra de proteína (seção 8.1).
-- Modo cogumelo: fica pronto com 3 cogumelos e é ativado com R (seção 8.2).
+- Modo cogumelo: fora do escopo final (seção 8.2 e §18).
 - Assobio: mantido (seções 3.2 e 5).
-- Câmeras de segurança: nas fases 4 e 5 (seção 6.6).
+- Câmeras de segurança e robô aspirador: fora do escopo final (seções 6.6 e 10, e §18).
 - Itens e valores: tabela da seção 7.8 e listas da seção 11, a balancear nos testes.
-- Fases: 5 no total, sem o mercado de orgânicos; o MVP são as 3 primeiras (seção 11).
+- Fases: 5 no total, sem o mercado de orgânicos, todas jogáveis (seção 11).
 
 ---
 
@@ -576,4 +598,14 @@ Mudanças de rumo em relação ao texto acima, para o GDD continuar sendo a refe
 | 24/11/2026 | **Fade de 0,3 s entre cenas.** | Trocas de tela mais suaves, e o jogo ignora pedidos enquanto troca (sem duplo clique). |
 | 24/11/2026 | **Indicação de interação e dicas do tutorial na Fase 1.** | O GDD trata a Fase 1 como tutorial, mas nada ensinava os controles (rubrica 1). |
 | 24/11/2026 | **O título "Operação Guaxinim" usa a fonte Lilita One** (licença OFL 1.1, de Juan Montoreano, no Google Fonts), em `Art/Fonts/`. O resto dos textos continua com a fonte padrão da Unity. | Um título com personalidade, sem criar fonte nova; a licença permite o uso no jogo, e o crédito está no README e na tela de Créditos. |
-| a decidir | Câmera em perspectiva ou ortográfica (§3.1) e o nome do jogo (§17). | Ainda em aberto. |
+| 24/11/2026 | **Dois tipos de inimigo** (§6.2): o segurança, com as velocidades da tabela, e o **faxineiro**, com metade delas (patrulha 1 m/s, desconfiado 1,5 m/s, perseguição 2,75 m/s, busca 1,5 m/s) e a mesma visão. O faxineiro usa o modelo do Seu Zé em todas as fases; na Fase 1 ele é o próprio Seu Zé. | O plano de fases novas pede inimigos com papéis diferentes: o segurança patrulha os corredores e alcança o guaxinim carregado; o faxineiro não alcança nem andando, mas obriga a mudar de caminho. |
+| 24/11/2026 | **Fontes dos textos:** Lilita One nos títulos, avisos grandes e botões, e Sniglet ExtraBold (arredondada, licença OFL) no resto da interface (HUD, listas, dicas e créditos). A seta de seleção ► continua na fonte padrão, que as duas não têm. | Pedido do usuário: letras mais características que a fonte padrão da Unity, e legíveis em tamanho pequeno (rubrica 3). |
+| 24/11/2026 | **Fora do escopo final:** robô aspirador (§10), cogumelos e modo cogumelo (§8.2), alerta geral (§6.4) e câmeras de segurança (§6.6). As fases usam o segurança e o faxineiro (§6.2 e §11). | Prazo de entrega: as rubricas premiam acabamento, e o tempo foi para as 5 fases, as telas, as animações e a viagem no mapa. |
+| 24/11/2026 | **Terceira estrela: "sem ser perseguido"** (no lugar de "sem alerta geral"): perde-se quando qualquer inimigo entra em Perseguição. | Sem o alerta geral, a estrela saía sempre ganha. |
+| 24/11/2026 | **Faxineiro persegue a 4,5 m/s** (era a metade do segurança, 2,75 m/s). Ronda, desconfiado e busca continuam na metade. | A 2,75 m/s ele não alcançava nem o guaxinim andando, e as fases com 3 faxineiros não tinham risco nenhum. |
+| 24/11/2026 | **Fases 4 e 5 redesenhadas** (blocos com corredor largo, caixas, ilhas e vãos estreitos), **rondas só em linha reta** e **seta para a toca** enquanto o guaxinim carrega algo; contorno dos itens da lista a 6 m. | As grades de gôndolas iguais eram monótonas e desorientavam, e nas fases grandes a câmera mostra só um pedaço do mercado. |
+| 24/11/2026 | **Poças de luz no chão** (quadrados aditivos com degradê, sem luz em tempo real) e alcance maior das 2 luzes da loja nas fases grandes. | As fases grandes ficavam escuras com 2 luzes, e o WebGL limita a 5 luzes em tempo real. |
+| 24/11/2026 | **Viagem no mapa:** depois de liberar uma fase, o guaxinim viaja pela estrada do mapa até o próximo mercado, que se acende, e o início da fase abre sozinho. Qualquer tecla pula. | Plano de próximos passos, Etapa 4: dar sensação de progresso entre as fases. |
+| 24/11/2026 | **Áudio sintetizado por script:** efeitos, clique dos menus e uma música só, em loop (sem a música de alerta e sem o "Ei!" falado). Os volumes ficam no `SoundData` e no prefab `Resources/GameAudio`. | Nenhum som de terceiros para creditar, e o prazo não comporta uma trilha completa. |
+| 24/11/2026 | **Modelos novos:** guaxinim com mais detalhes, gôndolas roxas com potes e pacotes, e os 19 itens modelados no Blender (antes eram cubos coloridos). | Referências de arte do plano de próximos passos (rubrica 3). |
+| a decidir | Câmera em perspectiva ou ortográfica (§3.1; as fases usam a perspectiva) e o nome do jogo (§17). | Ainda em aberto. |

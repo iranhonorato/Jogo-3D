@@ -7,9 +7,10 @@ using UnityEngine.UI;
 namespace Guaxinim.EditorTools
 {
     /// <summary>
-    /// Peças de uGUI em greybox para os montadores de tela (HUD, pausa, resultado, menu e mapa): canvas,
-    /// texto, botão e painel, no mesmo estilo. As cores dos botões vêm do <see cref="UITheme"/>. Tudo é criado
-    /// por código para a cena ser reproduzível.
+    /// Peças de uGUI para os montadores de tela (HUD, pausa, resultado, menu e mapa): canvas, texto, botão e painel,
+    /// no mesmo estilo. Duas fontes de licença livre (OFL): Lilita One nos títulos e botões, e Sniglet ExtraBold no
+    /// resto (arredondada e legível pequena). As cores dos botões vêm do <see cref="UITheme"/>. Tudo é criado por
+    /// código para a cena ser reproduzível.
     /// </summary>
     internal static class EditorUI
     {
@@ -19,6 +20,7 @@ namespace Guaxinim.EditorTools
 
         private const string ThemePath = "Assets/_Project/Data/UI/UITheme.asset";
         private const string TitleFontPath = "Assets/_Project/Art/Fonts/LilitaOne-Regular.ttf";
+        private const string BodyFontPath = "Assets/_Project/Art/Fonts/Sniglet-ExtraBold.ttf";
         private const string DataFolder = "Assets/_Project/Data/UI";
         private const string BuiltinFontName = "LegacyRuntime.ttf";
         private const int ArrowFontSize = 36;
@@ -46,15 +48,16 @@ namespace Guaxinim.EditorTools
         /// </summary>
         public static void ApplyTitleFont(Text text)
         {
-            var font = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>(TitleFontPath);
-            if (font == null)
-            {
-                Debug.LogWarning($"Title font not found at {TitleFontPath}; using the default font.");
-                return;
-            }
-
-            text.font = font;
+            text.font = LoadFont(TitleFontPath);
             text.fontStyle = FontStyle.Normal; // a Lilita One já é pesada: o negrito falso só borra
+        }
+
+        /// <summary>Título ou aviso grande, na fonte de título (Lilita One).</summary>
+        public static Text CreateTitle(string name, Transform parent, string content, int fontSize, Color color)
+        {
+            Text title = CreateText(name, parent, content, fontSize, color);
+            ApplyTitleFont(title);
+            return title;
         }
 
         /// <summary>
@@ -117,9 +120,9 @@ namespace Guaxinim.EditorTools
             textObject.transform.SetParent(parent, false);
             var text = textObject.AddComponent<Text>();
             text.text = content;
-            text.font = Resources.GetBuiltinResource<Font>(BuiltinFontName);
+            text.font = LoadFont(BodyFontPath);
             text.fontSize = fontSize;
-            text.fontStyle = FontStyle.Bold;
+            text.fontStyle = FontStyle.Normal; // a Sniglet ExtraBold já é pesada
             text.alignment = TextAnchor.MiddleCenter;
             text.color = color;
             text.raycastTarget = false;
@@ -154,6 +157,11 @@ namespace Guaxinim.EditorTools
 
             Text text = CreateText("Label", buttonObject.transform, label, ButtonFontSize,
                 isCard ? theme.SelectedText : theme.NormalText);
+            if (!isCard)
+            {
+                ApplyTitleFont(text); // as fachadas do mapa têm nome e estrelas: ficam com a fonte de texto
+            }
+
             Stretch((RectTransform)text.transform);
 
             Text arrow = isCard ? null : CreateArrow(buttonObject.transform, theme);
@@ -202,10 +210,27 @@ namespace Guaxinim.EditorTools
             rect.anchoredPosition = offset;
         }
 
+        /// <summary>
+        /// Fonte do projeto. Sem o arquivo, cai na fonte padrão da Unity com um aviso. Carregue dentro da cena nova:
+        /// o NewScene descarrega os assets sem uso.
+        /// </summary>
+        private static Font LoadFont(string path)
+        {
+            var font = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>(path);
+            if (font != null)
+            {
+                return font;
+            }
+
+            Debug.LogWarning($"Font not found at {path}; using the default font.");
+            return Resources.GetBuiltinResource<Font>(BuiltinFontName);
+        }
+
         /// <summary>Seta ao lado esquerdo do botão, escondida até ele ser selecionado.</summary>
         private static Text CreateArrow(Transform button, UITheme theme)
         {
             Text arrow = CreateText("Arrow", button, theme.SelectionArrow, ArrowFontSize, theme.SelectedText);
+            arrow.font = Resources.GetBuiltinResource<Font>(BuiltinFontName); // as fontes do jogo não têm o ►
             var rect = (RectTransform)arrow.transform;
             rect.anchorMin = new Vector2(0f, 0.5f);
             rect.anchorMax = new Vector2(0f, 0.5f);

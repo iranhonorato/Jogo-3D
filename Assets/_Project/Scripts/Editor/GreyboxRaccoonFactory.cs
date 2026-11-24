@@ -1,3 +1,4 @@
+using Guaxinim.Animation;
 using Guaxinim.Core;
 using Guaxinim.Noise;
 using Guaxinim.Player;
@@ -54,8 +55,11 @@ namespace Guaxinim.EditorTools
             AddDropper(root, input);
             AddBulkyLoad(root, data);
             AddFragileShake(root, data);
+            SoundDataFactory.AddSource(root);
+            EditorAssets.SetReference(root.AddComponent<Audio.RaccoonSounds>(), "_sounds", SoundDataFactory.LoadOrCreate());
             GameObject model = AddModel(root.transform);
             AddHiding(root, data, model);
+            AddMotion(root, model);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Player));
 
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
@@ -173,6 +177,15 @@ namespace Guaxinim.EditorTools
             var visual = (GameObject)PrefabUtility.InstantiatePrefab(model, root);
             visual.name = "Model";
             return visual;
+        }
+
+        /// <summary>Animação procedural (passo, inclinação, respiração) e o achatar ao pegar um item.</summary>
+        private static void AddMotion(GameObject root, GameObject model)
+        {
+            var motion = root.AddComponent<ProceduralMotion>();
+            EditorAssets.SetReference(motion, "_data", MotionDataFactory.LoadOrCreateRaccoon());
+            EditorAssets.SetReference(motion, "_model", model.transform);
+            EditorAssets.SetReference(root.AddComponent<RaccoonPickupSquash>(), "_motion", motion);
         }
 
         /// <summary>Entrar e sair da lixeira (GDD §9); o modelo some lá dentro.</summary>
