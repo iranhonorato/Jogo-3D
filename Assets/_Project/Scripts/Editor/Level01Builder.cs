@@ -79,7 +79,7 @@ namespace Guaxinim.EditorTools
             GameObject systems = LevelBuildKit.PlaceLevelSystems(root.transform, level);
             LevelBuildKit.PlaceDen(root.transform, systems, DenPosition, 0f);
             GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, systems, RaccoonStart, 180f);
-            LevelBuildKit.PlaceGuard(root.transform, GuardFactory.SeuZePrefabPath, SeuZeWaypoints, 0, -90f);
+            LevelBuildKit.PlaceGuard(root.transform, GuardFactory.JanitorPrefabPath, SeuZeWaypoints, 0, -90f);
             PlaceItems(root.transform);
             PlaceBins(root.transform);
             SetUpNightLighting(root.transform, raccoon.scene);

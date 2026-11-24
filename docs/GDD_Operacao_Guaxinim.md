@@ -130,6 +130,17 @@ O segurança não ouve através de paredes externas, mas ouve através das prate
 
 ### 6.2 Estados do segurança
 
+Há dois tipos de inimigo, com os mesmos estados e a mesma visão (§6.1). Só a velocidade muda:
+
+| Inimigo | Modelo | Patrulha | Desconfiado | Perseguição | Busca |
+| --- | --- | --- | --- | --- | --- |
+| **Segurança** | Segurança | 2 m/s | 3 m/s | 5,5 m/s | 3 m/s |
+| **Faxineiro** | Seu Zé | 1 m/s | 1,5 m/s | 2,75 m/s | 1,5 m/s |
+
+O segurança é rápido e patrulha os corredores principais: com carga, alcança o guaxinim. O faxineiro é lento e faz rondas curtas perto dos itens e da toca: não alcança o guaxinim nem andando, mas obriga a mudar de caminho e investiga os barulhos. Na Fase 1, o faxineiro é o próprio Seu Zé.
+
+As velocidades da tabela abaixo são as do segurança.
+
 | Estado | Comportamento |
 | --- | --- |
 | Patrulha | Segue waypoints (NavMesh) a 2 m/s, com pausas em que olha em volta. |
@@ -576,4 +587,5 @@ Mudanças de rumo em relação ao texto acima, para o GDD continuar sendo a refe
 | 24/11/2026 | **Fade de 0,3 s entre cenas.** | Trocas de tela mais suaves, e o jogo ignora pedidos enquanto troca (sem duplo clique). |
 | 24/11/2026 | **Indicação de interação e dicas do tutorial na Fase 1.** | O GDD trata a Fase 1 como tutorial, mas nada ensinava os controles (rubrica 1). |
 | 24/11/2026 | **O título "Operação Guaxinim" usa a fonte Lilita One** (licença OFL 1.1, de Juan Montoreano, no Google Fonts), em `Art/Fonts/`. O resto dos textos continua com a fonte padrão da Unity. | Um título com personalidade, sem criar fonte nova; a licença permite o uso no jogo, e o crédito está no README e na tela de Créditos. |
+| 24/11/2026 | **Dois tipos de inimigo** (§6.2): o segurança, com as velocidades da tabela, e o **faxineiro**, com metade delas (patrulha 1 m/s, desconfiado 1,5 m/s, perseguição 2,75 m/s, busca 1,5 m/s) e a mesma visão. O faxineiro usa o modelo do Seu Zé em todas as fases; na Fase 1 ele é o próprio Seu Zé. | O plano de fases novas pede inimigos com papéis diferentes: o segurança patrulha os corredores e alcança o guaxinim carregado; o faxineiro não alcança nem andando, mas obriga a mudar de caminho. |
 | a decidir | Câmera em perspectiva ou ortográfica (§3.1) e o nome do jogo (§17). | Ainda em aberto. |

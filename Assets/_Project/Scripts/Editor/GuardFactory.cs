@@ -9,18 +9,27 @@ using UnityEngine.Rendering;
 namespace Guaxinim.EditorTools
 {
     /// <summary>
-    /// Gera os prefabs dos seguranças (passos 1.5 a 1.10, GDD §6) em Prefabs/Guards/: NavMeshAgent, collider,
-    /// GuardAI, visão (VisionCone e o cone desenhado no chão), a lanterna (luz spot no Socket_Flashlight)
-    /// e o modelo do Blender (segurança comum ou Seu Zé), na layer Guard. Os waypoints são ligados na cena.
+    /// Gera os prefabs dos dois tipos de inimigo (GDD §6.2) em Prefabs/Guards/: o segurança (rápido) e o faxineiro
+    /// (metade da velocidade, com o modelo do Seu Zé). Cada um tem NavMeshAgent, collider, GuardAI com o seu
+    /// GuardData, visão (VisionCone e o cone no chão), a lanterna (luz spot no Socket_Flashlight) e o modelo do
+    /// Blender, na layer Guard. Os waypoints são ligados na cena.
     /// </summary>
     public static class GuardFactory
     {
         public const string GuardPrefabPath = "Assets/_Project/Prefabs/Guards/Guard.prefab";
-        public const string SeuZePrefabPath = "Assets/_Project/Prefabs/Guards/SeuZe.prefab";
+        public const string JanitorPrefabPath = "Assets/_Project/Prefabs/Guards/Janitor.prefab";
+
+        /// <summary>O faxineiro anda, desconfia, persegue e procura a esta fração da velocidade do segurança.</summary>
+        public const float JanitorSpeedFactor = 0.5f;
 
         private const string GuardModelPath = "Assets/_Project/Art/Models/Characters/Char_Guard.fbx";
         private const string SeuZeModelPath = "Assets/_Project/Art/Models/Characters/Char_SeuZe.fbx";
-        private const string DataPath = "Assets/_Project/Data/Guards/GuardData.asset";
+        public const string GuardDataPath = "Assets/_Project/Data/Guards/GuardData_Guard.asset";
+        public const string JanitorDataPath = "Assets/_Project/Data/Guards/GuardData_Janitor.asset";
+
+        // Caminhos antigos: renomeados com MoveAsset (mantém o GUID e as referências das cenas).
+        private const string LegacyGuardDataPath = "Assets/_Project/Data/Guards/GuardData.asset";
+        private const string LegacySeuZePrefabPath = "Assets/_Project/Prefabs/Guards/SeuZe.prefab";
         private const string VisionDataPath = "Assets/_Project/Data/Guards/VisionData_Guard.asset";
         private const string DetectionDataPath = "Assets/_Project/Data/Guards/DetectionData.asset";
         private const string ConeMaterialPath = "Assets/_Project/Art/Materials/Greybox/M_VisionCone_Guard.mat";
@@ -40,22 +49,76 @@ namespace Guaxinim.EditorTools
         private static readonly Color DetectionLowColor = new Color(1f, 0.85f, 0.2f);
         private static readonly Color DetectionFullColor = new Color(0.95f, 0.15f, 0.1f);
 
-        /// <summary>Gera o segurança comum e o Seu Zé (GDD §11: o segurança da Fase 1 é o dono do mercadinho).</summary>
+        /// <summary>Gera o segurança e o faxineiro (na Fase 1, o faxineiro é o Seu Zé, dono do mercadinho).</summary>
         [MenuItem("Tools/Guaxinim/Greybox/Prefabs dos Seguranças")]
         internal static void CreateGuardPrefabs()
         {
-            CreateGuardPrefab("Guard", GuardModelPath, GuardPrefabPath);
-            CreateGuardPrefab("SeuZe", SeuZeModelPath, SeuZePrefabPath);
+            RenameLegacyAssets();
+            GuardData guardData = EditorAssets.LoadOrCreate<GuardData>(GuardDataPath);
+            GuardData janitorData = LoadOrCreateJanitorData(guardData);
+            CreateGuardPrefab("Guard", GuardModelPath, GuardPrefabPath, guardData);
+            CreateGuardPrefab("Janitor", SeuZeModelPath, JanitorPrefabPath, janitorData);
         }
 
-        private static void CreateGuardPrefab(string name, string modelPath, string prefabPath)
+        private static void RenameLegacyAssets()
+        {
+            MoveIfOnlyOldExists(LegacyGuardDataPath, GuardDataPath);
+            MoveIfOnlyOldExists(LegacySeuZePrefabPath, JanitorPrefabPath);
+        }
+
+        private static void MoveIfOnlyOldExists(string oldPath, string newPath)
+        {
+            bool hasOld = AssetDatabase.LoadMainAssetAtPath(oldPath) != null;
+            bool hasNew = AssetDatabase.LoadMainAssetAtPath(newPath) != null;
+            if (!hasOld || hasNew)
+            {
+                return;
+            }
+
+            string error = AssetDatabase.MoveAsset(oldPath, newPath);
+            if (!string.IsNullOrEmpty(error))
+            {
+                Debug.LogError($"Could not rename {oldPath} to {newPath}: {error}");
+            }
+        }
+
+        /// <summary>
+        /// Faxineiro: as quatro velocidades do segurança vezes <see cref="JanitorSpeedFactor"/>, escritas uma vez
+        /// ao criar o asset. Depois, os números se ajustam no próprio asset.
+        /// </summary>
+        private static GuardData LoadOrCreateJanitorData(GuardData guardData)
+        {
+            var janitorData = AssetDatabase.LoadAssetAtPath<GuardData>(JanitorDataPath);
+            if (janitorData != null)
+            {
+                return janitorData;
+            }
+
+            janitorData = Object.Instantiate(guardData);
+            var serialized = new SerializedObject(janitorData);
+            ScaleSpeed(serialized, "_patrolSpeed");
+            ScaleSpeed(serialized, "_suspiciousSpeed");
+            ScaleSpeed(serialized, "_chaseSpeed");
+            ScaleSpeed(serialized, "_searchSpeed");
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            AssetDatabase.CreateAsset(janitorData, JanitorDataPath);
+            return janitorData;
+        }
+
+        private static void ScaleSpeed(SerializedObject data, string propertyName)
+        {
+            SerializedProperty speed = data.FindProperty(propertyName);
+            speed.floatValue *= JanitorSpeedFactor;
+        }
+
+        private static void CreateGuardPrefab(string name, string modelPath, string prefabPath, GuardData data)
         {
             var root = new GameObject(name);
             ConfigureAgent(root.AddComponent<NavMeshAgent>());
             AddBodyCollider(root);
 
             var guard = root.AddComponent<GuardAI>();
-            EditorAssets.SetReference(guard, "_data", EditorAssets.LoadOrCreate<GuardData>(DataPath));
+            EditorAssets.SetReference(guard, "_data", data);
             VisionData visionData = EditorAssets.LoadOrCreate<VisionData>(VisionDataPath);
             VisionCone visionCone = AddVision(root, visionData);
             AddConeMesh(root.transform, visionCone);
