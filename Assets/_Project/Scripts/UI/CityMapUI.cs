@@ -9,7 +9,8 @@ namespace Guaxinim.UI
 {
     /// <summary>
     /// Mapa da cidade (GDD §12 e §13): uma fachada por fase do catálogo, com estrelas e melhor tempo do save.
-    /// Escolher uma fase liberada abre o início da fase (nome, lista de compras e botão Começar).
+    /// Escolher uma fase liberada abre o início da fase (nome, lista de compras e botão Começar). Vindo de uma vitória
+    /// que liberou a próxima fase, toca antes a viagem do guaxinim pela estrada (Etapa 4) e abre o início dela.
     /// </summary>
     public class CityMapUI : MonoBehaviour
     {
@@ -19,7 +20,12 @@ namespace Guaxinim.UI
         [SerializeField] private LevelButtonUI[] _levelButtons = new LevelButtonUI[0];
 
         [SerializeField] private GameObject _mapPanel;
+
+        [Tooltip("Do painel do mapa: desligado durante a viagem, para um clique não abrir outra fase")]
+        [SerializeField] private CanvasGroup _mapGroup;
+
         [SerializeField] private Button _menuButton;
+        [SerializeField] private MapTravelAnimator _travel;
 
         [Header("Início da fase")]
         [SerializeField] private GameObject _briefingPanel;
@@ -28,11 +34,12 @@ namespace Guaxinim.UI
         [SerializeField] private Button _startButton;
 
         private LevelData _selectedLevel;
+        private int _travelDestination = -1;
 
         private void Awake()
         {
-            if (_catalog == null || _mapPanel == null || _menuButton == null || _briefingPanel == null ||
-                _briefingTitle == null || _briefingBody == null || _startButton == null)
+            if (_catalog == null || _mapPanel == null || _mapGroup == null || _menuButton == null || _travel == null ||
+                _briefingPanel == null || _briefingTitle == null || _briefingBody == null || _startButton == null)
             {
                 Debug.LogError("CityMapUI is missing references.", this);
                 enabled = false;
@@ -52,11 +59,20 @@ namespace Guaxinim.UI
             {
                 levelButton.OnSelected += HandleLevelSelected;
             }
+
+            _travel.OnArrived += HandleTravelArrived;
+            _travel.OnFinished += HandleTravelFinished;
         }
 
         private void Start()
         {
             RefreshLevelButtons();
+            if (TryStartTravel())
+            {
+                return;
+            }
+
+            _travel.PlaceAt(FindLastUnlockedIndex());
             ShowMap();
         }
 
@@ -66,6 +82,9 @@ namespace Guaxinim.UI
             {
                 levelButton.OnSelected -= HandleLevelSelected;
             }
+
+            _travel.OnArrived -= HandleTravelArrived;
+            _travel.OnFinished -= HandleTravelFinished;
         }
 
         /// <summary>Ligado ao botão Começar no Inspector.</summary>
@@ -85,6 +104,60 @@ namespace Guaxinim.UI
                 LevelData level = _catalog.Levels[i];
                 _levelButtons[i].Bind(level, save.Find(level.Id), _catalog.IsUnlocked(i, save));
             }
+        }
+
+        /// <summary>Viagem pedida pelo resultado da fase: o destino aparece bloqueado até o marcador chegar.</summary>
+        private bool TryStartTravel()
+        {
+            if (!MapTravelRequest.TryConsume(out LevelData from, out LevelData to))
+            {
+                return false;
+            }
+
+            int fromIndex = _catalog.IndexOf(from);
+            int toIndex = _catalog.IndexOf(to);
+            if (fromIndex < 0 || toIndex <= fromIndex)
+            {
+                return false;
+            }
+
+            _travelDestination = toIndex;
+            _levelButtons[toIndex].Bind(to, SaveSystem.Data.Find(to.Id), false);
+            _briefingPanel.SetActive(false);
+            _mapPanel.SetActive(true);
+            SetMapInteractable(false);
+            Deselect();
+            _travel.Play(fromIndex, toIndex, _levelButtons[toIndex].transform);
+            return true;
+        }
+
+        private void HandleTravelArrived() => RefreshLevelButtons();
+
+        private void HandleTravelFinished()
+        {
+            SetMapInteractable(true);
+            HandleLevelSelected(_catalog.Levels[_travelDestination]);
+        }
+
+        private void SetMapInteractable(bool isInteractable)
+        {
+            _mapGroup.interactable = isInteractable;
+            _mapGroup.blocksRaycasts = isInteractable;
+        }
+
+        private int FindLastUnlockedIndex()
+        {
+            SaveData save = SaveSystem.Data;
+            int last = 0;
+            for (int i = 0; i < _catalog.Levels.Count; i++)
+            {
+                if (_catalog.Levels[i].IsPlayable && _catalog.IsUnlocked(i, save))
+                {
+                    last = i;
+                }
+            }
+
+            return last;
         }
 
         private void HandleLevelSelected(LevelData level)
@@ -122,6 +195,14 @@ namespace Guaxinim.UI
             }
 
             return _menuButton;
+        }
+
+        private static void Deselect()
+        {
+            if (EventSystem.current != null)
+            {
+                EventSystem.current.SetSelectedGameObject(null);
+            }
         }
 
         private static void Select(Button button)

@@ -39,6 +39,9 @@ namespace Guaxinim.Core
         /// <summary>O tempo desta vitória bateu o melhor tempo salvo antes (a primeira vitória não conta).</summary>
         public bool IsNewRecord { get; private set; }
 
+        /// <summary>Esta vitória foi a primeira nesta fase (e por isso liberou a próxima).</summary>
+        public bool IsFirstCompletion { get; private set; }
+
         public LevelData Level => _level;
 
         /// <summary>Algum inimigo perseguiu o guaxinim nesta tentativa (perde a estrela "sem ser perseguido").</summary>
@@ -116,6 +119,8 @@ namespace Guaxinim.Core
             IsLevelOver = true;
             Result = LevelResult.Create(ElapsedSeconds, _level.TargetTimeSeconds, _shoppingList.Progress.IsComplete,
                 WasChased, _shoppingList.Progress.BonusCount, _data.PointsPerBonusItem);
+            LevelRecord previous = SaveSystem.Data.Find(_level.Id);
+            IsFirstCompletion = !string.IsNullOrEmpty(_level.Id) && (previous == null || !previous.IsCompleted);
             IsNewRecord = SaveSystem.RecordLevelResult(_level.Id, Result.Stars, Result.ElapsedSeconds); // libera a próxima fase
             Time.timeScale = 0f; // o mundo para atrás da tela de resultado; o SceneLoader volta a 1
             OnLevelWon?.Invoke();

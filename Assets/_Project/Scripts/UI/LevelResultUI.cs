@@ -87,11 +87,20 @@ namespace Guaxinim.UI
                 return;
             }
 
-            SceneLoader.LoadLevel(_nextLevel);
+            MapTravelRequest.Request(_levelFlow.Level, _nextLevel); // o mapa mostra a viagem e abre o início dela
+            SceneLoader.LoadCityMap();
         }
 
-        /// <summary>Ligado ao botão "Mapa" no Inspector.</summary>
-        public void GoToCityMap() => SceneLoader.LoadCityMap();
+        /// <summary>Ligado ao botão "Mapa" no Inspector. Se esta vitória liberou a próxima fase, o mapa mostra a viagem.</summary>
+        public void GoToCityMap()
+        {
+            if (_levelFlow.IsFirstCompletion && _nextLevel != null)
+            {
+                MapTravelRequest.Request(_levelFlow.Level, _nextLevel);
+            }
+
+            SceneLoader.LoadCityMap();
+        }
 
         private void HandleLevelWon()
         {

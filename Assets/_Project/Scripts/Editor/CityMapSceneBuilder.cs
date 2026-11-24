@@ -10,7 +10,8 @@ namespace Guaxinim.EditorTools
     /// <summary>
     /// Monta o mapa da cidade (GDD §13): uma fachada por fase do catálogo sobre a ilustração do mapa, e a tela de
     /// início da fase (nome, lista de compras e Começar) com o mesmo mapa escurecido atrás. As fachadas são
-    /// greybox: um cartão com nome, três estrelas e o estado da fase.
+    /// greybox: um cartão com nome, três estrelas e o estado da fase. Embaixo delas, a estrada pontilhada com uma
+    /// parada por fase e o marcador do guaxinim, que viaja entre os mercados (Etapa 4).
     /// </summary>
     internal static class CityMapSceneBuilder
     {
@@ -31,6 +32,15 @@ namespace Guaxinim.EditorTools
         private const float LevelTextPadding = 16f;
         private const float BriefingVeilOpacity = 0.75f;
         private const int BriefingSortingOrder = 1;
+        private const string DotSpritePath = "Assets/_Project/Art/UI/Dot.png";
+        private const string RaccoonIconPath = "Assets/_Project/Art/UI/Icon_Raccoon.png";
+        private const float RoadHeightAnchor = 0.24f;
+        private const int DotsPerSegment = 5;
+        private const float RoadDotSize = 16f;
+        private const float StopSize = 34f;
+        private const float MarkerSize = 96f;
+
+        private static readonly Color StopColor = new Color32(0xFF, 0xF1, 0xD6, 0xFF);
 
         private static readonly Vector2 LevelButtonSize = new Vector2(340f, 380f);
 
@@ -50,6 +60,11 @@ namespace Guaxinim.EditorTools
             {
                 levelButtons[i] = CreateLevelButton(mapPanel.transform, i, levelButtons.Length);
             }
+
+            var travel = root.gameObject.AddComponent<MapTravelAnimator>();
+            BuildRoad(mapPanel.transform, travel, levelButtons.Length);
+            EditorAssets.SetReference(mapUI, "_travel", travel);
+            EditorAssets.SetReference(mapUI, "_mapGroup", mapPanel.AddComponent<CanvasGroup>());
 
             Button menu = EditorUI.CreateButton("MenuButton", mapPanel.transform, MenuText, new Vector2(0.5f, 0.1f));
             UnityEventTools.AddPersistentListener(menu.onClick, mapUI.GoToMainMenu);
@@ -81,6 +96,65 @@ namespace Guaxinim.EditorTools
             briefingPanel.SetActive(false);
         }
 
+        /// <summary>
+        /// Estrada embaixo das fachadas: uma parada por fase, pontos entre elas e o marcador do guaxinim, todos irmãos
+        /// num mesmo pai (o MapTravelAnimator move o marcador pelas posições locais das paradas).
+        /// </summary>
+        private static void BuildRoad(Transform mapPanel, MapTravelAnimator travel, int stopCount)
+        {
+            var road = new GameObject("Road", typeof(RectTransform)) { layer = EditorUI.UILayer };
+            road.transform.SetParent(mapPanel, false);
+            EditorUI.Stretch((RectTransform)road.transform);
+            var dotSprite = AssetDatabase.LoadAssetAtPath<Sprite>(DotSpritePath);
+
+            var dots = new Object[(stopCount - 1) * DotsPerSegment];
+            for (int segment = 0; segment < stopCount - 1; segment++)
+            {
+                for (int i = 0; i < DotsPerSegment; i++)
+                {
+                    float t = (i + 1f) / (DotsPerSegment + 1f);
+                    float x = Mathf.Lerp(LevelButtonX(segment, stopCount), LevelButtonX(segment + 1, stopCount), t);
+                    dots[segment * DotsPerSegment + i] = CreateRoadImage($"Dot_{segment + 1}_{i + 1}", road.transform,
+                        dotSprite, x, RoadDotSize, Color.white);
+                }
+            }
+
+            var stops = new Object[stopCount];
+            for (int i = 0; i < stopCount; i++)
+            {
+                stops[i] = CreateRoadImage($"Stop_{i + 1}", road.transform, dotSprite, LevelButtonX(i, stopCount),
+                    StopSize, StopColor).rectTransform;
+            }
+
+            Image marker = CreateRoadImage("RaccoonMarker", road.transform,
+                AssetDatabase.LoadAssetAtPath<Sprite>(RaccoonIconPath), LevelButtonX(0, stopCount), MarkerSize, Color.white);
+            marker.rectTransform.pivot = new Vector2(0.5f, 0.15f); // em pé sobre a parada
+            marker.preserveAspect = true;
+
+            EditorAssets.SetReference(travel, "_marker", marker.rectTransform);
+            EditorAssets.SetReferenceArray(travel, "_stops", stops);
+            EditorAssets.SetReferenceArray(travel, "_roadDots", dots);
+            var serializedTravel = new SerializedObject(travel);
+            serializedTravel.FindProperty("_dotsPerSegment").intValue = DotsPerSegment;
+            serializedTravel.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static Image CreateRoadImage(string name, Transform road, Sprite sprite, float anchorX, float size,
+            Color color)
+        {
+            var imageObject = new GameObject(name, typeof(RectTransform)) { layer = EditorUI.UILayer };
+            imageObject.transform.SetParent(road, false);
+            EditorUI.Place((RectTransform)imageObject.transform, new Vector2(anchorX, RoadHeightAnchor), Vector2.one * size);
+            var image = imageObject.AddComponent<Image>();
+            image.sprite = sprite;
+            image.color = color;
+            image.raycastTarget = false;
+            return image;
+        }
+
+        /// <summary>Âncora X da fachada (e da parada) da fase <paramref name="index"/>, centradas na tela.</summary>
+        private static float LevelButtonX(int index, int count) => 0.5f + (index - (count - 1) / 2f) * LevelButtonSpacing;
+
         /// <summary>A ilustração é carregada aqui, depois da cena nova (ver o MainMenuSceneBuilder).</summary>
         private static void AddBackground(Transform root)
         {
@@ -97,8 +171,8 @@ namespace Guaxinim.EditorTools
         /// <summary>Cartão de uma fase: nome em cima, três estrelas no meio e o estado embaixo.</summary>
         private static LevelButtonUI CreateLevelButton(Transform parent, int index, int count)
         {
-            float x = 0.5f + (index - (count - 1) / 2f) * LevelButtonSpacing;
-            Button button = EditorUI.CreateButton($"Level_{index + 1}", parent, string.Empty, new Vector2(x, 0.5f),
+            Button button = EditorUI.CreateButton($"Level_{index + 1}", parent, string.Empty,
+                new Vector2(LevelButtonX(index, count), 0.5f),
                 LevelButtonSize, SelectableHighlight.HighlightStyle.Card);
 
             Text nameLabel = button.GetComponentInChildren<Text>();
