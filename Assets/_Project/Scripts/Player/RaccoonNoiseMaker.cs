@@ -1,3 +1,4 @@
+using System;
 using Guaxinim.Core;
 using Guaxinim.Noise;
 using UnityEngine;
@@ -16,6 +17,11 @@ namespace Guaxinim.Player
         [SerializeField] private Inventory _inventory;
 
         private float _secondsUntilNextRunNoise;
+
+        /// <summary>Um passo de corrida fez barulho (o áudio toca a pisada).</summary>
+        public event Action OnRunStep;
+
+        public event Action OnWhistled;
 
         private void Awake()
         {
@@ -60,8 +66,13 @@ namespace Guaxinim.Player
             float radius = NoiseRadius.ForRunning(_noiseData.RunRadius, _noiseData.RunCarryBonusRadius,
                 _inventory.CurrentWeight, _inventory.MaxWeight);
             NoiseSystem.Emit(transform.position, radius);
+            OnRunStep?.Invoke();
         }
 
-        private void HandleWhistlePressed() => NoiseSystem.Emit(transform.position, _noiseData.WhistleRadius);
+        private void HandleWhistlePressed()
+        {
+            NoiseSystem.Emit(transform.position, _noiseData.WhistleRadius);
+            OnWhistled?.Invoke();
+        }
     }
 }

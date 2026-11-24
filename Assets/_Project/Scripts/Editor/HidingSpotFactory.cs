@@ -56,6 +56,8 @@ namespace Guaxinim.EditorTools
             var lidAnimator = root.AddComponent<BinLidAnimator>();
             EditorAssets.SetReference(lidAnimator, "_lid", hinge);
             EditorAssets.SetReference(lidAnimator, "_visual", visual);
+            SoundDataFactory.AddSource(root);
+            EditorAssets.SetReference(root.AddComponent<Audio.BinSounds>(), "_sounds", SoundDataFactory.LoadOrCreate());
 
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Interactable));
             PrefabUtility.SaveAsPrefabAsset(root, BinPrefabPath);

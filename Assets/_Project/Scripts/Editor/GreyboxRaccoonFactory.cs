@@ -55,6 +55,8 @@ namespace Guaxinim.EditorTools
             AddDropper(root, input);
             AddBulkyLoad(root, data);
             AddFragileShake(root, data);
+            SoundDataFactory.AddSource(root);
+            EditorAssets.SetReference(root.AddComponent<Audio.RaccoonSounds>(), "_sounds", SoundDataFactory.LoadOrCreate());
             GameObject model = AddModel(root.transform);
             AddHiding(root, data, model);
             AddMotion(root, model);

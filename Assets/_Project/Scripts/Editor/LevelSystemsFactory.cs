@@ -68,6 +68,11 @@ namespace Guaxinim.EditorTools
             var flow = systems.AddComponent<LevelFlow>();
             EditorAssets.SetReference(flow, "_data", EditorAssets.LoadOrCreate<LevelFlowData>(FlowDataPath));
             EditorAssets.SetReference(flow, "_shoppingList", shoppingList);
+            SoundDataFactory.AddSource(systems);
+            var levelSounds = systems.AddComponent<Audio.LevelSounds>();
+            EditorAssets.SetReference(levelSounds, "_sounds", SoundDataFactory.LoadOrCreate());
+            EditorAssets.SetReference(levelSounds, "_levelFlow", flow);
+            EditorAssets.SetReference(levelSounds, "_shoppingList", shoppingList);
 
             HudBuilder.Build(systems.transform, flow, shoppingList);
             AddCaughtScreen(systems.transform, flow, shoppingList);
