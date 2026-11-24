@@ -18,6 +18,7 @@ namespace Guaxinim.EditorTools
         public const int BackgroundSortingOrder = -1;
 
         private const string ThemePath = "Assets/_Project/Data/UI/UITheme.asset";
+        private const string TitleFontPath = "Assets/_Project/Art/Fonts/LilitaOne-Regular.ttf";
         private const string DataFolder = "Assets/_Project/Data/UI";
         private const string BuiltinFontName = "LegacyRuntime.ttf";
         private const int ArrowFontSize = 36;
@@ -37,6 +38,23 @@ namespace Guaxinim.EditorTools
         {
             EditorAssets.EnsureFolder(DataFolder);
             return EditorAssets.LoadOrCreate<UITheme>(ThemePath);
+        }
+
+        /// <summary>
+        /// Usa a fonte de título (Lilita One, licença OFL) no texto. Sem o arquivo da fonte, o texto fica com a fonte
+        /// padrão. Carregue dentro da cena nova: o NewScene descarrega os assets sem uso.
+        /// </summary>
+        public static void ApplyTitleFont(Text text)
+        {
+            var font = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>(TitleFontPath);
+            if (font == null)
+            {
+                Debug.LogWarning($"Title font not found at {TitleFontPath}; using the default font.");
+                return;
+            }
+
+            text.font = font;
+            text.fontStyle = FontStyle.Normal; // a Lilita One já é pesada: o negrito falso só borra
         }
 
         /// <summary>

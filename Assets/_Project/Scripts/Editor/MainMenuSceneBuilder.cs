@@ -15,7 +15,7 @@ namespace Guaxinim.EditorTools
     {
         private const string BackgroundPath = "Assets/_Project/Art/UI/Background_MainMenu.jpg";
         private const string GameTitle = "Operação\nGuaxinim";
-        private const int GameTitleFontSize = 104;
+        private const int GameTitleFontSize = 116; // a Lilita One é mais estreita que a fonte padrão
         private const float MenuColumnX = 0.175f;
         private const int InfoTitleFontSize = 80;
         private const int InfoBodyFontSize = 36;
@@ -39,7 +39,8 @@ namespace Guaxinim.EditorTools
         private const string CreditsBody =
             "Jogos Digitais, Jogos e Interação, Insper 2026.2\n\n" +
             "Modelos 3D e texturas: gerados por scripts do Blender escritos com o Claude (Anthropic)\n" +
-            "Ferramentas: Unity 6, Blender e Claude Code (Anthropic)\n\n" +
+            "Ferramentas: Unity 6, Blender e Claude Code (Anthropic)\n" +
+            "Fonte do título: Lilita One, de Juan Montoreano (SIL Open Font License 1.1)\n\n" +
             "Os créditos completos, com fonte e licença de cada asset, estão no README do repositório.";
 
         public static void Build(Transform root)
@@ -50,6 +51,7 @@ namespace Guaxinim.EditorTools
             GameObject mainPanel = EditorUI.CreateScreenPanel("MainCanvas", root, 0);
             mainPanel.GetComponent<Image>().color = Color.clear; // sem o véu escuro: a ilustração aparece inteira
             Text title = EditorUI.CreateText("Title", mainPanel.transform, GameTitle, GameTitleFontSize, EditorUI.LightTextColor);
+            EditorUI.ApplyTitleFont(title);
             EditorUI.Place((RectTransform)title.transform, new Vector2(MenuColumnX, 0.76f), new Vector2(700f, 320f));
             EditorUI.AddOutline(title.gameObject);
 
