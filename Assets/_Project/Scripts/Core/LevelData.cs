@@ -6,7 +6,7 @@ namespace Guaxinim.Core
 {
     /// <summary>
     /// Dados de uma fase (GDD §11, §12 e §14.3): identidade (save e cena), lista de compras e tempo-alvo da
-    /// estrela. Cogumelos e música entram com o modo cogumelo e o áudio. Somente leitura durante o jogo.
+    /// estrela. Somente leitura durante o jogo.
     /// </summary>
     [CreateAssetMenu(fileName = "LevelData", menuName = "Guaxinim/Level Data")]
     public class LevelData : ScriptableObject

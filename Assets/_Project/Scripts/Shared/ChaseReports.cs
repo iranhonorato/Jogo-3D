@@ -5,7 +5,7 @@ namespace Guaxinim.Shared
 {
     /// <summary>
     /// Mediador das perseguições: o inimigo que começa a perseguir avisa aqui, sem saber quem escuta. O ciclo da fase
-    /// escuta para a terceira estrela ("sem ser perseguido", GDD §12), no lugar do alerta geral, que ficou fora do MVP.
+    /// escuta para a terceira estrela ("sem ser perseguido", GDD §12), no lugar do alerta geral, que ficou fora do escopo final.
     /// </summary>
     public static class ChaseReports
     {

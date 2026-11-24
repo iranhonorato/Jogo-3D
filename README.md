@@ -13,11 +13,9 @@ Projeto 3D Hiper-Casual — Jogos Digitais, Insper 2026.2.
 | --- | --- |
 | Mover (silencioso) | WASD |
 | Correr (faz barulho) | Shift |
-| Pegar item / interagir / lixeira / aspirador | E |
+| Pegar item / entrar e sair da lixeira | E |
 | Largar o último item | Q |
 | Assobiar (distração) | F |
-| Ativar o modo cogumelo (com 3 cogumelos) | R |
-| Pular (no modo cogumelo) | Espaço |
 | Ver a lista inteira | Tab (segurar) |
 | Pausar | Esc |
 
@@ -58,13 +56,13 @@ Tools/Blender/  Scripts bpy que geram os modelos
 | `Core` | Ciclo do jogo, troca de cenas, save e dados de cada fase |
 | `Player` | Movimento do guaxinim, estado, inventário e fragilidade |
 | `Items` | Itens no mundo, lista de compras e toca |
-| `Effects` | Consumíveis e modo cogumelo |
+| `Effects` | Consumíveis (energético e barra de proteína) |
 | `Noise` | Emissão e escuta de sons, anéis visuais no chão |
-| `Guards` | IA do segurança, visão, detecção e alerta geral (`States/` guarda a máquina de estados) |
-| `Hazards` | Robô aspirador, lixeiras e câmeras de segurança |
+| `Guards` | IA do segurança e do faxineiro, visão, detecção e limite de lanternas acesas (`States/` guarda a máquina de estados) |
+| `Hazards` | Lixeiras |
 | `Camera` | Câmera isométrica e transparência das prateleiras |
 | `Animation` | Animações procedurais dos personagens sem esqueleto (passo, inclinação, respiração, susto) e o arco do item coletado |
-| `UI` | HUD e menus |
+| `UI` | HUD, seta da toca, menus e a viagem no mapa da cidade |
 | `Shared` | Interfaces e tipos usados por mais de um módulo |
 | `Editor` | Ferramentas do Editor (não entram no build) |
 
@@ -122,6 +120,8 @@ Todo asset de terceiros ou gerado por IA entra aqui, com fonte e licença (GDD, 
 | Fonte dos textos do jogo (`Art/Fonts/Sniglet-ExtraBold.ttf`) | Haley Fiege, Brenda Gallo e Pablo Impallari | [Sniglet no Google Fonts](https://fonts.google.com/specimen/Sniglet), arquivo do repositório [google/fonts](https://github.com/google/fonts/tree/main/ofl/sniglet) | SIL Open Font License 1.1 (cópia em `Art/Fonts/OFL_Sniglet.txt`) |
 | Fundo do fim de jogo (`Art/UI/Background_Ending.jpg`) | Derivado da ilustração do menu (desfocada, dourada e com brilhos, por script) | `Tools/Art/make_ui_backgrounds.py` | Mesma origem e licença da ilustração do menu |
 | Mapa da cidade (`Art/UI/Background_CityMap.jpg`) | Desenhado por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_ui_backgrounds.py` | Feito para este projeto |
+| Ícones da HUD e do mapa (`Art/UI/Arrow_Den.png`, `Dot.png`, `Icon_Raccoon.png`) | Desenhados por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_ui_icons.py` | Feitos para este projeto |
+| Degradê das poças de luz (`Art/Textures/Effects/LightPool_Gradient.png`) | Gerado por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_effect_textures.py` | Feito para este projeto |
 
 ### Código de terceiros
 
