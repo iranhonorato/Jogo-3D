@@ -4,7 +4,9 @@ Uso:
     blender.exe -b --factory-startup -P Tools/Blender/char_raccoon.py -- [--preview <pasta>]
 
 Guaxinim em pé, com cerca de 0,6 m, máscara escura, cauda anelada e bolsa de couro
-transversal (sem o cajado da referência, GDD §15.1). Frente em -Y.
+transversal (sem o cajado da referência, GDD §15.1). Frente em -Y. Detalhes da referência de
+arte (pasta de próximos passos): bochechas com pontas de pelo, cabeça grande, brilho nos olhos,
+cauda cheia com a ponta clara e bolsa com aba e fivela.
 """
 
 import math
@@ -16,23 +18,24 @@ from mathutils import Euler, Matrix, Vector
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import guaxinim_common as gc  # noqa: E402
 
-FUR = gc.srgb("#857868")
-FUR_DARK = gc.srgb("#5c5249")
-CREAM = gc.srgb("#e3d6bd")
+FUR = gc.srgb("#8a8079")
+FUR_DARK = gc.srgb("#575049")
+CREAM = gc.srgb("#efe7da")
 EAR_INNER = gc.srgb("#b5a794")
-MASK = gc.srgb("#221e1b")
+MASK = gc.srgb("#1a1715")
 BRIDGE = gc.srgb("#4a4038")
 NOSE = gc.srgb("#141212")
 EYE = gc.srgb("#1a120c")
-PAW = gc.srgb("#37302a")
-TAIL_LIGHT = gc.srgb("#9a8a77")
-TAIL_DARK = gc.srgb("#2e2823")
+PAW = gc.srgb("#26211e")
+TAIL_LIGHT = gc.srgb("#cbbda8")
+TAIL_DARK = gc.srgb("#332d28")
 LEATHER = gc.srgb("#7b4b2b")
 LEATHER_DARK = gc.srgb("#5c3720")
-BRASS = gc.srgb("#c9a24a")
+BRASS = gc.srgb("#d8b04e")
+EYE_SHINE = gc.srgb("#ffffff")
 
-HEAD_CENTER = Vector((0.0, -0.035, 0.435))
-HEAD_RADII = (0.064, 0.058, 0.052)
+HEAD_CENTER = Vector((0.0, -0.035, 0.44))
+HEAD_RADII = (0.071, 0.063, 0.057)  # cabeça grande: lê bem de cima
 SNOUT_DIR = Vector((0.0, -1.0, -0.35)).normalized()
 SNOUT_LENGTH = 0.035
 
@@ -49,7 +52,7 @@ TAIL = [Vector(p) for p in (
     (0.0, 0.06, 0.15), (0.01, 0.12, 0.09), (0.03, 0.19, 0.055), (0.055, 0.26, 0.05),
     (0.075, 0.32, 0.065), (0.085, 0.36, 0.1), (0.08, 0.38, 0.14),
 )]
-TAIL_RADII = (0.03, 0.048, 0.056, 0.056, 0.05, 0.04, 0.02)
+TAIL_RADII = (0.034, 0.056, 0.066, 0.066, 0.06, 0.048, 0.024)  # cauda cheia
 
 
 def place(obj, location, rotation_degrees=(0.0, 0.0, 0.0)):
@@ -106,7 +109,8 @@ def build_tail():
 def paint_tail(co, n):
     t, _ = gc.closest_on_polyline(Vector(co), TAIL)
     ring = gc.smoothstep(-0.3, 0.3, math.sin(2.0 * math.pi * (t - 0.14) * 5.0)) if t > 0.14 else 0.0
-    color = gc.lerp(TAIL_LIGHT, TAIL_DARK, max(ring, gc.smoothstep(0.86, 0.92, t)))
+    color = gc.lerp(TAIL_LIGHT, TAIL_DARK, ring if t < 0.88 else 0.0)
+    color = gc.lerp(color, CREAM, gc.smoothstep(0.9, 0.97, t))  # ponta clara
     return gc.lerp(FUR, color, gc.smoothstep(0.04, 0.14, t))
 
 
@@ -127,6 +131,9 @@ def head_deform(d, p):
     cheek = gc.smoothstep(0.35, 0.9, abs(d.x)) * (1.0 - gc.smoothstep(0.1, 0.6, abs(d.z + 0.2)))
     p.x *= 1.0 + 0.4 * cheek
     p.y += 0.012 * cheek
+    # Pontas de pelo nas bochechas (a referência tem a cara bem fofa dos lados).
+    tufts = 0.5 + 0.5 * math.sin(9.0 * math.atan2(d.z, d.y))
+    p.x += math.copysign(0.014 * cheek * tufts, d.x)
     if d.z > 0.0:
         p.z *= 1.0 - 0.12 * d.z
     return p
@@ -181,9 +188,11 @@ def build_face_details(head):
     parts = []
     for side in (1, -1):
         hit, normal = gc.front_hit(head, 0.028 * side, HEAD_CENTER.z + 0.014)
-        eye = gc.ellipsoid("Eye_L" if side > 0 else "Eye_R", hit - normal * 0.0045, (0.008,) * 3,
+        eye = gc.ellipsoid("Eye_L" if side > 0 else "Eye_R", hit - normal * 0.0045, (0.0095,) * 3,
                            segments=10, rings=8)
-        parts.append(gc.Part(eye, gc.flat(EYE), 80))
+        shine = gc.ellipsoid("EyeShine", hit + normal * 0.0035 + Vector((0.003 * side, 0.0, 0.004)),
+                             (0.0028,) * 3, segments=6, rings=4)
+        parts += [gc.Part(eye, gc.flat(EYE), 80), gc.Part(shine, gc.flat(EYE_SHINE), 16)]
     tip = max((v.co for v in head.data.vertices), key=lambda co: (co - HEAD_CENTER).dot(SNOUT_DIR))
     nose = gc.ellipsoid("Nose", tip + SNOUT_DIR * 0.001, (0.012, 0.01, 0.009), segments=10, rings=8)
     parts.append(gc.Part(nose, gc.flat(NOSE), 80))
@@ -197,14 +206,15 @@ def build_face_details(head):
 def build_bag(body):
     hit, _ = gc.surface_hit(body, (-1.0, -0.005, 0.215), (1.0, 0.0, 0.0))
     center = hit + Vector((-0.019, 0.0, 0.0))
-    bag = gc.ellipsoid("Bag", center, (0.019, 0.042, 0.034), segments=16, rings=12, exponent=0.55)
+    bag = gc.ellipsoid("Bag", center, (0.021, 0.048, 0.04), segments=16, rings=12, exponent=0.55)
 
     def paint_bag(co, n):
         flap = gc.smoothstep(center.z - 0.004, center.z + 0.004, co.z) * gc.smoothstep(0.2, 0.6, -n.x)
         color = gc.lerp(LEATHER, LEATHER_DARK, 0.7 * flap)
         return gc.shade(color, 1.0 + 0.12 * gc.turbulence(co, 60.0))
 
-    buckle = gc.box("Buckle", center + Vector((-0.02, 0.0, 0.01)), (0.004, 0.013, 0.011))
+    flap = gc.box("Flap", center + Vector((-0.021, 0.0, 0.014)), (0.006, 0.09, 0.032))
+    buckle = gc.box("Buckle", center + Vector((-0.025, 0.0, 0.002)), (0.004, 0.014, 0.012))
 
     path = []
     for u in (0.0, 0.25, 0.5, 0.75, 1.0):  # costas, do quadril direito ao ombro esquerdo
@@ -221,7 +231,8 @@ def build_bag(body):
     skeleton.chain(None, [(tuple(p), 0.005) for p in path])
     strap = gc.skin("Strap", skeleton, subsurf=1)
 
-    return [gc.Part(bag, paint_bag, 160), gc.Part(buckle, gc.flat(BRASS), 12),
+    return [gc.Part(bag, paint_bag, 160), gc.Part(flap, gc.flat(LEATHER_DARK), 12),
+            gc.Part(buckle, gc.flat(BRASS), 12),
             gc.Part(strap, gc.flat(LEATHER_DARK), 160)]
 
 
@@ -229,11 +240,11 @@ def build():
     body = build_body()
     head = gc.ellipsoid("Head", HEAD_CENTER, HEAD_RADII, segments=48, rings=32, deform=head_deform)
     parts = [
-        gc.Part(body, paint_body, 850),
+        gc.Part(body, paint_body, 760),
         gc.Part(build_arm(1), paint_arm, 170),
         gc.Part(build_arm(-1), paint_arm, 170),
-        gc.Part(build_tail(), paint_tail, 420),
-        gc.Part(head, paint_head, 600),
+        gc.Part(build_tail(), paint_tail, 400),
+        gc.Part(head, paint_head, 580),
     ]
     for side in (1, -1):
         ear, paint_ear = build_ear(head, side)
@@ -244,6 +255,6 @@ def build():
 
 
 if __name__ == "__main__":
-    gc.run_character("Char_Raccoon", build, budget_tris=3000, texture_size=1024,
+    gc.run_character("Char_Raccoon", build, budget_tris=3300, texture_size=1024,
                      bake_cage=0.01, bake_ray=0.02, ao_distance=0.12,
                      blotch_scale=9.0, stroke_scale=120.0, target_height=0.6)

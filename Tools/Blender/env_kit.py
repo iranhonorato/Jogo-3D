@@ -25,14 +25,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import guaxinim_common as gc  # noqa: E402
 
 # Gôndola
-SHELF_METAL = gc.srgb("#cfcdc5")
-SHELF_BASE = gc.srgb("#55565e")
-SHELF_BACK = gc.srgb("#a9aaa6")
+# Estrutura roxo-acinzentada, como a referência de arte (pasta de próximos passos).
+SHELF_METAL = gc.srgb("#968ab0")
+SHELF_BASE = gc.srgb("#5b5270")
+SHELF_BACK = gc.srgb("#7a7093")
 PRICE_STRIP = gc.srgb("#e9e4d6")
 PRICE_TAGS = (gc.srgb("#f2d24b"), gc.srgb("#ffffff"), gc.srgb("#e2553f"))
 PRODUCT_COLORS = tuple(gc.srgb(h) for h in (
-    "#a8553f", "#c08a3e", "#5d7f63", "#4f6d8a", "#8a5a7a",
-    "#b8a06a", "#7b8f9c", "#9c4a4a", "#d0c4a8", "#6a7d4a"))
+    "#c9483a", "#e08a32", "#e9c13f", "#5f9a5c", "#3f7fbf",
+    "#8a5bb0", "#d65f7a", "#4fa6a0", "#d9cfb4", "#9c4a3a"))
+LID_COLORS = tuple(gc.srgb(h) for h in ("#e9e2cf", "#c9a24a", "#3d3a44", "#c9483a"))
+JAR_CHANCE = 0.35  # o resto, metade caixas e metade pacotes, varia por prateleira
+BAG_CHANCE = 0.2
 LABEL_COLORS = tuple(gc.srgb(h) for h in ("#ece3cb", "#f0d58a", "#d9dfe2", "#5a4a3e"))
 
 # Parede e piso
@@ -106,19 +110,58 @@ def _product(name, center, size, color, label, side):
     return gc.Part(high, paint_product, 12, low=low)
 
 
+def _jars(rng, parts, x, width, y, floor_z, clearance):
+    """Fileira de potes com tampa (vidros de geleia, conservas), na frente da prateleira."""
+    radius = rng.uniform(0.055, 0.07)
+    height = min(clearance * 0.7, rng.uniform(0.11, 0.16))
+    count = max(1, int(width // (2 * radius + 0.01)))
+    color, label, lid = rng.choice(PRODUCT_COLORS), rng.choice(LABEL_COLORS), rng.choice(LID_COLORS)
+    for i in range(count):
+        cx = x + (i + 0.5) * width / count
+        body = gc.cylinder("Jar", (cx, y, floor_z), (cx, y, floor_z + height), radius, segments=6)
+        cap = gc.cylinder("Lid", (cx, y, floor_z + height), (cx, y, floor_z + height + 0.025), radius * 0.92,
+                          segments=6)
+        bottom = floor_z
+
+        def paint_jar(co, n, bottom=bottom, color=color, label=label, height=height):
+            t = (co.z - bottom) / height
+            return gc.lerp(color, label, gc.band(t, 0.5, 0.18, 0.03) * (1.0 - gc.above(n.z, 0.5)))
+
+        parts += [gc.Part(body, paint_jar, 20), gc.Part(cap, gc.flat(lid), 12)]
+
+
+def _bag(rng, parts, x, width, y, floor_z, clearance):
+    """Pacote de salgadinho ou biscoito: almofada achatada, em pé na prateleira."""
+    height = min(clearance * 0.8, rng.uniform(0.22, 0.32))
+    color, label = rng.choice(PRODUCT_COLORS), rng.choice(LABEL_COLORS)
+    center = (x + width / 2, y, floor_z + height / 2)
+    bag = gc.ellipsoid("Bag", center, (width / 2 - 0.01, 0.07, height / 2), segments=8, rings=6, exponent=0.45)
+
+    def paint_bag(co, n):
+        t = (co.z - floor_z) / height
+        return gc.lerp(color, label, gc.band(t, 0.45, 0.16, 0.04))
+
+    parts.append(gc.Part(bag, paint_bag, 24))
+
+
 def _fill_shelf(rng, parts, length, side, floor_z, clearance):
-    """Enfileira produtos de larguras e alturas variadas sobre uma prateleira."""
+    """Enfileira produtos variados (caixas, potes e pacotes) sobre uma prateleira."""
     x = -length / 2 + 0.05
     y = side * (0.04 + PRODUCT_DEPTH / 2 + 0.03)
     while True:
-        width = rng.uniform(0.14, 0.34)
+        width = rng.uniform(0.18, 0.36)
         if x + width > length / 2 - 0.05:
             break
-        height = rng.uniform(0.45, 0.85) * clearance
-        color = rng.choice(PRODUCT_COLORS)
-        label = rng.choice(LABEL_COLORS)
-        center = (x + width / 2, y, floor_z + height / 2)
-        parts.append(_product("Product", center, (width - 0.015, PRODUCT_DEPTH, height), color, label, side))
+        kind = rng.random()
+        if kind < JAR_CHANCE:
+            _jars(rng, parts, x, width, y + side * 0.06, floor_z, clearance)
+        elif kind < JAR_CHANCE + BAG_CHANCE:
+            _bag(rng, parts, x, width, y + side * 0.04, floor_z, clearance)
+        else:
+            height = rng.uniform(0.45, 0.85) * clearance
+            center = (x + width / 2, y, floor_z + height / 2)
+            parts.append(_product("Product", center, (width - 0.015, PRODUCT_DEPTH, height),
+                                  rng.choice(PRODUCT_COLORS), rng.choice(LABEL_COLORS), side))
         x += width + rng.uniform(0.0, 0.03)
 
 
@@ -131,8 +174,10 @@ def build_shelf(name, length, seed):
                   (length - 0.04, 0.04, SHELF_HEIGHT - BASE_HEIGHT), SHELF_BACK),
     ]
     for side in (1, -1):
-        parts.append(_box_part("EndPanel", (side * (length / 2 - 0.015), 0.0, SHELF_HEIGHT / 2),
-                               (0.03, SHELF_DEPTH, SHELF_HEIGHT), SHELF_METAL, skip=("-z",)))
+        parts.append(_box_part("EndPanel", (side * (length / 2 - 0.03), 0.0, SHELF_HEIGHT / 2),
+                               (0.06, SHELF_DEPTH, SHELF_HEIGHT), SHELF_METAL, skip=("-z",)))
+        parts.append(_box_part("EndCap", (side * (length / 2 - 0.03), 0.0, SHELF_HEIGHT - 0.02),
+                               (0.064, SHELF_DEPTH, 0.04), SHELF_BASE))
 
     floors = (BASE_HEIGHT,) + SHELF_LEVELS
     for side in (1, -1):
