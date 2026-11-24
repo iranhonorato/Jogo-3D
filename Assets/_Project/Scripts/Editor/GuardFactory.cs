@@ -20,8 +20,14 @@ namespace Guaxinim.EditorTools
         public const string GuardPrefabPath = "Assets/_Project/Prefabs/Guards/Guard.prefab";
         public const string JanitorPrefabPath = "Assets/_Project/Prefabs/Guards/Janitor.prefab";
 
-        /// <summary>O faxineiro anda, desconfia, persegue e procura a esta fração da velocidade do segurança.</summary>
+        /// <summary>O faxineiro anda, desconfia e procura a esta fração da velocidade do segurança.</summary>
         public const float JanitorSpeedFactor = 0.5f;
+
+        /// <summary>
+        /// Perseguição do faxineiro, em m/s: pega o guaxinim que anda (3 m/s) e perde para o que corre (6 m/s). Com a
+        /// metade da velocidade do segurança ele não pegava ninguém.
+        /// </summary>
+        public const float JanitorChaseSpeed = 4.5f;
 
         private const string GuardModelPath = "Assets/_Project/Art/Models/Characters/Char_Guard.fbx";
         private const string SeuZeModelPath = "Assets/_Project/Art/Models/Characters/Char_SeuZe.fbx";
@@ -85,14 +91,16 @@ namespace Guaxinim.EditorTools
         }
 
         /// <summary>
-        /// Faxineiro: as quatro velocidades do segurança vezes <see cref="JanitorSpeedFactor"/>, escritas uma vez
-        /// ao criar o asset. Depois, os números se ajustam no próprio asset.
+        /// Faxineiro: as velocidades do segurança vezes <see cref="JanitorSpeedFactor"/> e a perseguição em
+        /// <see cref="JanitorChaseSpeed"/>, escritas uma vez ao criar o asset. Depois, os números se ajustam no próprio
+        /// asset.
         /// </summary>
         private static GuardData LoadOrCreateJanitorData(GuardData guardData)
         {
             var janitorData = AssetDatabase.LoadAssetAtPath<GuardData>(JanitorDataPath);
             if (janitorData != null)
             {
+                UpgradeHalfSpeedChase(janitorData, guardData);
                 return janitorData;
             }
 
@@ -100,11 +108,25 @@ namespace Guaxinim.EditorTools
             var serialized = new SerializedObject(janitorData);
             ScaleSpeed(serialized, "_patrolSpeed");
             ScaleSpeed(serialized, "_suspiciousSpeed");
-            ScaleSpeed(serialized, "_chaseSpeed");
             ScaleSpeed(serialized, "_searchSpeed");
+            serialized.FindProperty("_chaseSpeed").floatValue = JanitorChaseSpeed;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             AssetDatabase.CreateAsset(janitorData, JanitorDataPath);
             return janitorData;
+        }
+
+        /// <summary>Asset da versão antiga, com a perseguição na metade da do segurança: passa para a nova.</summary>
+        private static void UpgradeHalfSpeedChase(GuardData janitorData, GuardData guardData)
+        {
+            if (!Mathf.Approximately(janitorData.ChaseSpeed, guardData.ChaseSpeed * JanitorSpeedFactor))
+            {
+                return; // ajustado à mão: fica como está
+            }
+
+            var serialized = new SerializedObject(janitorData);
+            serialized.FindProperty("_chaseSpeed").floatValue = JanitorChaseSpeed;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(janitorData);
         }
 
         private static void ScaleSpeed(SerializedObject data, string propertyName)

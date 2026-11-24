@@ -27,7 +27,7 @@ namespace Guaxinim.UI
         [Tooltip("Painel da tela; começa escondido")]
         [SerializeField] private GameObject _panel;
 
-        [Tooltip("As três estrelas, na ordem: lista, tempo, sem alerta")]
+        [Tooltip("As três estrelas, na ordem: lista, tempo, sem ser perseguido")]
         [SerializeField] private Image[] _stars = new Image[0];
 
         [SerializeField] private Text _details;
@@ -98,7 +98,7 @@ namespace Guaxinim.UI
             LevelResult result = _levelFlow.Result;
             SetStar(0, result.IsListComplete);
             SetStar(1, result.BeatTargetTime);
-            SetStar(2, !result.HadAlert);
+            SetStar(2, !result.WasChased);
             _details.text = BuildDetails(result, _shoppingList.Progress);
             _recordLabel.gameObject.SetActive(_levelFlow.IsNewRecord);
 
@@ -125,7 +125,7 @@ namespace Guaxinim.UI
             text.AppendLine($"{Mark(result.IsListComplete)} Lista completa");
             text.AppendLine($"{Mark(result.BeatTargetTime)} Tempo {TimeFormat.MinutesAndSeconds(result.ElapsedSeconds)} " +
                 $"(meta {TimeFormat.MinutesAndSeconds(result.TargetSeconds)})");
-            text.AppendLine($"{Mark(!result.HadAlert)} Sem alerta geral");
+            text.AppendLine($"{Mark(!result.WasChased)} Sem ser perseguido");
             text.AppendLine();
             for (int i = 0; i < progress.RequiredCount; i++)
             {

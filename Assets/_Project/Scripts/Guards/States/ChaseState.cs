@@ -33,7 +33,7 @@ namespace Guaxinim.Guards.States
             _target = _guard.Vision.VisibleTarget;
             _wasSeenLastFrame = _target != null;
             _lastKnownPosition = _target != null ? _target.DetectionPoint : _guard.transform.position;
-            // TODO(passo 3.3): disparar o alerta geral (GDD §6.4).
+            ChaseReports.ReportChaseStarted();
         }
 
         public void Tick(float deltaTime)

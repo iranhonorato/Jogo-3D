@@ -111,6 +111,7 @@ namespace Guaxinim.EditorTools
         {
             GameObject den = Place(EnvironmentKitFactory.DenPath, root, position, yawDegrees);
             EditorAssets.SetReference(den.GetComponent<Den>(), "_shoppingList", systems.GetComponent<ShoppingList>());
+            EditorAssets.SetReference(systems.GetComponentInChildren<DenIndicatorUI>(), "_den", den.transform);
             return den;
         }
 
@@ -128,8 +129,9 @@ namespace Guaxinim.EditorTools
             GameObject cameraRig = Place(CameraRigFactory.PerspectivePath, root, Vector3.zero, 0f);
             DisableOtherMainCameras(cameraRig);
             ConnectCamera(cameraRig, raccoon);
-            EditorAssets.SetReference(systems.GetComponentInChildren<InteractionPromptUI>(), "_camera",
-                cameraRig.GetComponentInChildren<Camera>());
+            Camera gameCamera = cameraRig.GetComponentInChildren<Camera>();
+            EditorAssets.SetReference(systems.GetComponentInChildren<InteractionPromptUI>(), "_camera", gameCamera);
+            EditorAssets.SetReference(systems.GetComponentInChildren<DenIndicatorUI>(), "_camera", gameCamera);
             return raccoon;
         }
 
@@ -180,6 +182,8 @@ namespace Guaxinim.EditorTools
             var tipsUI = systems.GetComponentInChildren<TutorialTipsUI>();
             EditorAssets.SetReference(tipsUI, "_interactor", interactor);
             EditorAssets.SetReference(tipsUI, "_inventory", raccoon.GetComponent<Inventory>());
+            EditorAssets.SetReference(systems.GetComponentInChildren<DenIndicatorUI>(), "_inventory",
+                raccoon.GetComponent<Inventory>());
         }
 
         private static void DisableOtherMainCameras(GameObject cameraRig)

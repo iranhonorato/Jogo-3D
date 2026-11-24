@@ -30,7 +30,7 @@ namespace Guaxinim.Tests
         }
 
         [Test]
-        public void Stars_WithAlertAndSlow_IsOne()
+        public void Stars_ChasedAndSlow_IsOne()
         {
             LevelResult result = LevelResult.Create(200f, 120f, true, true, 0, 100);
 

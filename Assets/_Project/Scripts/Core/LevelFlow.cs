@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Guaxinim.Items;
 using Guaxinim.Player;
+using Guaxinim.Shared;
 using UnityEngine;
 
 namespace Guaxinim.Core
@@ -40,8 +41,8 @@ namespace Guaxinim.Core
 
         public LevelData Level => _level;
 
-        // TODO(passo 3.3): o AlertManager marca quando um alerta geral dispara (estrela "sem alerta").
-        public bool HadAlert { get; private set; }
+        /// <summary>Algum inimigo perseguiu o guaxinim nesta tentativa (perde a estrela "sem ser perseguido").</summary>
+        public bool WasChased { get; private set; }
 
         private void Awake()
         {
@@ -63,6 +64,8 @@ namespace Guaxinim.Core
             {
                 _shoppingList.OnCompleted += HandleListCompleted;
             }
+
+            ChaseReports.OnChaseStarted += HandleChaseStarted;
         }
 
         private void Update()
@@ -84,7 +87,11 @@ namespace Guaxinim.Core
             {
                 _shoppingList.OnCompleted -= HandleListCompleted;
             }
+
+            ChaseReports.OnChaseStarted -= HandleChaseStarted;
         }
+
+        private void HandleChaseStarted() => WasChased = true;
 
         private void HandlePlayerCaught()
         {
@@ -108,7 +115,7 @@ namespace Guaxinim.Core
 
             IsLevelOver = true;
             Result = LevelResult.Create(ElapsedSeconds, _level.TargetTimeSeconds, _shoppingList.Progress.IsComplete,
-                HadAlert, _shoppingList.Progress.BonusCount, _data.PointsPerBonusItem);
+                WasChased, _shoppingList.Progress.BonusCount, _data.PointsPerBonusItem);
             IsNewRecord = SaveSystem.RecordLevelResult(_level.Id, Result.Stars, Result.ElapsedSeconds); // libera a próxima fase
             Time.timeScale = 0f; // o mundo para atrás da tela de resultado; o SceneLoader volta a 1
             OnLevelWon?.Invoke();
