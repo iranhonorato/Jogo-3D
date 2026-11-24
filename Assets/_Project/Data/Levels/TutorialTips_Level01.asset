@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eca91c1255f3884b9800206b468abef, type: 3}
+  m_Name: TutorialTips_Level01
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Core.TutorialTipsData
+  _displaySeconds: 4
+  _tips:
+  - _text: "WASD anda em sil\xEAncio"
+    _trigger: 0
+    _triggerSeconds: 1
+  - _text: Shift corre, mas faz barulho
+    _trigger: 0
+    _triggerSeconds: 7
+  - _text: E pega os itens da lista
+    _trigger: 1
+    _triggerSeconds: 0
+  - _text: "Leve os itens at\xE9 a toca"
+    _trigger: 2
+    _triggerSeconds: 0
+  - _text: "Lixeiras escondem voc\xEA (E)"
+    _trigger: 3
+    _triggerSeconds: 0

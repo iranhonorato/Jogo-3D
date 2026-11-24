@@ -152,6 +152,7 @@ GameObject:
   - component: {fileID: 7136754089774412259}
   - component: {fileID: 7746685670434438030}
   - component: {fileID: 7000057843150100651}
+  - component: {fileID: 3986946913466164638}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -265,3 +266,24 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!114 &3986946913466164638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7502759139250300869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c33298618e1acb74a980abf384399838, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.CameraSystem.ObstacleFader
+  _target: {fileID: 0}
+  _obstacleMask:
+    serializedVersion: 2
+    m_Bits: 256
+  _fadePairs:
+  - _sourceMaterialName: M_Env_Kit
+    _fadedMaterial: {fileID: 2100000, guid: b1216ab49d485c240905133350e63fa9, type: 2}
+  _castRadius: 0.5
+  _targetHeight: 0.3

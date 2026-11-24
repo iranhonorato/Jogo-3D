@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b647779ce5a98be418cb88221589460d, type: 3}
+  m_Name: UITheme
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.UI.UITheme
+  _normalBackground: {r: 0.16470589, g: 0.12156863, b: 0.23921569, a: 1}
+  _normalText: {r: 1, g: 0.8784314, b: 0.7019608, a: 1}
+  _normalOutline: {r: 0.5411765, g: 0.45490196, b: 0.6901961, a: 1}
+  _selectedBackground: {r: 1, g: 0.78431374, b: 0.3019608, a: 1}
+  _selectedText: {r: 0.12156863, g: 0.07058824, b: 0.14901961, a: 1}
+  _selectedOutline: {r: 1, g: 0.94509804, b: 0.8392157, a: 1}
+  _selectedScale: 1.08
+  _pressedBackground: {r: 0.8509804, g: 0.6039216, b: 0.11764706, a: 1}
+  _disabledBackground: {r: 0.5, g: 0.5, b: 0.55, a: 0.4}
+  _disabledText: {r: 0.78, g: 0.76, b: 0.82, a: 1}
+  _thinOutline: 1.5
+  _thickOutline: 4
+  _selectionArrow: "\u25BA"

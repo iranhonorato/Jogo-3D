@@ -483,7 +483,7 @@ GameObject:
   - component: {fileID: 2460089505054489601}
   - component: {fileID: 6752677289022188063}
   m_Layer: 7
-  m_Name: SeuZe
+  m_Name: Janitor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -564,7 +564,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c773f3c8a41bc04aab73d1615782081, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Guards.GuardAI
-  _data: {fileID: 11400000, guid: eb6a211b0f4978043bce0a15baf0de52, type: 2}
+  _data: {fileID: 11400000, guid: d3e2fa8d33db54447981da91efc26878, type: 2}
   _waypoints: []
   _vision: {fileID: 1460352643743972036}
   _meter: {fileID: 2460089505054489601}

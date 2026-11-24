@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8032135921367071946}
-  - component: {fileID: 8592826939441569127}
-  - component: {fileID: 3273990974121639435}
+  - component: {fileID: 8278889295792389144}
+  - component: {fileID: 2985669576476877024}
   m_Layer: 0
   m_Name: Den_Manhole
   m_TagString: Untagged
@@ -34,7 +34,7 @@ Transform:
   - {fileID: 1113927229235094771}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &8592826939441569127
+--- !u!65 &8278889295792389144
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -55,7 +55,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.2, y: 1, z: 1.2}
   m_Center: {x: 0, y: 0.5, z: 0}
---- !u!114 &3273990974121639435
+--- !u!114 &2985669576476877024
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

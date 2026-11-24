@@ -18,3 +18,4 @@ MonoBehaviour:
   _volume: 0
   _isFragile: 0
   _isConsumable: 1
+  _effect: {fileID: 11400000, guid: 99aea7419bb1c9f44ae3a1aeb5e98390, type: 2}

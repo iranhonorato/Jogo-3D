@@ -14,7 +14,7 @@ namespace Guaxinim.EditorTools
         private static readonly Color BackgroundColor = new Color(0.06f, 0.05f, 0.09f);
 
         [MenuItem("Tools/Guaxinim/Montar Menu e Mapa")]
-        private static void BuildMenuScenes()
+        internal static void BuildMenuScenes()
         {
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
             {

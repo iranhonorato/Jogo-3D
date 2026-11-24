@@ -59,7 +59,7 @@ namespace Guaxinim.EditorTools
         private static readonly Color BackgroundColor = new Color(0.06f, 0.05f, 0.09f);
 
         [MenuItem("Tools/Guaxinim/Montar Fase 1")]
-        private static void BuildLevel()
+        internal static void BuildLevel()
         {
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
             {

@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: efd2d3347e3ad4048a780040b1e20088, type: 3}
-  m_Name: GuardData
+  m_Name: GuardData_Janitor
   m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Guards.GuardData
-  _patrolSpeed: 2
+  _patrolSpeed: 1
   _waypointPauseSeconds: 2.5
   _lookAroundAngleDegrees: 60
   _lookAroundPeriodSeconds: 2.5
   _arrivalDistance: 0.3
-  _suspiciousSpeed: 3
+  _suspiciousSpeed: 1.5
   _suspiciousLookSeconds: 4
-  _chaseSpeed: 5.5
+  _chaseSpeed: 2.75
   _lostSightGraceSeconds: 0.75
   _chaseRepathSeconds: 0.2
   _catchDistance: 1
-  _searchSpeed: 3
+  _searchSpeed: 1.5
   _searchLookSeconds: 6
