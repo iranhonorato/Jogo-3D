@@ -119,6 +119,7 @@ namespace Guaxinim.EditorTools
             GameObject raccoon = Place(GreyboxRaccoonFactory.PrefabPath, root, start, yawDegrees);
             EditorAssets.SetReference(systems.GetComponent<LevelFlow>(), "_player", raccoon.GetComponent<PlayerState>());
             EditorAssets.SetReference(systems.GetComponent<ShoppingListHighlighter>(), "_player", raccoon.transform);
+            EditorAssets.SetReference(systems.GetComponent<FlashlightBudget>(), "_player", raccoon.transform);
             ConnectHud(systems, raccoon);
 
             GameObject cameraRig = Place(CameraRigFactory.PerspectivePath, root, Vector3.zero, 0f);

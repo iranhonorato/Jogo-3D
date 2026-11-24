@@ -64,6 +64,7 @@ namespace Guaxinim.EditorTools
             var shoppingList = systems.AddComponent<ShoppingList>();
             var highlighter = systems.AddComponent<ShoppingListHighlighter>();
             EditorAssets.SetReference(highlighter, "_shoppingList", shoppingList);
+            systems.AddComponent<Guards.FlashlightBudget>(); // o guaxinim é ligado na montagem da fase
             var flow = systems.AddComponent<LevelFlow>();
             EditorAssets.SetReference(flow, "_data", EditorAssets.LoadOrCreate<LevelFlowData>(FlowDataPath));
             EditorAssets.SetReference(flow, "_shoppingList", shoppingList);
