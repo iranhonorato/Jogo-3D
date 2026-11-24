@@ -1,3 +1,4 @@
+using Guaxinim.Animation;
 using Guaxinim.Guards;
 using Guaxinim.Noise;
 using Guaxinim.Shared;
@@ -56,8 +57,9 @@ namespace Guaxinim.EditorTools
             RenameLegacyAssets();
             GuardData guardData = EditorAssets.LoadOrCreate<GuardData>(GuardDataPath);
             GuardData janitorData = LoadOrCreateJanitorData(guardData);
-            CreateGuardPrefab("Guard", GuardModelPath, GuardPrefabPath, guardData);
-            CreateGuardPrefab("Janitor", SeuZeModelPath, JanitorPrefabPath, janitorData);
+            CreateGuardPrefab("Guard", GuardModelPath, GuardPrefabPath, guardData, MotionDataFactory.LoadOrCreateGuard());
+            CreateGuardPrefab("Janitor", SeuZeModelPath, JanitorPrefabPath, janitorData,
+                MotionDataFactory.LoadOrCreateJanitor());
         }
 
         private static void RenameLegacyAssets()
@@ -111,7 +113,8 @@ namespace Guaxinim.EditorTools
             speed.floatValue *= JanitorSpeedFactor;
         }
 
-        private static void CreateGuardPrefab(string name, string modelPath, string prefabPath, GuardData data)
+        private static void CreateGuardPrefab(string name, string modelPath, string prefabPath, GuardData data,
+            MotionData motionData)
         {
             var root = new GameObject(name);
             ConfigureAgent(root.AddComponent<NavMeshAgent>());
@@ -128,10 +131,22 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(guard, "_hearing", root.AddComponent<NoiseListener>());
             GameObject model = AddModel(root.transform, modelPath);
             AddFlashlight(root.transform, model, visionData);
+            AddMotion(root, model, motionData, meter);
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Guard));
 
             PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
             Object.DestroyImmediate(root);
+        }
+
+        /// <summary>Animação procedural de cada tipo e o pulinho de susto quando o medidor enche.</summary>
+        private static void AddMotion(GameObject root, GameObject model, MotionData motionData, DetectionMeter meter)
+        {
+            var motion = root.AddComponent<ProceduralMotion>();
+            EditorAssets.SetReference(motion, "_data", motionData);
+            EditorAssets.SetReference(motion, "_model", model.transform);
+            var startle = root.AddComponent<DetectionStartle>();
+            EditorAssets.SetReference(startle, "_meter", meter);
+            EditorAssets.SetReference(startle, "_motion", motion);
         }
 
         private static void ConfigureAgent(NavMeshAgent agent)

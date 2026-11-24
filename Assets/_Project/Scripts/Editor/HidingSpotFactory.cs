@@ -8,7 +8,7 @@ namespace Guaxinim.EditorTools
     /// <summary>
     /// Gera o prefab greybox da lixeira (passo 2.8, GDD §9) em Prefabs/Hazards/: corpo e tampa em cilindro,
     /// collider sólido na layer Interactable (o E encontra; seguranças desviam pelo NavMesh) e o ponto de
-    /// saída à frente (+Z).
+    /// saída à frente (+Z). A tampa (Lid) tem o pivô na dobradiça, e o BinLidAnimator a abre ao entrar e sair.
     /// </summary>
     public static class HidingSpotFactory
     {
@@ -35,16 +35,27 @@ namespace Guaxinim.EditorTools
             body.height = Height;
             body.center = Vector3.up * Height / 2f;
 
-            AddCylinder(root.transform, "Body", Radius, Height, 0f,
+            // Visual separado do collider, para balançar; a tampa gira numa dobradiça no fundo (Etapa 5.4).
+            var visual = new GameObject("Visual").transform;
+            visual.SetParent(root.transform, false);
+            AddCylinder(visual, "Body", Radius, Height, 0f,
                 EditorAssets.LoadOrCreateLitMaterial(BodyMaterialPath, BodyColor));
-            AddCylinder(root.transform, "Lid", Radius + LidOverhang, LidThickness, Height,
+            float lidRadius = Radius + LidOverhang;
+            var hinge = new GameObject("Lid").transform;
+            hinge.SetParent(visual, false);
+            hinge.localPosition = new Vector3(0f, Height, -lidRadius);
+            AddCylinder(hinge, "LidMesh", lidRadius, LidThickness, 0f,
                 EditorAssets.LoadOrCreateLitMaterial(LidMaterialPath, LidColor));
+            hinge.GetChild(0).localPosition += Vector3.forward * lidRadius;
 
             var exitPoint = new GameObject("ExitPoint").transform;
             exitPoint.SetParent(root.transform, false);
             exitPoint.localPosition = Vector3.forward * ExitDistance;
             var spot = root.AddComponent<HidingSpot>();
             EditorAssets.SetReference(spot, "_exitPoint", exitPoint);
+            var lidAnimator = root.AddComponent<BinLidAnimator>();
+            EditorAssets.SetReference(lidAnimator, "_lid", hinge);
+            EditorAssets.SetReference(lidAnimator, "_visual", visual);
 
             EditorAssets.SetLayerRecursively(root, LayerMask.NameToLayer(Layers.Interactable));
             PrefabUtility.SaveAsPrefabAsset(root, BinPrefabPath);

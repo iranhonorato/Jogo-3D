@@ -20,6 +20,9 @@ namespace Guaxinim.Player
 
         public event Action OnChanged;
 
+        /// <summary>Um item (ou consumível) acabou de ser pego; a animação do guaxinim escuta.</summary>
+        public event Action<PickupItem> OnItemPickedUp;
+
         public IReadOnlyList<PickupItem> Items => _items;
         public float CurrentWeight { get; private set; }
         public float CurrentVolume { get; private set; }
@@ -60,7 +63,8 @@ namespace Guaxinim.Player
             }
 
             _items.Add(item);
-            item.Stow();
+            item.StowInto(transform);
+            OnItemPickedUp?.Invoke(item);
             Recalculate();
             return true;
         }
@@ -124,7 +128,8 @@ namespace Guaxinim.Player
                 Debug.LogError($"Consumable {item.Data.name} has no Effect assigned.", item);
             }
 
-            Destroy(item.gameObject);
+            item.ConsumeInto(transform); // voa até o guaxinim e some
+            OnItemPickedUp?.Invoke(item);
         }
 
         public bool CanCarry(ItemData item) =>

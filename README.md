@@ -63,6 +63,7 @@ Tools/Blender/  Scripts bpy que geram os modelos
 | `Guards` | IA do segurança, visão, detecção e alerta geral (`States/` guarda a máquina de estados) |
 | `Hazards` | Robô aspirador, lixeiras e câmeras de segurança |
 | `Camera` | Câmera isométrica e transparência das prateleiras |
+| `Animation` | Animações procedurais dos personagens sem esqueleto (passo, inclinação, respiração, susto) e o arco do item coletado |
 | `UI` | HUD e menus |
 | `Shared` | Interfaces e tipos usados por mais de um módulo |
 | `Editor` | Ferramentas do Editor (não entram no build) |

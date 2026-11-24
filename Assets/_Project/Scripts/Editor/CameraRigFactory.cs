@@ -22,8 +22,8 @@ namespace Guaxinim.EditorTools
         private const float PitchDegrees = 45f;
         private const float YawDegrees = 45f;
         private const float PerspectiveFieldOfView = 25f;
-        private const float PerspectiveDistance = 28f;
-        private const float OrthographicSize = 6f;
+        private const float PerspectiveDistance = 18f; // perto o bastante para ver o guaxinim, e o cone de 9 m ainda cabe
+        private const float OrthographicSize = 4.5f;
         private const float OrthographicDistance = 20f;
         private const float NearClip = 1f;
         private const float FarClip = 100f;
