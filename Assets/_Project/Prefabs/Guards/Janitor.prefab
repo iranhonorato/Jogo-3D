@@ -482,6 +482,8 @@ GameObject:
   - component: {fileID: 1460352643743972036}
   - component: {fileID: 2460089505054489601}
   - component: {fileID: 6752677289022188063}
+  - component: {fileID: 5913150116515967868}
+  - component: {fileID: 1882392676390918838}
   m_Layer: 7
   m_Name: Janitor
   m_TagString: Untagged
@@ -611,6 +613,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f549451ff40d23e42abde8334290ed55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Noise.NoiseListener
+--- !u!114 &5913150116515967868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8476069932276689431}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ea826d09c1b82b43a872aff4cfa996e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Animation.ProceduralMotion
+  _data: {fileID: 11400000, guid: 385606a5e4cf1784ba9ca25b751a2d49, type: 2}
+  _model: {fileID: 6895889831561467866}
+--- !u!114 &1882392676390918838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8476069932276689431}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07ef099c67eed9c4b9f6ea8f2f2215b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Guards.DetectionStartle
+  _meter: {fileID: 2460089505054489601}
+  _motion: {fileID: 5913150116515967868}
 --- !u!1001 &6357295114679644209
 PrefabInstance:
   m_ObjectHideFlags: 0

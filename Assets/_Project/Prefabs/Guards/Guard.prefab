@@ -352,6 +352,8 @@ GameObject:
   - component: {fileID: 3434282853962705449}
   - component: {fileID: 3662474010511063886}
   - component: {fileID: 6656983583190780619}
+  - component: {fileID: 7080263434199362028}
+  - component: {fileID: 8698958224369422247}
   m_Layer: 7
   m_Name: Guard
   m_TagString: Untagged
@@ -481,6 +483,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f549451ff40d23e42abde8334290ed55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Noise.NoiseListener
+--- !u!114 &7080263434199362028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6692697134681466285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ea826d09c1b82b43a872aff4cfa996e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Animation.ProceduralMotion
+  _data: {fileID: 11400000, guid: ec5c02e76e7d3734db5143ff3500dfe7, type: 2}
+  _model: {fileID: 420375050008482382}
+--- !u!114 &8698958224369422247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6692697134681466285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07ef099c67eed9c4b9f6ea8f2f2215b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Guards.DetectionStartle
+  _meter: {fileID: 3662474010511063886}
+  _motion: {fileID: 7080263434199362028}
 --- !u!1 &7177715793320131294
 GameObject:
   m_ObjectHideFlags: 0

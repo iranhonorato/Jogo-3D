@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/_Project/Scenes/Levels/Level_01_Mercadinho.unity
     guid: 9aa48328dccb2bf4bb0aef473b363100
   - enabled: 1
+    path: Assets/_Project/Scenes/Levels/Level_02_XOXO.unity
+    guid: 3114cb2e9944e7d42941eb6b2d7a5895
+  - enabled: 1
     path: Assets/_Project/Scenes/Ending.unity
     guid: 7a16be110f4d06e4fbe9cba55c3b8c04
   m_configObjects:

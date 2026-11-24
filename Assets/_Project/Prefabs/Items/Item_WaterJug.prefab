@@ -250,3 +250,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Items.PickupItem
   _data: {fileID: 11400000, guid: 47f466767f2214b4283a6fcb2e205006, type: 2}
   _highlight: {fileID: 1347486066514360910}
+  _flightSeconds: 0.3
+  _flightArcHeight: 0.5
+  _bagHeight: 0.35
+  _endScale: 0.2

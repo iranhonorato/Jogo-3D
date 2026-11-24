@@ -91,7 +91,7 @@ MonoBehaviour:
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 25
-    OrthographicSize: 6
+    OrthographicSize: 4.5
     NearClipPlane: 1
     FarClipPlane: 100
     Dutch: 0

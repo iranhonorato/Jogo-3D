@@ -84,7 +84,7 @@ namespace Guaxinim.EditorTools
         {
             GameObject panel = EditorUI.CreateScreenPanel("CaughtCanvas", parent, CaughtSortingOrder);
 
-            Text title = EditorUI.CreateText("Title", panel.transform, CaughtTitle, CaughtTitleFontSize,
+            Text title = EditorUI.CreateTitle("Title", panel.transform, CaughtTitle, CaughtTitleFontSize,
                 EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.84f), new Vector2(1500f, 160f));
             EditorUI.AddOutline(title.gameObject);
@@ -118,7 +118,7 @@ namespace Guaxinim.EditorTools
         {
             GameObject panel = EditorUI.CreateScreenPanel("ResultCanvas", parent, ResultSortingOrder);
 
-            Text title = EditorUI.CreateText("Title", panel.transform, WinTitle, TitleFontSize, EditorUI.LightTextColor);
+            Text title = EditorUI.CreateTitle("Title", panel.transform, WinTitle, TitleFontSize, EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.89f), new Vector2(1400f, 140f));
             EditorUI.AddOutline(title.gameObject);
             var stars = new Object[StarCount];
@@ -165,7 +165,7 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(pause, "_levelFlow", flow);
 
             GameObject panel = EditorUI.CreateScreenPanel("PauseCanvas", parent, PauseSortingOrder);
-            Text title = EditorUI.CreateText("Title", panel.transform, PauseTitle, TitleFontSize, EditorUI.LightTextColor);
+            Text title = EditorUI.CreateTitle("Title", panel.transform, PauseTitle, TitleFontSize, EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.84f), new Vector2(1000f, 140f));
             EditorUI.AddOutline(title.gameObject);
             AddControlsBox(panel.transform);

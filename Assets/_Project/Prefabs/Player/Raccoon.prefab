@@ -189,6 +189,8 @@ GameObject:
   - component: {fileID: 9024202737741693246}
   - component: {fileID: 4190801306820205234}
   - component: {fileID: 3981057151868319135}
+  - component: {fileID: 3338139650850223380}
+  - component: {fileID: 3513751165176537692}
   m_Layer: 6
   m_Name: Raccoon
   m_TagString: Untagged
@@ -396,6 +398,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Player.RaccoonHiding
   _data: {fileID: 11400000, guid: 12353b04fdf4c9b4bb1685517b0889e7, type: 2}
   _model: {fileID: 5509586063786277348}
+  _jumpArcHeight: 0.7
+--- !u!114 &3338139650850223380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4273513739543911675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ea826d09c1b82b43a872aff4cfa996e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Animation.ProceduralMotion
+  _data: {fileID: 11400000, guid: 892ab87ac8b89014c8e542dbd00b0e9f, type: 2}
+  _model: {fileID: 5133588977552204638}
+--- !u!114 &3513751165176537692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4273513739543911675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f192b219f3bdb20459b38e56873925fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Player.RaccoonPickupSquash
+  _motion: {fileID: 3338139650850223380}
 --- !u!1 &4807260146975927100
 GameObject:
   m_ObjectHideFlags: 0

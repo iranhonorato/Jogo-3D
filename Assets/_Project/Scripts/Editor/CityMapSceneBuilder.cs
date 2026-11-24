@@ -41,7 +41,7 @@ namespace Guaxinim.EditorTools
 
             GameObject mapPanel = EditorUI.CreateScreenPanel("MapCanvas", root, 0);
             EditorUI.SetPanelOpacity(mapPanel, 0f); // o mapa ilustrado aparece inteiro
-            Text title = EditorUI.CreateText("Title", mapPanel.transform, MapTitle, TitleFontSize, EditorUI.LightTextColor);
+            Text title = EditorUI.CreateTitle("Title", mapPanel.transform, MapTitle, TitleFontSize, EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.88f), new Vector2(1400f, 140f));
             EditorUI.AddOutline(title.gameObject);
 
@@ -56,7 +56,7 @@ namespace Guaxinim.EditorTools
 
             GameObject briefingPanel = EditorUI.CreateScreenPanel("BriefingCanvas", root, BriefingSortingOrder);
             EditorUI.SetPanelOpacity(briefingPanel, BriefingVeilOpacity); // o mesmo mapa, escurecido
-            Text briefingTitle = EditorUI.CreateText("Title", briefingPanel.transform, string.Empty, TitleFontSize,
+            Text briefingTitle = EditorUI.CreateTitle("Title", briefingPanel.transform, string.Empty, TitleFontSize,
                 EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)briefingTitle.transform, new Vector2(0.5f, 0.84f), new Vector2(1500f, 140f));
             EditorUI.AddOutline(briefingTitle.gameObject);

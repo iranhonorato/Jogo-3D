@@ -70,6 +70,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Items.PickupItem
   _data: {fileID: 11400000, guid: 56122c66ef289e5438c7e0d6fd9bbc50, type: 2}
   _highlight: {fileID: 2740477572280457111}
+  _flightSeconds: 0.3
+  _flightArcHeight: 0.5
+  _bagHeight: 0.35
+  _endScale: 0.2
 --- !u!1 &2740477572280457111
 GameObject:
   m_ObjectHideFlags: 0
