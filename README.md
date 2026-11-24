@@ -116,6 +116,7 @@ Todo asset de terceiros ou gerado por IA entra aqui, com fonte e licença (GDD, 
 | Asset | Autor | Fonte | Licença |
 | --- | --- | --- | --- |
 | Modelos e texturas em `Art/Models/` e `Art/Textures/` (personagens, câmera de segurança, kit modular) | Gerados por scripts Python do Blender escritos com o Claude (Anthropic) | `Tools/Blender/` | Feitos para este projeto |
+| Ilustração de fundo do menu principal (`Art/UI/Background_MainMenu.jpg`) | Gerada por IA (ferramenta e prompt a confirmar) | _a preencher_ | _a preencher_ |
 
 ### Código de terceiros
 

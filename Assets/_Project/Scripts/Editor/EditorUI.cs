@@ -13,6 +13,7 @@ namespace Guaxinim.EditorTools
     {
         public const int UILayer = 5;
         public const int ButtonFontSize = 44;
+        public const int BackgroundSortingOrder = -1;
 
         private const string BuiltinFontName = "LegacyRuntime.ttf";
 
@@ -30,6 +31,25 @@ namespace Guaxinim.EditorTools
         // para o teclado e o controle sempre mostrarem onde está a seleção.
         private static readonly Color ButtonIdleTint = new Color(0.8f, 0.8f, 0.8f);
         private static readonly Color ButtonPressedTint = new Color(0.6f, 0.6f, 0.6f);
+
+        /// <summary>
+        /// Ilustração de fundo, atrás de todas as telas da cena. Cobre a tela inteira em qualquer proporção
+        /// (corta as bordas em vez de esticar).
+        /// </summary>
+        public static void CreateBackground(Transform parent, Sprite sprite)
+        {
+            GameObject canvas = CreateCanvas("BackgroundCanvas", parent, BackgroundSortingOrder);
+            var imageObject = new GameObject("Background", typeof(RectTransform)) { layer = UILayer };
+            imageObject.transform.SetParent(canvas.transform, false);
+            Stretch((RectTransform)imageObject.transform);
+
+            var image = imageObject.AddComponent<Image>();
+            image.sprite = sprite;
+            image.raycastTarget = false;
+            var fitter = imageObject.AddComponent<AspectRatioFitter>();
+            fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            fitter.aspectRatio = sprite.rect.width / sprite.rect.height;
+        }
 
         public static GameObject CreateCanvas(string name, Transform parent, int sortingOrder)
         {

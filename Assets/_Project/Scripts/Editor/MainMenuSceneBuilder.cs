@@ -1,15 +1,22 @@
 using Guaxinim.UI;
+using UnityEditor;
 using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Guaxinim.EditorTools
 {
-    /// <summary>Monta a tela do menu principal (GDD §13): Jogar, Como jogar, Créditos e Sair, mais os dois painéis de texto.</summary>
+    /// <summary>
+    /// Monta a tela do menu principal (GDD §13): Jogar, Como jogar, Créditos e Sair, mais os dois painéis de texto.
+    /// Fica sobre a ilustração de fundo, com o título e os botões na coluna da esquerda, que é a parte vazia da
+    /// imagem, para os personagens aparecerem inteiros.
+    /// </summary>
     internal static class MainMenuSceneBuilder
     {
-        private const string GameTitle = "Operação Guaxinim";
-        private const int GameTitleFontSize = 130;
+        private const string BackgroundPath = "Assets/_Project/Art/UI/Background_MainMenu.jpg";
+        private const string GameTitle = "Operação\nGuaxinim";
+        private const int GameTitleFontSize = 104;
+        private const float MenuColumnX = 0.175f;
         private const int InfoTitleFontSize = 80;
         private const int InfoBodyFontSize = 36;
         private const string BackText = "Voltar";
@@ -38,16 +45,18 @@ namespace Guaxinim.EditorTools
         public static void Build(Transform root)
         {
             var menu = root.gameObject.AddComponent<MainMenuUI>();
+            AddBackground(root);
 
             GameObject mainPanel = EditorUI.CreateScreenPanel("MainCanvas", root, 0);
+            mainPanel.GetComponent<Image>().color = Color.clear; // sem o véu escuro: a ilustração aparece inteira
             Text title = EditorUI.CreateText("Title", mainPanel.transform, GameTitle, GameTitleFontSize, EditorUI.LightTextColor);
-            EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.8f), new Vector2(1700f, 200f));
+            EditorUI.Place((RectTransform)title.transform, new Vector2(MenuColumnX, 0.76f), new Vector2(700f, 320f));
             EditorUI.AddOutline(title.gameObject);
 
-            Button play = EditorUI.CreateButton("PlayButton", mainPanel.transform, "Jogar", new Vector2(0.5f, 0.56f));
-            Button howToPlay = EditorUI.CreateButton("HowToPlayButton", mainPanel.transform, "Como jogar", new Vector2(0.5f, 0.43f));
-            Button credits = EditorUI.CreateButton("CreditsButton", mainPanel.transform, "Créditos", new Vector2(0.5f, 0.3f));
-            Button quit = EditorUI.CreateButton("QuitButton", mainPanel.transform, "Sair", new Vector2(0.5f, 0.17f));
+            Button play = CreateMenuButton(mainPanel.transform, "PlayButton", "Jogar", 0.52f);
+            Button howToPlay = CreateMenuButton(mainPanel.transform, "HowToPlayButton", "Como jogar", 0.39f);
+            Button credits = CreateMenuButton(mainPanel.transform, "CreditsButton", "Créditos", 0.26f);
+            Button quit = CreateMenuButton(mainPanel.transform, "QuitButton", "Sair", 0.13f);
             UnityEventTools.AddPersistentListener(play.onClick, menu.Play);
             UnityEventTools.AddPersistentListener(howToPlay.onClick, menu.ShowHowToPlay);
             UnityEventTools.AddPersistentListener(credits.onClick, menu.ShowCredits);
@@ -66,6 +75,25 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(menu, "_creditsBackButton", creditsBack);
             EditorAssets.SetReference(menu, "_quitButton", quit.gameObject);
         }
+
+        /// <summary>
+        /// A ilustração é carregada aqui, depois da cena nova: o NewScene descarrega os assets sem uso, e uma
+        /// referência carregada antes viraria null. Sem a imagem, o menu fica com a cor de fundo da câmera.
+        /// </summary>
+        private static void AddBackground(Transform root)
+        {
+            var background = AssetDatabase.LoadAssetAtPath<Sprite>(BackgroundPath);
+            if (background == null)
+            {
+                Debug.LogWarning($"Main menu background not found at {BackgroundPath}; using the plain color.");
+                return;
+            }
+
+            EditorUI.CreateBackground(root, background);
+        }
+
+        private static Button CreateMenuButton(Transform parent, string name, string label, float heightAnchor) =>
+            EditorUI.CreateButton(name, parent, label, new Vector2(MenuColumnX, heightAnchor));
 
         /// <summary>Painel com título, texto e o botão Voltar, que leva ao menu principal.</summary>
         private static GameObject CreateInfoPanel(Transform root, string canvasName, string titleText, string bodyText,
