@@ -5,12 +5,18 @@ using UnityEngine;
 namespace Guaxinim.Core
 {
     /// <summary>
-    /// Dados de uma fase (GDD §11, §12 e §14.3): lista de compras e tempo-alvo da estrela. Cogumelos e
-    /// música entram com o modo cogumelo e o áudio. Somente leitura durante o jogo.
+    /// Dados de uma fase (GDD §11, §12 e §14.3): identidade (save e cena), lista de compras e tempo-alvo da
+    /// estrela. Cogumelos e música entram com o modo cogumelo e o áudio. Somente leitura durante o jogo.
     /// </summary>
     [CreateAssetMenu(fileName = "LevelData", menuName = "Guaxinim/Level Data")]
     public class LevelData : ScriptableObject
     {
+        [Tooltip("Identificador da fase no save. Não mude depois de publicar: o progresso fica ligado a ele")]
+        [SerializeField] private string _id = string.Empty;
+
+        [Tooltip("Nome da cena da fase no Build Profile. Vazio: a fase ainda não tem cena e aparece como \"Em breve\"")]
+        [SerializeField] private string _sceneName = string.Empty;
+
         [Tooltip("Nome que o jogador vê")]
         [SerializeField] private string _displayName = "Fase";
 
@@ -20,6 +26,9 @@ namespace Guaxinim.Core
         [Tooltip("Segundos: terminar abaixo disto dá uma estrela (GDD §12)")]
         [SerializeField, Min(1f)] private float _targetTimeSeconds = 120f;
 
+        public string Id => _id;
+        public string SceneName => _sceneName;
+        public bool IsPlayable => !string.IsNullOrEmpty(_sceneName);
         public string DisplayName => _displayName;
         public float TargetTimeSeconds => _targetTimeSeconds;
         public IReadOnlyList<ItemData> ShoppingList => _shoppingList;

@@ -51,6 +51,17 @@ namespace Guaxinim.Tests
         }
 
         [Test]
+        public void RecordResult_EmptyLevelId_IsIgnored()
+        {
+            var save = new SaveData();
+
+            save.RecordResult(string.Empty, 3, 50f);
+
+            Assert.IsNull(save.Find(string.Empty));
+            Assert.IsFalse(SaveData.FromJson(save.ToJson()).IsCompleted(string.Empty));
+        }
+
+        [Test]
         public void FromJson_EmptyText_StartsFresh()
         {
             SaveData loaded = SaveData.FromJson(string.Empty);

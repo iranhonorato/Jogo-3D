@@ -99,6 +99,7 @@ namespace Guaxinim.Core
             IsLevelOver = true;
             Result = LevelResult.Create(ElapsedSeconds, _level.TargetTimeSeconds, _shoppingList.Progress.IsComplete,
                 HadAlert, _shoppingList.Progress.BonusCount, _data.PointsPerBonusItem);
+            SaveSystem.RecordLevelResult(_level.Id, Result.Stars, Result.ElapsedSeconds); // libera a próxima fase
             Time.timeScale = 0f; // o mundo para atrás da tela de resultado; o SceneLoader volta a 1
             OnLevelWon?.Invoke();
         }

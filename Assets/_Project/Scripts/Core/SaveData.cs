@@ -33,8 +33,16 @@ namespace Guaxinim.Core
 
         public string ToJson() => JsonUtility.ToJson(this);
 
-        public void RecordResult(string levelId, int stars, float timeSeconds) =>
+        /// <summary>Guarda o resultado da fase. Fase sem id (a Sandbox) não entra no save.</summary>
+        public void RecordResult(string levelId, int stars, float timeSeconds)
+        {
+            if (string.IsNullOrEmpty(levelId))
+            {
+                return;
+            }
+
             GetOrCreate(levelId).Record(stars, timeSeconds);
+        }
 
         /// <summary>Resultado salvo da fase, ou null se nunca foi completa.</summary>
         public LevelRecord Find(string levelId)

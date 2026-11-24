@@ -16,7 +16,24 @@ namespace Guaxinim.Core
 
         public static void RecordLevelResult(string levelId, int stars, float timeSeconds)
         {
+            if (string.IsNullOrEmpty(levelId))
+            {
+                return; // fase sem id (a Sandbox) não tem progresso
+            }
+
             Data.RecordResult(levelId, stars, timeSeconds);
+            Persist();
+        }
+
+        /// <summary>Apaga todo o progresso (menu do Editor, para testar o desbloqueio das fases do começo).</summary>
+        public static void Clear()
+        {
+            _data = new SaveData();
+            Persist();
+        }
+
+        private static void Persist()
+        {
             PlayerPrefs.SetString(SaveKey, Data.ToJson());
             PlayerPrefs.Save(); // no WebGL, grava no IndexedDB do navegador
         }
