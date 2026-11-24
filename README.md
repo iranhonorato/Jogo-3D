@@ -61,7 +61,7 @@ Tools/Blender/  Scripts bpy que geram os modelos
 | `Guards` | IA do segurança e do faxineiro, visão, detecção e limite de lanternas acesas (`States/` guarda a máquina de estados) |
 | `Hazards` | Lixeiras |
 | `Camera` | Câmera isométrica e transparência das prateleiras |
-| `Audio` | Efeitos sonoros: escutam os eventos do guaxinim, da fase e da lixeira |
+| `Audio` | Efeitos sonoros (escutam os eventos do guaxinim, da fase e da lixeira), música de fundo e clique dos menus (`GameAudio`) |
 | `Animation` | Animações procedurais dos personagens sem esqueleto (passo, inclinação, respiração, susto) e o arco do item coletado |
 | `UI` | HUD, seta da toca, menus e a viagem no mapa da cidade |
 | `Shared` | Interfaces e tipos usados por mais de um módulo |
@@ -123,6 +123,7 @@ Todo asset de terceiros ou gerado por IA entra aqui, com fonte e licença (GDD, 
 | Mapa da cidade (`Art/UI/Background_CityMap.jpg`) | Desenhado por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_ui_backgrounds.py` | Feito para este projeto |
 | Ícones da HUD e do mapa (`Art/UI/Arrow_Den.png`, `Dot.png`, `Icon_Raccoon.png`) | Desenhados por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_ui_icons.py` | Feitos para este projeto |
 | Efeitos sonoros (`Audio/SFX/*.wav`) | Sintetizados por script com o NumPy, escrito com o Claude (Anthropic) | `Tools/Audio/make_sfx.py` | Feitos para este projeto |
+| Música de fundo (`Audio/Music/Music_Sneak.wav`) | Sintetizada por script com o NumPy, escrito com o Claude (Anthropic) | `Tools/Audio/make_music.py` | Feita para este projeto |
 | Degradê das poças de luz (`Art/Textures/Effects/LightPool_Gradient.png`) | Gerado por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_effect_textures.py` | Feito para este projeto |
 
 ### Código de terceiros

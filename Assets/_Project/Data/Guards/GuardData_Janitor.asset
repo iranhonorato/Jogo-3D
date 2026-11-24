@@ -19,7 +19,7 @@ MonoBehaviour:
   _arrivalDistance: 0.3
   _suspiciousSpeed: 1.5
   _suspiciousLookSeconds: 4
-  _chaseSpeed: 2.75
+  _chaseSpeed: 4.5
   _lostSightGraceSeconds: 0.75
   _chaseRepathSeconds: 0.2
   _catchDistance: 1

@@ -516,7 +516,7 @@ A história se passa em um supermercado à noite. A iluminação combina sombras
 - Música: menu, furtividade (calma), alerta (tensa) e modo cogumelo (distorcida).
 - Efeitos: passos andando e correndo, pegar item, largar item, vidro quebrando, assobio, aspirador, câmera detectando, lixeira (entrar e sair), detecção do segurança ("Ei!"), alerta geral, pego, entrega na toca, fase completa.
 - Todo asset de terceiros ou gerado por IA vai para a lista de **créditos no README**, com a fonte e a licença.
-- **Na entrega:** efeitos sintetizados por script (`Tools/Audio/make_sfx.py`): pisada correndo, assobio, pegar, largar, vidro quebrando, lixeira, entrega na toca, inimigo perseguindo, pego e fase completa. Sem música (§18).
+- **Na entrega:** efeitos sintetizados por script (`Tools/Audio/make_sfx.py`): pisada correndo, assobio, pegar, largar, vidro quebrando, lixeira, entrega na toca, inimigo perseguindo, pego, fase completa e clique dos menus; e uma música de furtividade em loop (`Tools/Audio/make_music.py`, lá menor, 96 bpm) que toca em todas as telas, sem recomeçar na troca de cena. Sem a música de alerta e sem o "Ei!" falado (§18).
 
 ---
 
@@ -606,6 +606,6 @@ Mudanças de rumo em relação ao texto acima, para o GDD continuar sendo a refe
 | 24/11/2026 | **Fases 4 e 5 redesenhadas** (blocos com corredor largo, caixas, ilhas e vãos estreitos), **rondas só em linha reta** e **seta para a toca** enquanto o guaxinim carrega algo; contorno dos itens da lista a 6 m. | As grades de gôndolas iguais eram monótonas e desorientavam, e nas fases grandes a câmera mostra só um pedaço do mercado. |
 | 24/11/2026 | **Poças de luz no chão** (quadrados aditivos com degradê, sem luz em tempo real) e alcance maior das 2 luzes da loja nas fases grandes. | As fases grandes ficavam escuras com 2 luzes, e o WebGL limita a 5 luzes em tempo real. |
 | 24/11/2026 | **Viagem no mapa:** depois de liberar uma fase, o guaxinim viaja pela estrada do mapa até o próximo mercado, que se acende, e o início da fase abre sozinho. Qualquer tecla pula. | Plano de próximos passos, Etapa 4: dar sensação de progresso entre as fases. |
-| 24/11/2026 | **Áudio só com efeitos sintetizados** (sem música e sem o "Ei!" falado). Os volumes ficam no `SoundData`. | Nenhum som de terceiros para creditar, e o prazo não comporta música. |
+| 24/11/2026 | **Áudio sintetizado por script:** efeitos, clique dos menus e uma música só, em loop (sem a música de alerta e sem o "Ei!" falado). Os volumes ficam no `SoundData` e no prefab `Resources/GameAudio`. | Nenhum som de terceiros para creditar, e o prazo não comporta uma trilha completa. |
 | 24/11/2026 | **Modelos novos:** guaxinim com mais detalhes, gôndolas roxas com potes e pacotes, e os 19 itens modelados no Blender (antes eram cubos coloridos). | Referências de arte do plano de próximos passos (rubrica 3). |
 | a decidir | Câmera em perspectiva ou ortográfica (§3.1; as fases usam a perspectiva) e o nome do jogo (§17). | Ainda em aberto. |
