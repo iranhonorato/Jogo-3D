@@ -26,11 +26,15 @@ namespace Guaxinim.Core
         [Tooltip("Segundos: terminar abaixo disto dá uma estrela (GDD §12)")]
         [SerializeField, Min(1f)] private float _targetTimeSeconds = 120f;
 
+        [Tooltip("Dicas do tutorial desta fase (a Fase 1). Vazio: a fase não mostra dicas")]
+        [SerializeField] private TutorialTipsData _tips;
+
         public string Id => _id;
         public string SceneName => _sceneName;
         public bool IsPlayable => !string.IsNullOrEmpty(_sceneName);
         public string DisplayName => _displayName;
         public float TargetTimeSeconds => _targetTimeSeconds;
+        public TutorialTipsData Tips => _tips;
         public IReadOnlyList<ItemData> ShoppingList => _shoppingList;
     }
 }

@@ -17,6 +17,7 @@ namespace Guaxinim.Items
 
         public ItemData Data => _data;
         public Vector3 InteractionPoint => transform.position;
+        public string PromptText => "Pegar";
 
         private void Awake()
         {

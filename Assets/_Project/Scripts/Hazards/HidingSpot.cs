@@ -16,6 +16,9 @@ namespace Guaxinim.Hazards
 
         public Vector3 InteractionPoint => transform.position;
 
+        /// <summary>Quem está dentro sai ("Sair"); quem está fora entra ("Esconder").</summary>
+        public string PromptText => _occupant != null ? "Sair" : "Esconder";
+
         private void Awake()
         {
             if (_exitPoint == null)

@@ -354,10 +354,17 @@ Cada fase é uma cena (`Level_01_Mercadinho`, etc.) com um `LevelData` (lista, t
 | Menu principal | Jogar, Como jogar, Créditos, Sair (Sair escondido no WebGL) |
 | Mapa da cidade | Fachadas dos mercados como botões; bloqueados em cinza; estrelas e melhor tempo de cada fase. Fase ainda sem cena aparece como "Em breve" |
 | Início da fase | Nome do mercado, lista de compras, tempo-alvo e melhor resultado, com botões Começar e Voltar. Aparece **no mapa da cidade**, depois de escolher uma fase liberada, e não dentro da cena da fase (reiniciar a fase não repete a tela) |
-| HUD | Lista (canto superior esquerdo), barras de peso e volume, contador de cogumelos (x/3, brilhando com "R" quando o poder está pronto), ícones de efeitos ativos, cronômetro, aviso de alerta geral |
-| Pausa | Continuar, Reiniciar fase, Mapa |
-| Pego | "Você foi pego!", e a fase reinicia após 1,5 s ou com um botão |
-| Resultado | Estrelas, tempo, itens bônus, botões Próxima fase e Mapa |
+| HUD | Lista (canto superior esquerdo), barras de peso e volume, contador de cogumelos (x/3, brilhando com "R" quando o poder está pronto), ícones de efeitos ativos, cronômetro, aviso de alerta geral. Também: a **indicação de interação** ("[E] Pegar", "[E] Esconder" ou "[E] Sair") sobre o objeto ao alcance do E, e as **dicas do tutorial** da Fase 1 em faixas curtas no topo (andar em silêncio, correr faz barulho, pegar itens, levar à toca, lixeiras), cada uma mostrada uma vez |
+| Pausa | Continuar, Reiniciar fase, Mapa e Menu inicial, com um quadro dos controles ao lado |
+| Pego | O jogo congela e, depois de 0,6 s, aparece "Você foi pego!" com o tempo, quantos itens da lista já tinham sido entregues e uma dica sorteada. Botões **Tentar de novo** (já selecionado, basta Enter ou A), Mapa e Menu inicial. A fase **não reinicia sozinha** |
+| Resultado | Estrelas (ganha: cheia, âmbar; perdida: apagada), tempo, itens bônus e o aviso "Novo recorde!" quando o melhor tempo melhora. Botões Mapa, Jogar de novo e Próxima fase (só quando liberada); na **última fase**, o botão vira **Concluir** e abre o fim de jogo |
+| Fim de jogo | Depois de Concluir a última fase jogável: "Você saqueou a cidade!", total de estrelas (x de y) e soma dos melhores tempos, sobre uma ilustração comemorativa. Botões Recomeçar (volta à Fase 1 **mantendo o save**), Menu inicial e Créditos |
+
+**Seleção dos botões:** o botão selecionado (teclado, controle ou mouse) fica âmbar `#FFC84D` com texto roxo quase preto, contorno grosso, tamanho 1,08 e uma seta ► à esquerda; os outros ficam roxo escuro `#2A1F3D` com texto creme e contorno fino; pressionado é âmbar escuro. Passar o mouse seleciona o botão, então só há um destaque por vez. As fachadas do mapa ganham contorno claro e tamanho maior; fase bloqueada fica cinza e não pode ser selecionada. As cores ficam no asset `UITheme`.
+
+**Transição entre telas:** toda troca de cena escurece (0,3 s) e clareia na cena nova; durante o fade nada responde (mouse nem teclado).
+
+**Fundos:** menu principal, mapa da cidade, início da fase (o mapa escurecido) e fim de jogo têm ilustração de fundo, com o texto sempre sobre um trecho escuro.
 
 Os **ícones dos itens** na HUD são renderizados a partir dos próprios modelos do Blender (render ortográfico de cada item em PNG transparente).
 
@@ -377,7 +384,7 @@ Os **ícones dos itens** na HUD são renderizados a partir dos próprios modelos
 Assets/_Project/
   Scenes/       MainMenu, CityMap, Levels/Level_01_Mercadinho, Level_02_XOXO, Level_03_PaoDeMel, Level_04_Carrecinco, Level_05_Atacadaco (sem cena Boot: o build abre no MainMenu)
   Scripts/
-    Core/       LevelFlow, SceneLoader, SaveSystem, LevelData, LevelCatalog
+    Core/       LevelFlow, SceneLoader, ScreenFader, SaveSystem, LevelData, LevelCatalog, TutorialTipsData
     Player/     RaccoonController, PlayerState, Inventory, FragileShake
     Items/      ItemData, PickupItem, ShoppingList, Den
     Effects/    ConsumableEffect, EnergyDrinkEffect, ProteinBarEffect, MushroomPower
@@ -385,7 +392,7 @@ Assets/_Project/
     Guards/     GuardAI, GuardData, VisionCone, VisionConeMesh, DetectionMeter, AlertManager
     Hazards/    RobotVacuum, HidingSpot, SecurityCamera
     Camera/     CameraRig, ObstacleFader
-    UI/         HUD, ShoppingListUI, LevelResultUI, PauseMenuUI, CityMapUI, LevelButtonUI, MainMenuUI
+    UI/         HUD, ShoppingListUI, LevelResultUI, CaughtScreenUI, PauseMenuUI, CityMapUI, LevelButtonUI, MainMenuUI, EndingUI, InteractionPromptUI, TutorialTipsUI, SelectableHighlight, UITheme
   Data/         Items/, Guards/, Levels/
   Art/
     Models/     (FBX exportados do Blender)
@@ -562,4 +569,10 @@ Mudanças de rumo em relação ao texto acima, para o GDD continuar sendo a refe
 | 24/11/2026 | **A tela de início da fase vive no mapa da cidade** (depois de escolher a fase), e não dentro da cena da fase. | Reiniciar ou perder a fase não repete a tela, e a cena da fase não precisa de um estado "ainda não começou". |
 | 24/11/2026 | **A Sandbox de teste fica fora do Build Profile.** | É só para desenvolvimento. |
 | 24/11/2026 | **O menu principal ganha uma ilustração de fundo** (`Art/UI/Background_MainMenu.jpg`: o guaxinim, o segurança e o Seu Zé no mercado à noite). O título e os botões ficam na coluna da esquerda, a parte vazia da imagem. Os painéis Como jogar e Créditos continuam com o véu escuro por cima. | Visual mais charmoso na primeira tela (rubrica 3); a imagem segue a direção de arte do §15.1. |
+| 24/11/2026 | **Seleção dos botões com contraste forte** (âmbar com texto escuro e seta ► no selecionado; roxo escuro com texto creme nos outros), e **passar o mouse seleciona**. As cores ficam no `UITheme`. | Quem usa teclado ou controle não sabia onde estava a seleção (rubrica 1), e o mouse e o teclado podiam destacar botões diferentes. |
+| 24/11/2026 | **Pego: tela com opções, sem reinício automático.** O jogo congela, aparece o painel (tempo, itens entregues, dica) e o jogador escolhe Tentar de novo, Mapa ou Menu inicial. | Reiniciar sozinho tirava a escolha do jogador e não deixava voltar ao menu (rubrica 4). Decisão em aberto do documento de design: sem contagem regressiva. |
+| 24/11/2026 | **Fim de jogo depois da última fase jogável.** O botão Concluir (no lugar de Próxima fase) abre a tela final. "Última fase" vem do catálogo e **ignora as fases "Em breve"**; "Recomeçar" volta à primeira fase **mantendo o save**. Hoje, com só a Fase 1 jogável, vencê-la leva ao fim de jogo. | A campanha precisa terminar de forma clara mesmo com 1 fase pronta, e fases novas entram sem mudar código. |
+| 24/11/2026 | **Fundos das telas:** o menu usa a ilustração enviada; o mapa da cidade é um mapa noturno visto de cima, desenhado por script (`Tools/Art/make_ui_backgrounds.py`); o fim de jogo usa a ilustração do menu em versão dourada e desfocada. O início da fase é o mapa escurecido. | Não havia arte pronta para todas as telas. Trocar por arte nova é só substituir o arquivo em `Art/UI/`. |
+| 24/11/2026 | **Fade de 0,3 s entre cenas.** | Trocas de tela mais suaves, e o jogo ignora pedidos enquanto troca (sem duplo clique). |
+| 24/11/2026 | **Indicação de interação e dicas do tutorial na Fase 1.** | O GDD trata a Fase 1 como tutorial, mas nada ensinava os controles (rubrica 1). |
 | a decidir | Câmera em perspectiva ou ortográfica (§3.1) e o nome do jogo (§17). | Ainda em aberto. |

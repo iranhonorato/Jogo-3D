@@ -6,6 +6,9 @@ namespace Guaxinim.Core
     /// </summary>
     public readonly struct LevelResult
     {
+        /// <summary>Estrelas possíveis em cada fase.</summary>
+        public const int MaxStars = 3;
+
         private LevelResult(float elapsedSeconds, float targetSeconds, bool isListComplete, bool hadAlert,
             int bonusCount, int bonusPoints)
         {

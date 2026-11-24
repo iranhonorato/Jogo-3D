@@ -34,6 +34,7 @@ namespace Guaxinim.EditorTools
             GuardFactory.CreateGuardPrefabs();
             ItemFactory.CreateItems();
             HidingSpotFactory.CreateBinPrefab();
+            ScreenFaderFactory.CreatePrefab();
         }
 
         public static GameObject Place(string prefabPath, Transform parent, Vector3 position, float yawDegrees)
@@ -123,6 +124,8 @@ namespace Guaxinim.EditorTools
             GameObject cameraRig = Place(CameraRigFactory.PerspectivePath, root, Vector3.zero, 0f);
             DisableOtherMainCameras(cameraRig);
             ConnectCamera(cameraRig, raccoon);
+            EditorAssets.SetReference(systems.GetComponentInChildren<InteractionPromptUI>(), "_camera",
+                cameraRig.GetComponentInChildren<Camera>());
             return raccoon;
         }
 
@@ -167,6 +170,12 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(loadUI, "_bulkyLoad", raccoon.GetComponent<RaccoonBulkyLoad>());
             EditorAssets.SetReference(systems.GetComponentInChildren<EffectsUI>(), "_effects",
                 raccoon.GetComponent<RaccoonEffects>());
+
+            var interactor = raccoon.GetComponent<RaccoonInteractor>();
+            EditorAssets.SetReference(systems.GetComponentInChildren<InteractionPromptUI>(), "_interactor", interactor);
+            var tipsUI = systems.GetComponentInChildren<TutorialTipsUI>();
+            EditorAssets.SetReference(tipsUI, "_interactor", interactor);
+            EditorAssets.SetReference(tipsUI, "_inventory", raccoon.GetComponent<Inventory>());
         }
 
         private static void DisableOtherMainCameras(GameObject cameraRig)

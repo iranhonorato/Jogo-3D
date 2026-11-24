@@ -14,15 +14,17 @@ namespace Guaxinim.Core
 
         public static SaveData Data => _data ??= SaveData.FromJson(PlayerPrefs.GetString(SaveKey, string.Empty));
 
-        public static void RecordLevelResult(string levelId, int stars, float timeSeconds)
+        /// <summary>Grava o resultado da fase. Devolve true quando o tempo bateu o recorde anterior.</summary>
+        public static bool RecordLevelResult(string levelId, int stars, float timeSeconds)
         {
             if (string.IsNullOrEmpty(levelId))
             {
-                return; // fase sem id (a Sandbox) não tem progresso
+                return false; // fase sem id (a Sandbox) não tem progresso
             }
 
-            Data.RecordResult(levelId, stars, timeSeconds);
+            bool isNewRecord = Data.RecordResult(levelId, stars, timeSeconds);
             Persist();
+            return isNewRecord;
         }
 
         /// <summary>Apaga todo o progresso (menu do Editor, para testar o desbloqueio das fases do começo).</summary>

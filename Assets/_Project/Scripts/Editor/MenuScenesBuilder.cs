@@ -6,8 +6,8 @@ using UnityEngine.SceneManagement;
 namespace Guaxinim.EditorTools
 {
     /// <summary>
-    /// Cria as cenas MainMenu e CityMap (passo 3.8, GDD §13) e deixa o Build Profile na ordem do jogo.
-    /// Rodar de novo recria as duas cenas do zero, com o catálogo de fases atualizado.
+    /// Cria as cenas MainMenu, CityMap e Ending (GDD §13), o prefab do fade entre cenas e deixa o Build Profile na
+    /// ordem do jogo. Rodar de novo recria as cenas do zero, com o catálogo de fases atualizado.
     /// </summary>
     public static class MenuScenesBuilder
     {
@@ -22,9 +22,12 @@ namespace Guaxinim.EditorTools
             }
 
             LevelCatalogFactory.CreateOrUpdate();
+            ScreenFaderFactory.CreatePrefab();
 
             // O catálogo é carregado dentro da cena nova: NewScene descarrega os assets sem uso, e uma referência
-            // carregada antes viraria null ao ser ligada ao CityMapUI.
+            // carregada antes viraria null ao ser ligada à tela.
+            BuildScene(BuildSceneList.EndingPath, "Ending",
+                root => EndingSceneBuilder.Build(root, LevelCatalogFactory.LoadOrCreateCatalog()));
             BuildScene(BuildSceneList.CityMapPath, "CityMap",
                 root => CityMapSceneBuilder.Build(root, LevelCatalogFactory.LoadOrCreateCatalog()));
             BuildScene(BuildSceneList.MainMenuPath, "MainMenu", MainMenuSceneBuilder.Build);

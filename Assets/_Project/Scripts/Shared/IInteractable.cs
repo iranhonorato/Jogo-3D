@@ -10,6 +10,9 @@ namespace Guaxinim.Shared
     {
         Vector3 InteractionPoint { get; }
 
+        /// <summary>O que o E faz agora, em uma palavra ("Pegar", "Esconder", "Sair"); aparece na indicação da HUD.</summary>
+        string PromptText { get; }
+
         void Interact(GameObject interactor);
     }
 }

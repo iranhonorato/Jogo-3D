@@ -51,6 +51,39 @@ namespace Guaxinim.Tests
         }
 
         [Test]
+        public void RecordResult_FirstCompletion_IsNotARecord()
+        {
+            var save = new SaveData();
+
+            bool isNewRecord = save.RecordResult("level_01", 2, 80f);
+
+            Assert.IsFalse(isNewRecord);
+        }
+
+        [Test]
+        public void RecordResult_FasterThanBest_IsARecord()
+        {
+            var save = new SaveData();
+            save.RecordResult("level_01", 2, 80f);
+
+            bool isNewRecord = save.RecordResult("level_01", 1, 70f);
+
+            Assert.IsTrue(isNewRecord);
+        }
+
+        [Test]
+        public void RecordResult_SlowerThanBest_IsNotARecord()
+        {
+            var save = new SaveData();
+            save.RecordResult("level_01", 2, 80f);
+
+            bool isNewRecord = save.RecordResult("level_01", 3, 95f);
+
+            Assert.IsFalse(isNewRecord);
+            Assert.AreEqual(80f, save.Find("level_01").BestTimeSeconds, Tolerance);
+        }
+
+        [Test]
         public void RecordResult_EmptyLevelId_IsIgnored()
         {
             var save = new SaveData();

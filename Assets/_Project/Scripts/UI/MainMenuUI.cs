@@ -35,7 +35,16 @@ namespace Guaxinim.UI
             _quitButton.SetActive(Application.platform != RuntimePlatform.WebGLPlayer);
         }
 
-        private void Start() => ShowMain();
+        private void Start()
+        {
+            if (MenuRequest.ConsumeCreditsRequest())
+            {
+                ShowCredits(); // a tela de fim de jogo pediu os Créditos
+                return;
+            }
+
+            ShowMain();
+        }
 
         /// <summary>Ligado ao botão Jogar no Inspector.</summary>
         public void Play() => SceneLoader.LoadCityMap();

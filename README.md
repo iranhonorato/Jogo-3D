@@ -117,6 +117,8 @@ Todo asset de terceiros ou gerado por IA entra aqui, com fonte e licença (GDD, 
 | --- | --- | --- | --- |
 | Modelos e texturas em `Art/Models/` e `Art/Textures/` (personagens, câmera de segurança, kit modular) | Gerados por scripts Python do Blender escritos com o Claude (Anthropic) | `Tools/Blender/` | Feitos para este projeto |
 | Ilustração de fundo do menu principal (`Art/UI/Background_MainMenu.jpg`) | Gerada por IA (ferramenta e prompt a confirmar) | _a preencher_ | _a preencher_ |
+| Fundo do fim de jogo (`Art/UI/Background_Ending.jpg`) | Derivado da ilustração do menu (desfocada, dourada e com brilhos, por script) | `Tools/Art/make_ui_backgrounds.py` | Mesma origem e licença da ilustração do menu |
+| Mapa da cidade (`Art/UI/Background_CityMap.jpg`) | Desenhado por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_ui_backgrounds.py` | Feito para este projeto |
 
 ### Código de terceiros
 

@@ -1,5 +1,6 @@
 using Guaxinim.Core;
 using Guaxinim.UI;
+using UnityEditor;
 using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,11 +8,13 @@ using UnityEngine.UI;
 namespace Guaxinim.EditorTools
 {
     /// <summary>
-    /// Monta o mapa da cidade (GDD §13): uma fachada por fase do catálogo e a tela de início da fase (nome, lista
-    /// de compras e Começar). As fachadas são greybox: um cartão com nome, três estrelas e o estado da fase.
+    /// Monta o mapa da cidade (GDD §13): uma fachada por fase do catálogo sobre a ilustração do mapa, e a tela de
+    /// início da fase (nome, lista de compras e Começar) com o mesmo mapa escurecido atrás. As fachadas são
+    /// greybox: um cartão com nome, três estrelas e o estado da fase.
     /// </summary>
     internal static class CityMapSceneBuilder
     {
+        private const string BackgroundPath = "Assets/_Project/Art/UI/Background_CityMap.jpg";
         private const string MapTitle = "Mapa da cidade";
         private const string MenuText = "Menu";
         private const string StartText = "Começar";
@@ -26,6 +29,7 @@ namespace Guaxinim.EditorTools
         private const float StarHeightAnchor = 0.36f;
         private const float LevelButtonSpacing = 0.19f;
         private const float LevelTextPadding = 16f;
+        private const float BriefingVeilOpacity = 0.75f;
         private const int BriefingSortingOrder = 1;
 
         private static readonly Vector2 LevelButtonSize = new Vector2(340f, 380f);
@@ -33,8 +37,10 @@ namespace Guaxinim.EditorTools
         public static void Build(Transform root, LevelCatalog catalog)
         {
             var mapUI = root.gameObject.AddComponent<CityMapUI>();
+            AddBackground(root);
 
             GameObject mapPanel = EditorUI.CreateScreenPanel("MapCanvas", root, 0);
+            EditorUI.SetPanelOpacity(mapPanel, 0f); // o mapa ilustrado aparece inteiro
             Text title = EditorUI.CreateText("Title", mapPanel.transform, MapTitle, TitleFontSize, EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.88f), new Vector2(1400f, 140f));
             EditorUI.AddOutline(title.gameObject);
@@ -49,6 +55,7 @@ namespace Guaxinim.EditorTools
             UnityEventTools.AddPersistentListener(menu.onClick, mapUI.GoToMainMenu);
 
             GameObject briefingPanel = EditorUI.CreateScreenPanel("BriefingCanvas", root, BriefingSortingOrder);
+            EditorUI.SetPanelOpacity(briefingPanel, BriefingVeilOpacity); // o mesmo mapa, escurecido
             Text briefingTitle = EditorUI.CreateText("Title", briefingPanel.transform, string.Empty, TitleFontSize,
                 EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)briefingTitle.transform, new Vector2(0.5f, 0.84f), new Vector2(1500f, 140f));
@@ -74,12 +81,25 @@ namespace Guaxinim.EditorTools
             briefingPanel.SetActive(false);
         }
 
+        /// <summary>A ilustração é carregada aqui, depois da cena nova (ver o MainMenuSceneBuilder).</summary>
+        private static void AddBackground(Transform root)
+        {
+            var background = AssetDatabase.LoadAssetAtPath<Sprite>(BackgroundPath);
+            if (background == null)
+            {
+                Debug.LogWarning($"City map background not found at {BackgroundPath}; using the plain color.");
+                return;
+            }
+
+            EditorUI.CreateBackground(root, background);
+        }
+
         /// <summary>Cartão de uma fase: nome em cima, três estrelas no meio e o estado embaixo.</summary>
         private static LevelButtonUI CreateLevelButton(Transform parent, int index, int count)
         {
             float x = 0.5f + (index - (count - 1) / 2f) * LevelButtonSpacing;
             Button button = EditorUI.CreateButton($"Level_{index + 1}", parent, string.Empty, new Vector2(x, 0.5f),
-                LevelButtonSize);
+                LevelButtonSize, SelectableHighlight.HighlightStyle.Card);
 
             Text nameLabel = button.GetComponentInChildren<Text>();
             nameLabel.fontSize = LevelNameFontSize;
@@ -97,6 +117,7 @@ namespace Guaxinim.EditorTools
 
             var levelButton = button.gameObject.AddComponent<LevelButtonUI>();
             EditorAssets.SetReference(levelButton, "_button", button);
+            EditorAssets.SetReference(levelButton, "_highlight", button.GetComponent<SelectableHighlight>());
             EditorAssets.SetReference(levelButton, "_background", button.GetComponent<Image>());
             EditorAssets.SetReference(levelButton, "_nameLabel", nameLabel);
             EditorAssets.SetReference(levelButton, "_statusLabel", statusLabel);

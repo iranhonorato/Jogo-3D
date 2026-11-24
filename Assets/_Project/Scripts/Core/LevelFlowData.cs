@@ -6,13 +6,13 @@ namespace Guaxinim.Core
     [CreateAssetMenu(fileName = "LevelFlowData", menuName = "Guaxinim/Level Flow Data")]
     public class LevelFlowData : ScriptableObject
     {
-        [Tooltip("Segundos com o aviso \"Você foi pego!\" antes de reiniciar a fase")]
-        [SerializeField, Min(0f)] private float _caughtRestartDelaySeconds = 1.5f;
+        [Tooltip("Segundos com o jogo congelado depois de ser pego, antes de mostrar a tela \"Você foi pego!\"")]
+        [SerializeField, Min(0f)] private float _caughtPanelDelaySeconds = 0.6f;
 
         [Tooltip("Pontos por item bônus entregue (GDD §12)")]
         [SerializeField, Min(0)] private int _pointsPerBonusItem = 100;
 
-        public float CaughtRestartDelaySeconds => _caughtRestartDelaySeconds;
+        public float CaughtPanelDelaySeconds => _caughtPanelDelaySeconds;
         public int PointsPerBonusItem => _pointsPerBonusItem;
     }
 }

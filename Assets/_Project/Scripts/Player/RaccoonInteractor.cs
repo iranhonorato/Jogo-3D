@@ -1,3 +1,4 @@
+using System;
 using Guaxinim.Core;
 using Guaxinim.Shared;
 using UnityEngine;
@@ -6,7 +7,8 @@ namespace Guaxinim.Player
 {
     /// <summary>
     /// Interação com E (GDD §3.2): procura os <see cref="IInteractable"/> por perto, na layer Interactable,
-    /// e usa o mais próximo.
+    /// e usa o mais próximo. Avisa em <see cref="OnTargetChanged"/> quando o mais próximo muda, para a HUD mostrar
+    /// a indicação "E Pegar" sobre ele.
     /// </summary>
     [RequireComponent(typeof(PlayerState))]
     public class RaccoonInteractor : MonoBehaviour
@@ -21,6 +23,12 @@ namespace Guaxinim.Player
 
         private readonly Collider[] _nearby = new Collider[MaxNearbyColliders];
         private PlayerState _state;
+
+        /// <summary>Muda para o mais próximo ao alcance do E, ou para null quando não há nada ao alcance.</summary>
+        public event Action<IInteractable> OnTargetChanged;
+
+        /// <summary>O que o E usaria agora, ou null.</summary>
+        public IInteractable CurrentTarget { get; private set; }
 
         private void Awake()
         {
@@ -37,6 +45,21 @@ namespace Guaxinim.Player
             if (_input != null)
             {
                 _input.OnInteractPressed += HandleInteractPressed;
+            }
+        }
+
+        private void Update()
+        {
+            IInteractable target = null;
+            if (!_state.IsCaught)
+            {
+                TryGetClosestInteractable(out target);
+            }
+
+            if (!ReferenceEquals(target, CurrentTarget))
+            {
+                CurrentTarget = target;
+                OnTargetChanged?.Invoke(target);
             }
         }
 

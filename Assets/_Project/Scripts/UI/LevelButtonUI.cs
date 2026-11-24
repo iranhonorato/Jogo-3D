@@ -16,6 +16,10 @@ namespace Guaxinim.UI
         private const string AvailableText = "Disponível";
 
         [SerializeField] private Button _button;
+
+        [Tooltip("Destaque da seleção (contorno e tamanho); precisa ser avisado quando a fase libera ou bloqueia")]
+        [SerializeField] private SelectableHighlight _highlight;
+
         [SerializeField] private Image _background;
         [SerializeField] private Text _nameLabel;
         [SerializeField] private Text _statusLabel;
@@ -40,8 +44,8 @@ namespace Guaxinim.UI
 
         private void Awake()
         {
-            if (_button == null || _background == null || _nameLabel == null || _statusLabel == null ||
-                _stars.Length != 3)
+            if (_button == null || _highlight == null || _background == null || _nameLabel == null ||
+                _statusLabel == null || _stars.Length != 3)
             {
                 Debug.LogError("LevelButtonUI is missing references (it needs 3 stars).", this);
                 enabled = false;
@@ -54,6 +58,7 @@ namespace Guaxinim.UI
             _level = level;
             _nameLabel.text = level.DisplayName;
             _button.interactable = isUnlocked;
+            _highlight.Refresh();
             _background.color = isUnlocked ? _unlockedColor : _lockedColor;
             _nameLabel.color = isUnlocked ? _unlockedTextColor : _lockedTextColor;
             _statusLabel.color = _nameLabel.color;

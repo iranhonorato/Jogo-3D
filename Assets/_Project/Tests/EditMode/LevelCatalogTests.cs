@@ -114,6 +114,57 @@ namespace Guaxinim.Tests
             Assert.AreEqual(-1, _catalog.IndexOf(null));
         }
 
+        [Test]
+        public void PlayableCount_CountsOnlyLevelsWithScene()
+        {
+            Assert.AreEqual(2, _catalog.PlayableCount);
+        }
+
+        [Test]
+        public void FirstPlayable_ReturnsFirstLevelWithScene()
+        {
+            Assert.AreSame(_first, _catalog.FirstPlayable);
+        }
+
+        [Test]
+        public void IsLastPlayable_SkipsComingSoonLevelsAfterIt()
+        {
+            Assert.IsTrue(_catalog.IsLastPlayable(_second));
+            Assert.IsFalse(_catalog.IsLastPlayable(_first));
+            Assert.IsFalse(_catalog.IsLastPlayable(_comingSoon));
+        }
+
+        [Test]
+        public void IsLastPlayable_LevelNotInCatalog_ReturnsFalse()
+        {
+            LevelData sandbox = CreateLevel(string.Empty, "Sandbox");
+
+            Assert.IsFalse(_catalog.IsLastPlayable(sandbox));
+            Object.DestroyImmediate(sandbox);
+        }
+
+        [Test]
+        public void SumBestStars_AddsBestStarsOfPlayableLevels()
+        {
+            var save = new SaveData();
+            save.RecordResult("level_01", 2, 60f);
+            save.RecordResult("level_02", 3, 45f);
+
+            Assert.AreEqual(5, _catalog.SumBestStars(save));
+            Assert.AreEqual(0, _catalog.SumBestStars(new SaveData()));
+        }
+
+        [Test]
+        public void SumBestTimeSeconds_AddsBestTimesOfCompletedLevels()
+        {
+            var save = new SaveData();
+            save.RecordResult("level_01", 2, 60f);
+            save.RecordResult("level_02", 1, 45f);
+            save.RecordResult("level_02", 1, 90f);
+
+            Assert.AreEqual(105f, _catalog.SumBestTimeSeconds(save), 0.001f);
+        }
+
         private static LevelData CreateLevel(string id, string sceneName)
         {
             var level = ScriptableObject.CreateInstance<LevelData>();

@@ -15,6 +15,84 @@ namespace Guaxinim.Core
 
         public IReadOnlyList<LevelData> Levels => _levels;
 
+        /// <summary>Fases que já têm cena; as outras aparecem como "Em breve".</summary>
+        public int PlayableCount
+        {
+            get
+            {
+                int count = 0;
+                foreach (LevelData level in _levels)
+                {
+                    count += level != null && level.IsPlayable ? 1 : 0;
+                }
+
+                return count;
+            }
+        }
+
+        /// <summary>A primeira fase jogável (para recomeçar a campanha), ou null se não há nenhuma.</summary>
+        public LevelData FirstPlayable
+        {
+            get
+            {
+                foreach (LevelData level in _levels)
+                {
+                    if (level != null && level.IsPlayable)
+                    {
+                        return level;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>Última fase jogável do catálogo: vencê-la termina a campanha (as "Em breve" não contam).</summary>
+        public bool IsLastPlayable(LevelData level)
+        {
+            int index = IndexOf(level);
+            if (index < 0 || !level.IsPlayable)
+            {
+                return false;
+            }
+
+            for (int i = index + 1; i < _levels.Length; i++)
+            {
+                if (_levels[i] != null && _levels[i].IsPlayable)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>Soma das melhores estrelas das fases jogáveis.</summary>
+        public int SumBestStars(SaveData save)
+        {
+            int total = 0;
+            foreach (LevelData level in _levels)
+            {
+                LevelRecord record = level != null && level.IsPlayable ? save.Find(level.Id) : null;
+                total += record != null ? record.BestStars : 0;
+            }
+
+            return total;
+        }
+
+        /// <summary>Soma dos melhores tempos das fases jogáveis já completas.</summary>
+        public float SumBestTimeSeconds(SaveData save)
+        {
+            float total = 0f;
+            foreach (LevelData level in _levels)
+            {
+                LevelRecord record = level != null && level.IsPlayable ? save.Find(level.Id) : null;
+                total += record != null && record.IsCompleted ? record.BestTimeSeconds : 0f;
+            }
+
+            return total;
+        }
+
         /// <summary>Posição da fase no catálogo, ou -1 se ela não está (a Sandbox, por exemplo).</summary>
         public int IndexOf(LevelData level)
         {

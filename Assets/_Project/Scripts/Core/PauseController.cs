@@ -88,6 +88,9 @@ namespace Guaxinim.Core
         /// <summary>Ligado ao botão Mapa no Inspector.</summary>
         public void GoToCityMap() => SceneLoader.LoadCityMap();
 
+        /// <summary>Ligado ao botão Menu inicial no Inspector.</summary>
+        public void GoToMainMenu() => SceneLoader.LoadMainMenu();
+
         private void LockPlayerInput() => _input.EnableUIInput();
     }
 }

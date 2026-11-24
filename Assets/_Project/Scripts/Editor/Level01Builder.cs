@@ -75,6 +75,7 @@ namespace Guaxinim.EditorTools
             BuildShelves(root.transform);
             LevelData level = LevelBuildKit.LoadOrCreateLevelData(LevelDataPath, LevelName, ShoppingListItems,
                 TargetTimeSeconds);
+            TutorialTipsFactory.AssignToLevel01(level); // a Fase 1 é o tutorial (GDD §11)
             GameObject systems = LevelBuildKit.PlaceLevelSystems(root.transform, level);
             LevelBuildKit.PlaceDen(root.transform, systems, DenPosition, 0f);
             GameObject raccoon = LevelBuildKit.PlacePlayer(root.transform, systems, RaccoonStart, 180f);

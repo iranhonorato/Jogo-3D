@@ -7,9 +7,10 @@ using UnityEngine;
 namespace Guaxinim.Core
 {
     /// <summary>
-    /// Ciclo da fase (GDD §6.5, §7.7 e §13): pego, avisa a UI e reinicia a fase depois de 1,5 s; lista
-    /// completa na toca, vence, congela o jogo e avisa a tela de resultado. Só um fim por fase. Vive na cena
-    /// (no LevelSystems), então o estado da fase morre com ela a cada reinício.
+    /// Ciclo da fase (GDD §6.5, §7.7 e §13): ao ser pego, congela o jogo e, depois de uma pausa curta, avisa a UI
+    /// para mostrar a tela "Você foi pego!" (quem decide o que fazer é o jogador); lista completa na toca, vence,
+    /// congela o jogo e avisa a tela de resultado. Só um fim por fase. Vive na cena (no LevelSystems), então o
+    /// estado da fase morre com ela a cada reinício.
     /// </summary>
     public class LevelFlow : MonoBehaviour
     {
@@ -18,7 +19,12 @@ namespace Guaxinim.Core
         [SerializeField] private PlayerState _player;
         [SerializeField] private ShoppingList _shoppingList;
 
+        /// <summary>Na hora em que o guaxinim é pego: o jogo já está congelado.</summary>
         public event Action OnPlayerCaught;
+
+        /// <summary>Alguns instantes depois de ser pego: é a hora de mostrar a tela com as opções.</summary>
+        public event Action OnCaughtPanelDue;
+
         public event Action OnLevelWon;
 
         public bool IsLevelOver { get; private set; }
@@ -28,6 +34,9 @@ namespace Guaxinim.Core
 
         /// <summary>Preenchido ao vencer (estrelas, tempo e bônus).</summary>
         public LevelResult Result { get; private set; }
+
+        /// <summary>O tempo desta vitória bateu o melhor tempo salvo antes (a primeira vitória não conta).</summary>
+        public bool IsNewRecord { get; private set; }
 
         public LevelData Level => _level;
 
@@ -85,8 +94,9 @@ namespace Guaxinim.Core
             }
 
             IsLevelOver = true;
+            Time.timeScale = 0f; // o mundo para; o SceneLoader volta a 1 ao sair da fase
             OnPlayerCaught?.Invoke();
-            StartCoroutine(RestartAfterDelay());
+            StartCoroutine(RaiseCaughtPanelAfterDelay());
         }
 
         private void HandleListCompleted()
@@ -99,15 +109,15 @@ namespace Guaxinim.Core
             IsLevelOver = true;
             Result = LevelResult.Create(ElapsedSeconds, _level.TargetTimeSeconds, _shoppingList.Progress.IsComplete,
                 HadAlert, _shoppingList.Progress.BonusCount, _data.PointsPerBonusItem);
-            SaveSystem.RecordLevelResult(_level.Id, Result.Stars, Result.ElapsedSeconds); // libera a próxima fase
+            IsNewRecord = SaveSystem.RecordLevelResult(_level.Id, Result.Stars, Result.ElapsedSeconds); // libera a próxima fase
             Time.timeScale = 0f; // o mundo para atrás da tela de resultado; o SceneLoader volta a 1
             OnLevelWon?.Invoke();
         }
 
-        private IEnumerator RestartAfterDelay()
+        private IEnumerator RaiseCaughtPanelAfterDelay()
         {
-            yield return new WaitForSeconds(_data.CaughtRestartDelaySeconds);
-            SceneLoader.ReloadActiveScene();
+            yield return new WaitForSecondsRealtime(_data.CaughtPanelDelaySeconds); // o tempo do jogo está parado
+            OnCaughtPanelDue?.Invoke();
         }
     }
 }
