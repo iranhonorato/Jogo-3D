@@ -23,6 +23,7 @@ namespace Guaxinim.EditorTools
 
         private const string MainCameraTag = "MainCamera";
         private const float WallThicknessOffset = 0.1f;
+        private const float SpawnHeight = 0.05f;
 
         /// <summary>Gera (ou atualiza) todos os prefabs usados nas fases.</summary>
         public static void GenerateAllPrefabs()
@@ -116,7 +117,9 @@ namespace Guaxinim.EditorTools
         /// <summary>Põe o guaxinim e o rig de câmera, e liga os dois aos sistemas da fase.</summary>
         public static GameObject PlacePlayer(Transform root, GameObject systems, Vector3 start, float yawDegrees)
         {
-            GameObject raccoon = Place(GreyboxRaccoonFactory.PrefabPath, root, start, yawDegrees);
+            // Um pouco acima do piso: começar encostado faz o primeiro passo da gravidade atravessar a placa.
+            GameObject raccoon = Place(GreyboxRaccoonFactory.PrefabPath, root, start + Vector3.up * SpawnHeight,
+                yawDegrees);
             EditorAssets.SetReference(systems.GetComponent<LevelFlow>(), "_player", raccoon.GetComponent<PlayerState>());
             EditorAssets.SetReference(systems.GetComponent<ShoppingListHighlighter>(), "_player", raccoon.transform);
             EditorAssets.SetReference(systems.GetComponent<FlashlightBudget>(), "_player", raccoon.transform);

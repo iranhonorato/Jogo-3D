@@ -29,6 +29,9 @@ namespace Guaxinim.Player
         [Tooltip("Metros por segundo para baixo no chão, para manter o contato em rampas e degraus")]
         [SerializeField, Min(0f)] private float _groundedFallSpeed = 2f;
 
+        [Tooltip("Metros: abaixo desta altura, o guaxinim caiu do mapa e volta ao ponto de início")]
+        [SerializeField] private float _fallResetHeight = -5f;
+
         [Header("Carga")]
         [Tooltip("Unidades de peso que o guaxinim consegue carregar (GDD §4)")]
         [SerializeField, Min(0.1f)] private float _maxWeight = 10f;
@@ -69,6 +72,7 @@ namespace Guaxinim.Player
         public float TurnSpeedDegrees => _turnSpeedDegrees;
         public float Gravity => _gravity;
         public float GroundedFallSpeed => _groundedFallSpeed;
+        public float FallResetHeight => _fallResetHeight;
         public float MaxWeight => _maxWeight;
         public float MaxVolume => _maxVolume;
         public float WeightSpeedPenalty => _weightSpeedPenalty;

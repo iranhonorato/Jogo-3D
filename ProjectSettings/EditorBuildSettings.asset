@@ -18,6 +18,15 @@ EditorBuildSettings:
     path: Assets/_Project/Scenes/Levels/Level_02_XOXO.unity
     guid: 3114cb2e9944e7d42941eb6b2d7a5895
   - enabled: 1
+    path: Assets/_Project/Scenes/Levels/Level_03_PaoDeMel.unity
+    guid: 7fb257fa69c692b4b808e13092c724c0
+  - enabled: 1
+    path: Assets/_Project/Scenes/Levels/Level_04_Carrecinco.unity
+    guid: 244d6e241d471754998edef3a02697c9
+  - enabled: 1
+    path: Assets/_Project/Scenes/Levels/Level_05_Atacadaco.unity
+    guid: 3b5415f16af02634bb5ff934fb38b623
+  - enabled: 1
     path: Assets/_Project/Scenes/Ending.unity
     guid: 7a16be110f4d06e4fbe9cba55c3b8c04
   m_configObjects:

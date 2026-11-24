@@ -13,8 +13,15 @@ MonoBehaviour:
   m_Name: Level_05_Atacadaco
   m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Core.LevelData
   _id: level_05_atacadaco
-  _sceneName: 
+  _sceneName: Level_05_Atacadaco
   _displayName: "Atacada\xE7o"
-  _shoppingList: []
-  _targetTimeSeconds: 120
+  _shoppingList:
+  - {fileID: 11400000, guid: bfa7eb870f75c1840aecb34e2e478ad0, type: 2}
+  - {fileID: 11400000, guid: e638e9012ff6a6044bc9cfb30786fb05, type: 2}
+  - {fileID: 11400000, guid: 302d74512377d6346a83a7453ffa1036, type: 2}
+  - {fileID: 11400000, guid: 56122c66ef289e5438c7e0d6fd9bbc50, type: 2}
+  - {fileID: 11400000, guid: a4647548bcfc2cf469ae7998e63ab575, type: 2}
+  - {fileID: 11400000, guid: 7bcd19e69e3b270489fe2581b73d7322, type: 2}
+  - {fileID: 11400000, guid: ec73f6aedd73c5b4db86f3017c5a95b7, type: 2}
+  _targetTimeSeconds: 270
   _tips: {fileID: 0}

@@ -13,8 +13,14 @@ MonoBehaviour:
   m_Name: Level_04_Carrecinco
   m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.Core.LevelData
   _id: level_04_carrecinco
-  _sceneName: 
+  _sceneName: Level_04_Carrecinco
   _displayName: Carrecinco
-  _shoppingList: []
-  _targetTimeSeconds: 120
+  _shoppingList:
+  - {fileID: 11400000, guid: bfa7eb870f75c1840aecb34e2e478ad0, type: 2}
+  - {fileID: 11400000, guid: 47f466767f2214b4283a6fcb2e205006, type: 2}
+  - {fileID: 11400000, guid: e638e9012ff6a6044bc9cfb30786fb05, type: 2}
+  - {fileID: 11400000, guid: 302d74512377d6346a83a7453ffa1036, type: 2}
+  - {fileID: 11400000, guid: a08b631010433024c82380d0f3e1c107, type: 2}
+  - {fileID: 11400000, guid: be2733857069a904da29d3231056214b, type: 2}
+  _targetTimeSeconds: 210
   _tips: {fileID: 0}
