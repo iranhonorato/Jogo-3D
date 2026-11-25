@@ -33,9 +33,7 @@ namespace Guaxinim.EditorTools
         private const string ResumeText = "Continuar";
         private const string RestartText = "Reiniciar fase";
 
-        private const string ControlsText =
-            "Controles\n\nWASD  mover\nShift  correr\nE  pegar e esconder\nQ  largar o item\nF  assobiar\n" +
-            "Tab  lista inteira\nEsc  pausar";
+        private const string ControlsTitle = "Controles";
 
         private const int StarCount = LevelResult.MaxStars;
         private const float StarSize = 90f;
@@ -45,6 +43,11 @@ namespace Guaxinim.EditorTools
         private const int DetailsFontSize = 40;
         private const int RecordFontSize = 46;
         private const int ControlsFontSize = 34;
+        private const int ControlsTitleFontSize = 48;
+        private const int ControlsNoteFontSize = 24;
+        private const float ControlsPadding = 30f;
+        private const float ControlsTitleHeight = 64f;
+        private const float ControlsNoteHeight = 70f;
         private const int CaughtSortingOrder = 10;
         private const int ResultSortingOrder = 20;
         private const int PauseSortingOrder = 30;
@@ -52,6 +55,12 @@ namespace Guaxinim.EditorTools
         private static readonly Color AmberColor = new Color32(0xFF, 0xC8, 0x4D, 0xFF);
         private static readonly Color StarOutlineColor = new Color32(0xFF, 0xE0, 0xB3, 0xFF);
         private static readonly Color ControlsBoxColor = new Color(0.08f, 0.05f, 0.14f, 0.7f);
+
+        // Quadro de controles à esquerda dos botões da pausa, com a tabela de ação, teclado e controle.
+        private static readonly Vector2 ControlsBoxAnchor = new Vector2(0.19f, 0.47f);
+        private static readonly Vector2 ControlsBoxSize = new Vector2(640f, 620f);
+        private static readonly ControlsTable.Columns CompactColumns = new ControlsTable.Columns(
+            new Vector2(0f, 0.52f), new Vector2(0.55f, 0.74f), new Vector2(0.76f, 1f));
 
         [MenuItem("Tools/Guaxinim/Greybox/Sistemas da Fase")]
         internal static void CreateLevelSystemsPrefab()
@@ -93,7 +102,6 @@ namespace Guaxinim.EditorTools
             Text title = EditorUI.CreateTitle("Title", panel.transform, CaughtTitle, CaughtTitleFontSize,
                 EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.84f), new Vector2(1500f, 160f));
-            EditorUI.AddOutline(title.gameObject);
             Text summary = EditorUI.CreateText("Summary", panel.transform, string.Empty, DetailsFontSize, Color.white);
             EditorUI.Place((RectTransform)summary.transform, new Vector2(0.5f, 0.69f), new Vector2(1400f, 70f));
             Text tip = EditorUI.CreateText("Tip", panel.transform, string.Empty, DetailsFontSize, AmberColor);
@@ -108,7 +116,8 @@ namespace Guaxinim.EditorTools
             var caughtUI = panel.transform.parent.gameObject.AddComponent<CaughtScreenUI>();
             EditorAssets.SetReference(caughtUI, "_levelFlow", flow);
             EditorAssets.SetReference(caughtUI, "_shoppingList", shoppingList);
-            EditorAssets.SetReference(caughtUI, "_tips", EditorAssets.LoadOrCreate<CaughtTipsData>(CaughtTipsPath));
+            var tips = EditorAssets.LoadOrCreateFromCode<CaughtTipsData>(CaughtTipsPath); // dicas vêm do código
+            EditorAssets.SetReference(caughtUI, "_tips", tips);
             EditorAssets.SetReference(caughtUI, "_panel", panel);
             EditorAssets.SetReference(caughtUI, "_summary", summary);
             EditorAssets.SetReference(caughtUI, "_tip", tip);
@@ -126,7 +135,6 @@ namespace Guaxinim.EditorTools
 
             Text title = EditorUI.CreateTitle("Title", panel.transform, WinTitle, TitleFontSize, EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.89f), new Vector2(1400f, 140f));
-            EditorUI.AddOutline(title.gameObject);
             var stars = new Object[StarCount];
             for (int i = 0; i < StarCount; i++)
             {
@@ -135,7 +143,6 @@ namespace Guaxinim.EditorTools
 
             Text record = EditorUI.CreateText("Record", panel.transform, RecordText, RecordFontSize, AmberColor);
             EditorUI.Place((RectTransform)record.transform, new Vector2(0.5f, 0.68f), new Vector2(900f, 70f));
-            EditorUI.AddOutline(record.gameObject);
             Text details = EditorUI.CreateText("Details", panel.transform, string.Empty, DetailsFontSize, Color.white);
             details.fontStyle = FontStyle.Normal;
             EditorUI.Place((RectTransform)details.transform, new Vector2(0.5f, 0.42f), new Vector2(1100f, 470f));
@@ -173,7 +180,6 @@ namespace Guaxinim.EditorTools
             GameObject panel = EditorUI.CreateScreenPanel("PauseCanvas", parent, PauseSortingOrder);
             Text title = EditorUI.CreateTitle("Title", panel.transform, PauseTitle, TitleFontSize, EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.84f), new Vector2(1000f, 140f));
-            EditorUI.AddOutline(title.gameObject);
             AddControlsBox(panel.transform);
 
             Button resume = EditorUI.CreateButton("ResumeButton", panel.transform, ResumeText, new Vector2(0.5f, 0.64f));
@@ -192,23 +198,43 @@ namespace Guaxinim.EditorTools
             panel.SetActive(false);
         }
 
-        /// <summary>Quadro com os controles, à esquerda dos botões da pausa.</summary>
+        /// <summary>
+        /// Quadro com os controles à esquerda dos botões da pausa: título, tabela de ação, teclado e controle
+        /// (<see cref="ControlsTable"/>) e, no rodapé, os botões equivalentes do PlayStation.
+        /// </summary>
         private static void AddControlsBox(Transform parent)
         {
             var box = new GameObject("ControlsBox", typeof(RectTransform)) { layer = EditorUI.UILayer };
             box.transform.SetParent(parent, false);
-            EditorUI.Place((RectTransform)box.transform, new Vector2(0.16f, 0.5f), new Vector2(520f, 560f));
+            EditorUI.Place((RectTransform)box.transform, ControlsBoxAnchor, ControlsBoxSize);
             var background = box.AddComponent<Image>();
             background.color = ControlsBoxColor;
             background.raycastTarget = false;
 
-            Text text = EditorUI.CreateText("Text", box.transform, ControlsText, ControlsFontSize, Color.white);
-            text.fontStyle = FontStyle.Normal;
-            text.alignment = TextAnchor.UpperLeft;
-            var rect = (RectTransform)text.transform;
-            EditorUI.Stretch(rect);
-            rect.offsetMin = new Vector2(36f, 24f);
-            rect.offsetMax = new Vector2(-24f, -24f);
+            Text title = EditorUI.CreateTitle("Title", box.transform, ControlsTitle, ControlsTitleFontSize,
+                EditorUI.LightTextColor);
+            RectTransform titleRect = title.rectTransform;
+            titleRect.anchorMin = new Vector2(0f, 1f);
+            titleRect.anchorMax = Vector2.one;
+            titleRect.offsetMin = new Vector2(ControlsPadding, -(ControlsPadding + ControlsTitleHeight));
+            titleRect.offsetMax = new Vector2(-ControlsPadding, -ControlsPadding);
+
+            var table = new GameObject("Table", typeof(RectTransform)) { layer = EditorUI.UILayer };
+            table.transform.SetParent(box.transform, false);
+            var tableRect = (RectTransform)table.transform;
+            EditorUI.Stretch(tableRect);
+            tableRect.offsetMin = new Vector2(ControlsPadding, ControlsPadding + ControlsNoteHeight);
+            tableRect.offsetMax = new Vector2(-ControlsPadding, -(ControlsPadding + ControlsTitleHeight));
+            ControlsTable.BuildCompact(tableRect, CompactColumns, ControlsFontSize);
+
+            Text note = EditorUI.CreateText("GamepadNote", box.transform, ControlsTable.GamepadNote, ControlsNoteFontSize,
+                Color.white);
+            note.alignment = TextAnchor.LowerLeft;
+            RectTransform noteRect = note.rectTransform;
+            noteRect.anchorMin = Vector2.zero;
+            noteRect.anchorMax = new Vector2(1f, 0f);
+            noteRect.offsetMin = new Vector2(ControlsPadding, ControlsPadding);
+            noteRect.offsetMax = new Vector2(-ControlsPadding, ControlsPadding + ControlsNoteHeight);
         }
 
         /// <summary>

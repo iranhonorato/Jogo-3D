@@ -56,11 +56,11 @@ namespace Guaxinim.Core
 
         [SerializeField] private TutorialTip[] _tips =
         {
-            new TutorialTip("WASD anda em silêncio", TipTrigger.AfterSeconds, 1f),
-            new TutorialTip("Shift corre, mas faz barulho", TipTrigger.AfterSeconds, 7f),
-            new TutorialTip("E pega os itens da lista", TipTrigger.NearPickup),
+            new TutorialTip("WASD ou analógico: anda em silêncio", TipTrigger.AfterSeconds, 1f),
+            new TutorialTip("Shift ou RT: corre, mas faz barulho", TipTrigger.AfterSeconds, 7f),
+            new TutorialTip("E ou A: pega os itens da lista", TipTrigger.NearPickup),
             new TutorialTip("Leve os itens até a toca", TipTrigger.FirstPickup),
-            new TutorialTip("Lixeiras escondem você (E)", TipTrigger.NearHidingSpot),
+            new TutorialTip("Lixeiras escondem você (E ou A)", TipTrigger.NearHidingSpot),
         };
 
         public float DisplaySeconds => _displaySeconds;

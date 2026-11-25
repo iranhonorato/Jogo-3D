@@ -8,9 +8,10 @@ namespace Guaxinim.EditorTools
 {
     /// <summary>
     /// Peças de uGUI para os montadores de tela (HUD, pausa, resultado, menu e mapa): canvas, texto, botão e painel,
-    /// no mesmo estilo. Duas fontes de licença livre (OFL): Lilita One nos títulos e botões, e Sniglet ExtraBold no
-    /// resto (arredondada e legível pequena). As cores dos botões vêm do <see cref="UITheme"/>. Tudo é criado por
-    /// código para a cena ser reproduzível.
+    /// no mesmo estilo. Duas fontes de licença livre (OFL): Lilita One nos títulos e botões, e Nunito ExtraBold no
+    /// resto (arredondada, limpa e legível mesmo pequena). Todo texto avulso ganha contorno escuro e sombra, para ser
+    /// lido sobre as ilustrações e sobre a fase 3D. As cores dos botões vêm do <see cref="UITheme"/>. Tudo é criado
+    /// por código para a cena ser reproduzível.
     /// </summary>
     internal static class EditorUI
     {
@@ -20,7 +21,13 @@ namespace Guaxinim.EditorTools
 
         private const string ThemePath = "Assets/_Project/Data/UI/UITheme.asset";
         private const string TitleFontPath = "Assets/_Project/Art/Fonts/LilitaOne-Regular.ttf";
-        private const string BodyFontPath = "Assets/_Project/Art/Fonts/Sniglet-ExtraBold.ttf";
+        private const string BodyFontPath = "Assets/_Project/Art/Fonts/Nunito-ExtraBold.ttf";
+
+        // Contorno proporcional à letra: fino nos textos pequenos, grosso nos títulos (unidades da tela de 1080p).
+        private const float OutlinePerFontSize = 0.08f;
+        private const float MinOutlineWidth = 2f;
+        private const float MaxOutlineWidth = 6f;
+        private const float ShadowExtraDrop = 2f;
         private const string DataFolder = "Assets/_Project/Data/UI";
         private const string BuiltinFontName = "LegacyRuntime.ttf";
         private const int ArrowFontSize = 36;
@@ -32,8 +39,8 @@ namespace Guaxinim.EditorTools
         public static readonly Color PanelColor = new Color(0.05f, 0.03f, 0.1f, 0.85f);
 
         private static readonly Vector2 ReferenceResolution = new Vector2(1920f, 1080f);
-        private static readonly Color OutlineColor = new Color(0.1f, 0.05f, 0.1f);
-        private static readonly Vector2 OutlineDistance = new Vector2(4f, -4f);
+        private static readonly Color OutlineColor = new Color(0.06f, 0.03f, 0.08f, 0.95f);
+        private static readonly Color ShadowColor = new Color(0f, 0f, 0f, 0.55f);
 
         /// <summary>O tema das telas. Carregue dentro da cena nova: o NewScene descarrega os assets sem uso.</summary>
         public static UITheme LoadTheme()
@@ -114,7 +121,31 @@ namespace Guaxinim.EditorTools
             panel.GetComponent<Image>().color = color;
         }
 
+        /// <summary>Texto avulso (HUD, títulos, painéis), com contorno e sombra para ser lido sobre qualquer fundo.</summary>
         public static Text CreateText(string name, Transform parent, string content, int fontSize, Color color)
+        {
+            Text text = CreateLabel(name, parent, content, fontSize, color);
+            AddReadability(text);
+            return text;
+        }
+
+        /// <summary>
+        /// Contorno escuro (proporcional ao tamanho da letra) e sombra caindo para baixo. Os rótulos dos botões não
+        /// usam: já ficam sobre um fundo sólido.
+        /// </summary>
+        private static void AddReadability(Text text)
+        {
+            float width = Mathf.Clamp(text.fontSize * OutlinePerFontSize, MinOutlineWidth, MaxOutlineWidth);
+            var shadow = text.gameObject.AddComponent<Shadow>();
+            shadow.effectColor = ShadowColor;
+            shadow.effectDistance = new Vector2(0f, -(width + ShadowExtraDrop));
+            var outline = text.gameObject.AddComponent<Outline>();
+            outline.effectColor = OutlineColor;
+            outline.effectDistance = new Vector2(width, -width);
+        }
+
+        /// <summary>Texto sem efeitos, para os rótulos dos botões.</summary>
+        private static Text CreateLabel(string name, Transform parent, string content, int fontSize, Color color)
         {
             var textObject = new GameObject(name, typeof(RectTransform)) { layer = UILayer };
             textObject.transform.SetParent(parent, false);
@@ -122,7 +153,7 @@ namespace Guaxinim.EditorTools
             text.text = content;
             text.font = LoadFont(BodyFontPath);
             text.fontSize = fontSize;
-            text.fontStyle = FontStyle.Normal; // a Sniglet ExtraBold já é pesada
+            text.fontStyle = FontStyle.Normal; // a Nunito ExtraBold já é pesada: o negrito falso só borra
             text.alignment = TextAnchor.MiddleCenter;
             text.color = color;
             text.raycastTarget = false;
@@ -155,7 +186,7 @@ namespace Guaxinim.EditorTools
             outline.effectColor = theme.NormalOutline;
             outline.effectDistance = new Vector2(theme.ThinOutline, -theme.ThinOutline);
 
-            Text text = CreateText("Label", buttonObject.transform, label, ButtonFontSize,
+            Text text = CreateLabel("Label", buttonObject.transform, label, ButtonFontSize,
                 isCard ? theme.SelectedText : theme.NormalText);
             if (!isCard)
             {
@@ -175,13 +206,6 @@ namespace Guaxinim.EditorTools
             eventSystem.transform.SetParent(parent, false);
             eventSystem.AddComponent<EventSystem>();
             eventSystem.AddComponent<InputSystemUIInputModule>(); // só o Input System novo (GDD §0)
-        }
-
-        public static void AddOutline(GameObject target)
-        {
-            var outline = target.AddComponent<Outline>();
-            outline.effectColor = OutlineColor;
-            outline.effectDistance = OutlineDistance;
         }
 
         public static void Stretch(RectTransform rect)
@@ -229,7 +253,7 @@ namespace Guaxinim.EditorTools
         /// <summary>Seta ao lado esquerdo do botão, escondida até ele ser selecionado.</summary>
         private static Text CreateArrow(Transform button, UITheme theme)
         {
-            Text arrow = CreateText("Arrow", button, theme.SelectionArrow, ArrowFontSize, theme.SelectedText);
+            Text arrow = CreateLabel("Arrow", button, theme.SelectionArrow, ArrowFontSize, theme.SelectedText);
             arrow.font = Resources.GetBuiltinResource<Font>(BuiltinFontName); // as fontes do jogo não têm o ►
             var rect = (RectTransform)arrow.transform;
             rect.anchorMin = new Vector2(0f, 0.5f);

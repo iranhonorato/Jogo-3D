@@ -23,7 +23,7 @@ namespace Guaxinim.EditorTools
         private const int TitleFontSize = 90;
         private const int BriefingBodyFontSize = 40;
         private const int LevelNameFontSize = 38;
-        private const int LevelStatusFontSize = 30;
+        private const int LevelStatusFontSize = 32;
         private const int StarCount = 3;
         private const float StarSize = 34f;
         private const float StarSpacing = 64f;
@@ -53,7 +53,6 @@ namespace Guaxinim.EditorTools
             EditorUI.SetPanelOpacity(mapPanel, 0f); // o mapa ilustrado aparece inteiro
             Text title = EditorUI.CreateTitle("Title", mapPanel.transform, MapTitle, TitleFontSize, EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.88f), new Vector2(1400f, 140f));
-            EditorUI.AddOutline(title.gameObject);
 
             var levelButtons = new Object[catalog.Levels.Count];
             for (int i = 0; i < levelButtons.Length; i++)
@@ -74,7 +73,6 @@ namespace Guaxinim.EditorTools
             Text briefingTitle = EditorUI.CreateTitle("Title", briefingPanel.transform, string.Empty, TitleFontSize,
                 EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)briefingTitle.transform, new Vector2(0.5f, 0.84f), new Vector2(1500f, 140f));
-            EditorUI.AddOutline(briefingTitle.gameObject);
             Text briefingBody = EditorUI.CreateText("Body", briefingPanel.transform, string.Empty, BriefingBodyFontSize,
                 Color.white);
             briefingBody.fontStyle = FontStyle.Normal;

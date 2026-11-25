@@ -17,21 +17,21 @@ namespace Guaxinim.EditorTools
     {
         private const int HudSortingOrder = 1;
         private const int PromptSortingOrder = 2;
-        private const int HudFontSize = 32;
+        private const int HudFontSize = 36;
         private const int TimerFontSize = 48;
-        private const int PromptFontSize = 30;
-        private const int TipFontSize = 36;
-        private const float BarBlockHeight = 80f;
-        private const float BarLabelHeight = 40f;
+        private const int PromptFontSize = 34;
+        private const int TipFontSize = 38;
+        private const float BarBlockHeight = 88f;
+        private const float BarLabelHeight = 44f;
         private const float TipTopMargin = 24f;
-        private const int DenLabelFontSize = 26;
+        private const int DenLabelFontSize = 30;
         private const string DenArrowSpritePath = "Assets/_Project/Art/UI/Arrow_Den.png";
 
         private static readonly Vector2 BarSize = new Vector2(380f, 22f);
-        private static readonly Vector2 PromptSize = new Vector2(230f, 58f);
-        private static readonly Vector2 TipSize = new Vector2(1100f, 84f);
+        private static readonly Vector2 PromptSize = new Vector2(290f, 64f);
+        private static readonly Vector2 TipSize = new Vector2(1200f, 92f);
         private static readonly Vector2 DenArrowSize = new Vector2(76f, 76f);
-        private static readonly Vector2 DenLabelSize = new Vector2(140f, 40f);
+        private static readonly Vector2 DenLabelSize = new Vector2(160f, 46f);
         private static readonly Color HudPanelColor = new Color(0.05f, 0.03f, 0.1f, 0.6f);
         private static readonly Color PillColor = new Color(0.05f, 0.03f, 0.1f, 0.82f);
 
@@ -40,7 +40,8 @@ namespace Guaxinim.EditorTools
             GameObject canvas = EditorUI.CreateCanvas("HudCanvas", parent, HudSortingOrder);
 
             Text list = CreateHudText("ShoppingList", canvas.transform, new Vector2(0f, 1f), new Vector2(30f, -30f),
-                new Vector2(560f, 320f), TextAnchor.UpperLeft);
+                new Vector2(620f, 480f), TextAnchor.UpperLeft);
+            list.verticalOverflow = VerticalWrapMode.Overflow; // lista longa (Tab) cresce para baixo sem cortar linhas
             var listUI = canvas.AddComponent<ShoppingListUI>();
             EditorAssets.SetReference(listUI, "_shoppingList", shoppingList);
             EditorAssets.SetReference(listUI, "_text", list);
@@ -53,7 +54,7 @@ namespace Guaxinim.EditorTools
             EditorAssets.SetReference(timerUI, "_text", timer);
 
             Text effects = CreateHudText("Effects", canvas.transform, new Vector2(1f, 0f), new Vector2(-30f, 30f),
-                new Vector2(380f, 140f), TextAnchor.LowerRight);
+                new Vector2(440f, 160f), TextAnchor.LowerRight);
             EditorAssets.SetReference(canvas.AddComponent<EffectsUI>(), "_text", effects);
 
             AddLoadBars(canvas);
@@ -125,7 +126,6 @@ namespace Guaxinim.EditorTools
             var labelRect = (RectTransform)label.transform;
             labelRect.sizeDelta = DenLabelSize;
             labelRect.anchoredPosition = new Vector2(0f, -DenArrowSize.y * 0.75f);
-            EditorUI.AddOutline(label.gameObject);
 
             var denUI = canvas.AddComponent<DenIndicatorUI>();
             EditorAssets.SetReference(denUI, "_levelFlow", flow);
@@ -182,7 +182,6 @@ namespace Guaxinim.EditorTools
             text.alignment = alignment;
             text.fontStyle = FontStyle.Normal;
             EditorUI.PinToCorner((RectTransform)text.transform, corner, offset, size);
-            EditorUI.AddOutline(text.gameObject);
             return text;
         }
     }

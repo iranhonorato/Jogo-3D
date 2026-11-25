@@ -29,10 +29,8 @@ namespace Guaxinim.EditorTools
             EditorUI.SetPanelOpacity(panel, VeilOpacity);
             Text title = EditorUI.CreateTitle("Title", panel.transform, EndingTitle, TitleFontSize, EditorUI.LightTextColor);
             EditorUI.Place((RectTransform)title.transform, new Vector2(0.5f, 0.8f), new Vector2(1700f, 170f));
-            EditorUI.AddOutline(title.gameObject);
             Text summary = EditorUI.CreateText("Summary", panel.transform, string.Empty, SummaryFontSize, Color.white);
             EditorUI.Place((RectTransform)summary.transform, new Vector2(0.5f, 0.62f), new Vector2(1200f, 200f));
-            EditorUI.AddOutline(summary.gameObject);
 
             Button restart = EditorUI.CreateButton("RestartButton", panel.transform, "Recomeçar", new Vector2(0.5f, 0.4f));
             Button mainMenu = EditorUI.CreateButton("MainMenuButton", panel.transform, "Menu inicial", new Vector2(0.5f, 0.27f));

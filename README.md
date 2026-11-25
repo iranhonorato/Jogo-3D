@@ -9,15 +9,18 @@ Projeto 3D Hiper-Casual — Jogos Digitais, Insper 2026.2.
 
 ## Controles
 
-| Ação | Teclado |
-| --- | --- |
-| Mover (silencioso) | WASD |
-| Correr (faz barulho) | Shift |
-| Pegar item / entrar e sair da lixeira | E |
-| Largar o último item | Q |
-| Assobiar (distração) | F |
-| Ver a lista inteira | Tab (segurar) |
-| Pausar | Esc |
+| Ação | Teclado | Controle |
+| --- | --- | --- |
+| Mover (silencioso) | WASD ou setas | Analógico esquerdo ou direcional |
+| Correr (faz barulho) | Shift | RT |
+| Pegar item / entrar e sair da lixeira | E | A |
+| Largar o último item | Q | B |
+| Assobiar (distração) | F | Y |
+| Ver a lista inteira | Tab (segurar) | Select (segurar) |
+| Pausar | Esc | Start |
+| Nos menus | Setas e Enter | Direcional e A |
+
+Os botões do controle seguem o padrão Xbox. No PlayStation: A = X, B = Bola, Y = Triângulo e RT = R2.
 
 ## Requisitos
 
@@ -118,7 +121,7 @@ Todo asset de terceiros ou gerado por IA entra aqui, com fonte e licença (GDD, 
 | Modelos e texturas em `Art/Models/` e `Art/Textures/` (personagens, câmera de segurança, kit modular e itens) | Gerados por scripts Python do Blender escritos com o Claude (Anthropic) | `Tools/Blender/` | Feitos para este projeto |
 | Ilustração de fundo do menu principal (`Art/UI/Background_MainMenu.jpg`) | Gerada por IA (ferramenta e prompt a confirmar) | _a preencher_ | _a preencher_ |
 | Fonte do título do jogo (`Art/Fonts/LilitaOne-Regular.ttf`) | Juan Montoreano | [Lilita One no Google Fonts](https://fonts.google.com/specimen/Lilita+One), arquivo do repositório [google/fonts](https://github.com/google/fonts/tree/main/ofl/lilitaone) | SIL Open Font License 1.1 (cópia em `Art/Fonts/OFL.txt`) |
-| Fonte dos textos do jogo (`Art/Fonts/Sniglet-ExtraBold.ttf`) | Haley Fiege, Brenda Gallo e Pablo Impallari | [Sniglet no Google Fonts](https://fonts.google.com/specimen/Sniglet), arquivo do repositório [google/fonts](https://github.com/google/fonts/tree/main/ofl/sniglet) | SIL Open Font License 1.1 (cópia em `Art/Fonts/OFL_Sniglet.txt`) |
+| Fonte dos textos do jogo (`Art/Fonts/Nunito-ExtraBold.ttf`) | The Nunito Project Authors (Vernon Adams e Jacques Le Bailly) | [Nunito no Google Fonts](https://fonts.google.com/specimen/Nunito), arquivo variável do repositório [google/fonts](https://github.com/google/fonts/tree/main/ofl/nunito), instanciado no peso 800 (ExtraBold) com o fontTools | SIL Open Font License 1.1 (cópia em `Art/Fonts/OFL_Nunito.txt`) |
 | Fundo do fim de jogo (`Art/UI/Background_Ending.jpg`) | Derivado da ilustração do menu (desfocada, dourada e com brilhos, por script) | `Tools/Art/make_ui_backgrounds.py` | Mesma origem e licença da ilustração do menu |
 | Mapa da cidade (`Art/UI/Background_CityMap.jpg`) | Desenhado por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_ui_backgrounds.py` | Feito para este projeto |
 | Ícones da HUD e do mapa (`Art/UI/Arrow_Den.png`, `Dot.png`, `Icon_Raccoon.png`) | Desenhados por script com o Pillow, escrito com o Claude (Anthropic) | `Tools/Art/make_ui_icons.py` | Feitos para este projeto |

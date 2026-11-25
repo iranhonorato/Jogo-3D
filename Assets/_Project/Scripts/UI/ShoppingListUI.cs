@@ -13,7 +13,7 @@ namespace Guaxinim.UI
     public class ShoppingListUI : MonoBehaviour
     {
         private const string Title = "Lista de compras";
-        private const string TabHint = "(Tab: lista inteira)";
+        private const string TabHint = "(Tab ou Select: lista inteira)";
 
         [SerializeField] private ShoppingList _shoppingList;
 

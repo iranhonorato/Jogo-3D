@@ -27,6 +27,22 @@ namespace Guaxinim.EditorTools
             return asset;
         }
 
+        /// <summary>
+        /// Carrega ou cria o asset e o regrava com os valores iniciais do código. Para dados cujo texto vem do código
+        /// (dicas, por exemplo): uma mudança no código chega ao jogo ao regerar. Ajustes no Inspector se perdem.
+        /// </summary>
+        public static T LoadOrCreateFromCode<T>(string path) where T : ScriptableObject
+        {
+            T asset = LoadOrCreate<T>(path);
+            string assetName = asset.name; // o CopySerialized também copiaria o nome vazio da instância nova
+            T defaults = ScriptableObject.CreateInstance<T>();
+            EditorUtility.CopySerialized(defaults, asset);
+            Object.DestroyImmediate(defaults);
+            asset.name = assetName;
+            EditorUtility.SetDirty(asset);
+            return asset;
+        }
+
         public static Material LoadOrCreateLitMaterial(string path, Color color)
         {
             Material material = LoadOrCreateMaterial(path, LitShaderName);

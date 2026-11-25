@@ -7,9 +7,9 @@ using UnityEngine.UI;
 namespace Guaxinim.UI
 {
     /// <summary>
-    /// Indicação de interação (GDD §3.2 e §13): um balão "[E] Pegar", "[E] Esconder" ou "[E] Sair" sobre o objeto
-    /// que o E usaria agora (o mais próximo escolhido pelo <see cref="RaccoonInteractor"/>). Some quando não há
-    /// nada ao alcance e quando a fase termina.
+    /// Indicação de interação (GDD §3.2 e §13): um balão "[E/A] Pegar", "[E/A] Esconder" ou "[E/A] Sair" sobre o
+    /// objeto que o E (ou o A do controle) usaria agora, o mais próximo escolhido pelo <see cref="RaccoonInteractor"/>.
+    /// Some quando não há nada ao alcance e quando a fase termina.
     /// </summary>
     [DefaultExecutionOrder(AfterCameraExecutionOrder)]
     public class InteractionPromptUI : MonoBehaviour
@@ -17,7 +17,7 @@ namespace Guaxinim.UI
         // A câmera do Cinemachine se move no LateUpdate; o balão precisa ler a posição já atualizada, senão fica
         // um quadro atrasado e treme em relação ao objeto.
         private const int AfterCameraExecutionOrder = 200;
-        private const string KeyHint = "[E] ";
+        private const string KeyHint = "[E/A] "; // teclado / controle
 
         [SerializeField] private RaccoonInteractor _interactor;
         [SerializeField] private LevelFlow _levelFlow;
