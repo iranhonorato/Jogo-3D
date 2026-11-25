@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Guaxinim.Runtime::Guaxinim.UI.CaughtTipsData
   _tips:
   - "Andar n\xE3o faz barulho: corra s\xF3 quando precisar."
-  - "Largue itens (Q) para fugir mais r\xE1pido."
+  - "Largue itens (Q ou B) para fugir mais r\xE1pido."
   - "Lixeiras escondem, mas n\xE3o com carga volumosa."
   - "Sem carga, voc\xEA corre mais r\xE1pido que o seguran\xE7a."
   - "Item fr\xE1gil quebra se voc\xEA correr com ele."
-  - "Assobie (F) para atrair o seguran\xE7a para longe."
+  - "Assobie (F ou Y) para atrair o seguran\xE7a para longe."
